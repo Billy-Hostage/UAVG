@@ -18,7 +18,8 @@ public class UAVGEditor : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
                 "UAVGEditor/Private",
-				"UAVGEditor/Private/AssetTypeActions"
+				"UAVGEditor/Private/AssetTypeActions",
+                "UAVGEditor/Private/UAVGScriptAssetEditor"
 				// ... add other private include paths required here ...
 			}
 			);
