@@ -17,7 +17,7 @@
 		{
 			"Name": "UAVG",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PreDefault"
 		},
 		{
 			"Name": "UAVGEditor",

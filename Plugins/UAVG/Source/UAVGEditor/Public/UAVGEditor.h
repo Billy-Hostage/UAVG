@@ -13,7 +13,7 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 private:
-	void RegisterAssetTypeActions(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action);
+	void RegisterAssetTypeActions(class IAssetTools& AssetTools, TSharedRef<class IAssetTypeActions> Action);
 
 	TArray<TSharedPtr<IAssetTypeActions>> CreatedAssetTypeActions;
 };

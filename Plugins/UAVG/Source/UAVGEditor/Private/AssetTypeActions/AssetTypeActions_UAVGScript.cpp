@@ -2,6 +2,7 @@
 
 #include "AssetTypeActions_UAVGScript.h"
 #include "UAVGScript.h"
+#include "AssetEditor_UAVGScript.h"
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions_UAVGScript"
 
@@ -24,6 +25,24 @@ FColor FAssetTypeActions_UAVGScript::GetTypeColor() const
 UClass* FAssetTypeActions_UAVGScript::GetSupportedClass() const
 {
 	return UUAVGScript::StaticClass();
+}
+
+void FAssetTypeActions_UAVGScript::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor /*= TSharedPtr<IToolkitHost>()*/)
+{
+	//const EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
+	//UUAVGScript* ScriptToEditPtr = nullptr;
+
+	//for (auto ObjectItr = InObjects.CreateConstIterator(); ObjectItr; ++ObjectItr)
+	//{
+	//	ScriptToEditPtr = CastChecked<UUAVGScript>(*ObjectItr);
+	//	if (ScriptToEditPtr && ScriptToEditPtr->IsValidLowLevel())
+	//	{
+	//		TSharedRef<FAssetEditor_UAVGScrpit> EditorNew(new FAssetEditor_UAVGScrpit());
+	//		EditorNew->InitAssetEditor(Mode, EditWithinLevelEditor, ScriptToEditPtr);
+	//	}
+	//}
+
+	FAssetTypeActions_Base::OpenAssetEditor(InObjects, EditWithinLevelEditor);
 }
 
 uint32 FAssetTypeActions_UAVGScript::GetCategories()

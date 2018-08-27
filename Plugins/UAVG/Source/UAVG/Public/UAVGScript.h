@@ -12,6 +12,10 @@ class UAVG_API UUAVGScript : public UObject
 public:
 	UUAVGScript();
 	
-	UPROPERTY(EditDefaultsOnly, Category = "UAVGScript")
-	FString Name;
+#if WITH_EDITORONLY_DATA
+
+	UPROPERTY()
+	class UEdGraph* MyEdGraph;
+
+#endif
 };
