@@ -38,9 +38,11 @@ void FAssetTypeActions_UAVGScript::OpenAssetEditor(const TArray<UObject*>& InObj
 	//	if (ScriptToEditPtr && ScriptToEditPtr->IsValidLowLevel())
 	//	{
 	//		TSharedRef<FAssetEditor_UAVGScrpit> EditorNew(new FAssetEditor_UAVGScrpit());
-	//		EditorNew->InitAssetEditor(Mode, EditWithinLevelEditor, ScriptToEditPtr);
+	//		EditorNew->InitUAVGScriptAssetEditor(Mode, EditWithinLevelEditor, ScriptToEditPtr);
 	//	}
 	//}
+
+	//TODO
 
 	FAssetTypeActions_Base::OpenAssetEditor(InObjects, EditWithinLevelEditor);
 }

@@ -19,7 +19,8 @@ public class UAVGEditor : ModuleRules
 			new string[] {
                 "UAVGEditor/Private",
 				"UAVGEditor/Private/AssetTypeActions",
-                "UAVGEditor/Private/UAVGScriptAssetEditor"
+                "UAVGEditor/Private/UAVGScriptAssetEditor",
+				"UAVGEditor/Private/Factories",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -43,7 +44,8 @@ public class UAVGEditor : ModuleRules
 				"Slate",
 				"SlateCore",
                 "UAVG",
-                "AssetTools"
+                "AssetTools",
+                "GraphEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
