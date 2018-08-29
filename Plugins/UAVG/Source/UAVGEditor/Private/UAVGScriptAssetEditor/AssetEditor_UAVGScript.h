@@ -8,7 +8,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGScriptAssetEditor, Log, All);
 
-class FAssetEditor_UAVGScrpit : public IUAVGScriptEditor, public FEditorUndoClient
+class FAssetEditor_UAVGScrpit : public IUAVGScriptEditor, public FEditorUndoClient, public FGCObject
 {
 public:
 	FAssetEditor_UAVGScrpit();
@@ -25,6 +25,9 @@ public:
 	{
 		PostUndo(bSuccess);
 	}
+
+	/** FGCObject interface */
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 private:
 	class UUAVGScript* EditingScript;
 
@@ -39,10 +42,19 @@ private:
 	/** Creates all internal widgets for the tabs to point at */
 	void CreateInternalWidgets();
 
+	TSharedRef<class SDockTab> SpawnTab_GraphCanvas(const FSpawnTabArgs& Args);
+	TSharedRef<class SDockTab> SpawnTab_Properties(const FSpawnTabArgs& Args);
+
 	/** Create new graph editor widget */
-	//TSharedRef<SGraphEditor> CreateGraphEditorWidget();
+	TSharedRef<class SGraphEditor> CreateGraphEditorWidget();
 
 	/**	The tab ids for all the tabs used */
 	static const FName GraphCanvasTabId;
 	static const FName PropertiesTabId;
+
+	/** Graph Editor */
+	TSharedPtr<class SGraphEditor> GraphEditor;
+
+	/** Property View */
+	TSharedPtr<class IDetailsView> DetailsView;
 };

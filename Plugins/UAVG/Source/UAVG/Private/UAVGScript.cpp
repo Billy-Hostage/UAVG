@@ -4,5 +4,5 @@
 
 UUAVGScript::UUAVGScript()
 {
-	
+	ScriptName = FName("UAVGScript");
 }

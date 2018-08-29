@@ -6,9 +6,14 @@
 #include "AssetGraphSchema_UAVGScript.h"
 #include "UAVGScript.h"
 
+#include "PropertyEditorModule.h"
+#include "IDetailsView.h"
+
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "GenericCommands.h"
 #include "GraphEditorActions.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "EditorStyleSet.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
 DEFINE_LOG_CATEGORY(LogUAVGScriptAssetEditor);
@@ -34,30 +39,68 @@ void FAssetEditor_UAVGScrpit::RegisterTabSpawners(const TSharedRef<class FTabMan
 
 	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
 
-	//TODO Register tabs here
+	InTabManager->RegisterTabSpawner(GraphCanvasTabId, FOnSpawnTab::CreateSP(this, &FAssetEditor_UAVGScrpit::SpawnTab_GraphCanvas))
+		.SetDisplayName(LOCTEXT("GraphCanvasTab", "Graph"))
+		.SetGroup(WorkspaceMenuCategoryRef)
+		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "GraphEditor.EventGraph_16x"));
+
+	InTabManager->RegisterTabSpawner(PropertiesTabId, FOnSpawnTab::CreateSP(this, &FAssetEditor_UAVGScrpit::SpawnTab_Properties))
+		.SetDisplayName(LOCTEXT("PropertiesTab", "Details"))
+		.SetGroup(WorkspaceMenuCategoryRef)
+		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details")); //Why No Icon?
 }
 
 void FAssetEditor_UAVGScrpit::UnregisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
 	FAssetEditorToolkit::UnregisterTabSpawners(InTabManager);
 
-	//TODO Unregister tabs here
+	InTabManager->UnregisterTabSpawner(GraphCanvasTabId);
+	InTabManager->UnregisterTabSpawner(PropertiesTabId);
 }
 
 void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UUAVGScript* InScrpit)
 {
 	EditingScript = InScrpit;
 
-	//EditingScript->SetFlags(RF_Transactional);
-	//GEditor->RegisterForUndo(this);
+	EditingScript->SetFlags(RF_Transactional);
+	GEditor->RegisterForUndo(this);
+	//TODO Map Undo Redo Events
 
 	CreateEditorGraph();
 
 	CreateInternalWidgets();
 	
-	//TODO Slate Style
+	TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_UAVGScriptEditor_Layout_v1")->AddArea
+	(
+		FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+		->Split
+		(
+			FTabManager::NewStack()
+			->SetSizeCoefficient(0.1f)
+			->SetHideTabWell(true)
+			->AddTab(GetToolbarTabId(), ETabState::OpenedTab)
+		)
+		->Split
+		(
+			FTabManager::NewSplitter()
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(0.2f)
+				->AddTab(PropertiesTabId, ETabState::OpenedTab)
+			)
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(0.8f)
+				->AddTab(GraphCanvasTabId, ETabState::OpenedTab)
+			)
+		)
+	);
 
-	//FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, UAVGScriptEditorAppName, TODOLayout, true, true, InScrpit, false);
+	const bool bCreateDefaultStandaloneMenu = true;
+	const bool bCreateDefaultToolbar = true;
+	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, UAVGScriptEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, InScrpit, false);
 }
 
 void FAssetEditor_UAVGScrpit::PostUndo(bool bSuccess)
@@ -65,11 +108,17 @@ void FAssetEditor_UAVGScrpit::PostUndo(bool bSuccess)
 	//TODO Rearrange and save
 }
 
+void FAssetEditor_UAVGScrpit::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	Collector.AddReferencedObject(EditingScript);
+}
+
 void FAssetEditor_UAVGScrpit::CreateEditorGraph()
 {
 	if (EditingScript->MyEdGraph == nullptr)
 	{
 		EditingScript->MyEdGraph = CastChecked<UEdGraph_UAVGScript>(FBlueprintEditorUtils::CreateNewGraph(EditingScript, NAME_None, UEdGraph_UAVGScript::StaticClass(), UAssetGraphSchema_UAVGScript::StaticClass()));
+		
 	}
 }
 
@@ -95,12 +144,50 @@ FString FAssetEditor_UAVGScrpit::GetWorldCentricTabPrefix() const
 
 void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 {
-	//TODO SGraphEditor
+	GraphEditor = CreateGraphEditorWidget();
+
+	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::ObjectsUseNameArea, false);
+	DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
+	DetailsView->SetObject(EditingScript);
 }
 
-//TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
-//{
-//	
-//}
+TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
+{
+	FGraphAppearanceInfo AppearanceInfo;
+	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_UAVGScript", "UAVG SCRIPT");
+
+	return SNew(SGraphEditor)
+		.IsEditable(true)
+		.Appearance(AppearanceInfo)
+		.GraphToEdit(EditingScript->MyEdGraph)
+		.ShowGraphStateOverlay(false);
+}
+
+TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_GraphCanvas(const FSpawnTabArgs& Args)
+{
+	check(Args.GetTabId() == GraphCanvasTabId);
+
+	TSharedRef<SDockTab> SpawnedTab = SNew(SDockTab)
+		.Label(LOCTEXT("UAVGScriptEditorGraphCanvasTitle", "Graph"))
+		[
+			GraphEditor.ToSharedRef()
+		];
+
+	return SpawnedTab;
+}
+TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_Properties(const FSpawnTabArgs& Args)
+{
+	check(Args.GetTabId() == PropertiesTabId);
+
+	TSharedRef<SDockTab> SpawnedTab = SNew(SDockTab)
+		.Icon(FEditorStyle::GetBrush("UAVGScriptEditor.Tabs.Properties"))
+		.Label(LOCTEXT("UAVGScriptEditorPropertiesTitle", "Details"))
+		[
+			DetailsView.ToSharedRef()
+		];
+
+	return SpawnedTab;
+}
 
 #undef LOCTEXT_NAMESPACE

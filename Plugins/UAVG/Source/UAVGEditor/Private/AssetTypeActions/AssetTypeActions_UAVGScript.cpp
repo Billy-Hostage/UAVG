@@ -29,22 +29,18 @@ UClass* FAssetTypeActions_UAVGScript::GetSupportedClass() const
 
 void FAssetTypeActions_UAVGScript::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor /*= TSharedPtr<IToolkitHost>()*/)
 {
-	//const EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
-	//UUAVGScript* ScriptToEditPtr = nullptr;
+	const EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
+	UUAVGScript* ScriptToEditPtr = nullptr;
 
-	//for (auto ObjectItr = InObjects.CreateConstIterator(); ObjectItr; ++ObjectItr)
-	//{
-	//	ScriptToEditPtr = CastChecked<UUAVGScript>(*ObjectItr);
-	//	if (ScriptToEditPtr && ScriptToEditPtr->IsValidLowLevel())
-	//	{
-	//		TSharedRef<FAssetEditor_UAVGScrpit> EditorNew(new FAssetEditor_UAVGScrpit());
-	//		EditorNew->InitUAVGScriptAssetEditor(Mode, EditWithinLevelEditor, ScriptToEditPtr);
-	//	}
-	//}
-
-	//TODO
-
-	FAssetTypeActions_Base::OpenAssetEditor(InObjects, EditWithinLevelEditor);
+	for (auto ObjectItr = InObjects.CreateConstIterator(); ObjectItr; ++ObjectItr)
+	{
+		ScriptToEditPtr = CastChecked<UUAVGScript>(*ObjectItr);
+		if (ScriptToEditPtr && ScriptToEditPtr->IsValidLowLevel())
+		{
+			TSharedRef<FAssetEditor_UAVGScrpit> EditorNew(new FAssetEditor_UAVGScrpit());
+			EditorNew->InitUAVGScriptAssetEditor(Mode, EditWithinLevelEditor, ScriptToEditPtr);
+		}
+	}
 }
 
 uint32 FAssetTypeActions_UAVGScript::GetCategories()

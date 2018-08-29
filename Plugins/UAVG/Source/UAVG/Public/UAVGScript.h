@@ -12,6 +12,9 @@ class UAVG_API UUAVGScript : public UObject
 public:
 	UUAVGScript();
 	
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ShortTooltip = "Name of Script", ToolTip = "The Name of This UAVG Script"))
+	FName ScriptName;
+
 #if WITH_EDITORONLY_DATA
 
 	UPROPERTY()

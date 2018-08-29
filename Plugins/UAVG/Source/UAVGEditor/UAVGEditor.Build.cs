@@ -45,7 +45,8 @@ public class UAVGEditor : ModuleRules
 				"SlateCore",
                 "UAVG",
                 "AssetTools",
-                "GraphEditor"
+                "GraphEditor",
+                "EditorStyle",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
