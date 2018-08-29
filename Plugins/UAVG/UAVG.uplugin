@@ -1,18 +1,18 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
+	"VersionName": "0.1",
 	"FriendlyName": "UAVG",
 	"Description": "Not Description Yet.",
 	"Category": "Other",
 	"CreatedBy": "NTRHostage",
-	"CreatedByURL": "",
+	"CreatedByURL": "https://github.com/NTRHostage/UAVG",
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "UAVG",

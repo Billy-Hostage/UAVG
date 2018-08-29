@@ -4,7 +4,5 @@
 
 UUAVGScriptGraphNode::UUAVGScriptGraphNode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, ChildPin(NULL)
-	, ParentPin(NULL)
 {
 }

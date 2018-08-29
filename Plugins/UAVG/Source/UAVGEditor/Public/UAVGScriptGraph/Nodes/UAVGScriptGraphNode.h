@@ -12,8 +12,4 @@ class UUAVGScriptGraphNode : public UEdGraphNode
 	GENERATED_UCLASS_BODY()
 
 private:
-	/** Pin that connects to all children */
-	UEdGraphPin * ChildPin;
-	/** Pin that connects to its parent */
-	UEdGraphPin* ParentPin;
 };

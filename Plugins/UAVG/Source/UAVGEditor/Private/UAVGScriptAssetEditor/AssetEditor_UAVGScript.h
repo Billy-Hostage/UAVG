@@ -35,6 +35,7 @@ private:
 
 	/** IToolkit interface */
 	virtual FName GetToolkitFName() const override;
+	virtual FText GetToolkitName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
@@ -44,6 +45,7 @@ private:
 
 	TSharedRef<class SDockTab> SpawnTab_GraphCanvas(const FSpawnTabArgs& Args);
 	TSharedRef<class SDockTab> SpawnTab_Properties(const FSpawnTabArgs& Args);
+	TSharedRef<class SDockTab> SpawnTab_Palette(const FSpawnTabArgs& Args);
 
 	/** Create new graph editor widget */
 	TSharedRef<class SGraphEditor> CreateGraphEditorWidget();
@@ -51,10 +53,14 @@ private:
 	/**	The tab ids for all the tabs used */
 	static const FName GraphCanvasTabId;
 	static const FName PropertiesTabId;
+	static const FName PaletteTabId;
 
 	/** Graph Editor */
 	TSharedPtr<class SGraphEditor> GraphEditor;
 
 	/** Property View */
 	TSharedPtr<class IDetailsView> DetailsView;
+
+	/** Palette of Sound Node types */
+	TSharedPtr<class SUAVGScriptGraphPalette> Palette;
 };

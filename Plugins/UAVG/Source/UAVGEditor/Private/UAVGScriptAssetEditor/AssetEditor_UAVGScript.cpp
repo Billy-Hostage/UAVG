@@ -8,6 +8,7 @@
 
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
+#include "SUAVGScriptGraphPalette.h"
 
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "GenericCommands.h"
@@ -21,6 +22,7 @@ DEFINE_LOG_CATEGORY(LogUAVGScriptAssetEditor);
 const FName UAVGScriptEditorAppName = FName(TEXT("UAVGScriptEditorApp"));
 const FName FAssetEditor_UAVGScrpit::GraphCanvasTabId(TEXT("UAVGScriptEditor_GraphCanvas"));
 const FName FAssetEditor_UAVGScrpit::PropertiesTabId(TEXT("UAVGScriptEditor_Properties"));
+const FName FAssetEditor_UAVGScrpit::PaletteTabId(TEXT("UAVGScriptEditor_Palette"));
 
 FAssetEditor_UAVGScrpit::FAssetEditor_UAVGScrpit()
 {
@@ -47,7 +49,12 @@ void FAssetEditor_UAVGScrpit::RegisterTabSpawners(const TSharedRef<class FTabMan
 	InTabManager->RegisterTabSpawner(PropertiesTabId, FOnSpawnTab::CreateSP(this, &FAssetEditor_UAVGScrpit::SpawnTab_Properties))
 		.SetDisplayName(LOCTEXT("PropertiesTab", "Details"))
 		.SetGroup(WorkspaceMenuCategoryRef)
-		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details")); //Why No Icon?
+		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.Tabs.Details"));
+
+	InTabManager->RegisterTabSpawner(PaletteTabId, FOnSpawnTab::CreateSP(this, &FAssetEditor_UAVGScrpit::SpawnTab_Palette))
+		.SetDisplayName(LOCTEXT("PaletteTab", "Palette"))
+		.SetGroup(WorkspaceMenuCategoryRef)
+		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "Kismet.Tabs.Palette"));
 }
 
 void FAssetEditor_UAVGScrpit::UnregisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
@@ -70,7 +77,7 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 
 	CreateInternalWidgets();
 	
-	TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_UAVGScriptEditor_Layout_v1")->AddArea
+	TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_UAVGScriptEditor_Layout_v2")->AddArea
 	(
 		FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
 		->Split
@@ -94,6 +101,12 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 				FTabManager::NewStack()
 				->SetSizeCoefficient(0.8f)
 				->AddTab(GraphCanvasTabId, ETabState::OpenedTab)
+			)
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(0.2f)
+				->AddTab(PaletteTabId, ETabState::OpenedTab)
 			)
 		)
 	);
@@ -127,6 +140,16 @@ FName FAssetEditor_UAVGScrpit::GetToolkitFName() const
 	return FName("FUAVGScriptEditor");
 }
 
+FText FAssetEditor_UAVGScrpit::GetToolkitName() const
+{
+	const bool bDirtyState = EditingScript->GetOutermost()->IsDirty();
+
+	FFormatNamedArguments Args;
+	Args.Add(TEXT("UAVGScriptName"), FText::FromString(EditingScript->GetName()));
+	Args.Add(TEXT("DirtyState"), bDirtyState ? FText::FromString(TEXT("*")) : FText::GetEmpty());
+	return FText::Format(LOCTEXT("UAVGScriptToolkitName", "{UAVGScriptName}{DirtyState}"), Args);
+}
+
 FText FAssetEditor_UAVGScrpit::GetBaseToolkitName() const
 {
 	return LOCTEXT("UAVGScriptEditorAppLabel", "UAVG Script Editor");
@@ -150,6 +173,8 @@ void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::ObjectsUseNameArea, false);
 	DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 	DetailsView->SetObject(EditingScript);
+
+	Palette = SNew(SUAVGScriptGraphPalette);
 }
 
 TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
@@ -168,26 +193,33 @@ TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_GraphCanvas(const FSpawnT
 {
 	check(Args.GetTabId() == GraphCanvasTabId);
 
-	TSharedRef<SDockTab> SpawnedTab = SNew(SDockTab)
+	return SNew(SDockTab)
 		.Label(LOCTEXT("UAVGScriptEditorGraphCanvasTitle", "Graph"))
 		[
 			GraphEditor.ToSharedRef()
 		];
-
-	return SpawnedTab;
 }
 TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_Properties(const FSpawnTabArgs& Args)
 {
 	check(Args.GetTabId() == PropertiesTabId);
 
-	TSharedRef<SDockTab> SpawnedTab = SNew(SDockTab)
-		.Icon(FEditorStyle::GetBrush("UAVGScriptEditor.Tabs.Properties"))
+	return SNew(SDockTab)
+		.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
 		.Label(LOCTEXT("UAVGScriptEditorPropertiesTitle", "Details"))
 		[
 			DetailsView.ToSharedRef()
 		];
+}
+TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_Palette(const FSpawnTabArgs& Args)
+{
+	check(Args.GetTabId() == PaletteTabId);
 
-	return SpawnedTab;
+	return SNew(SDockTab)
+		.Icon(FEditorStyle::GetBrush("Kismet.Tabs.Palette"))
+		.Label(LOCTEXT("UAVGScriptEditorGraphPaletteTitle", "Palette"))
+		[
+			Palette.ToSharedRef()
+		];
 }
 
 #undef LOCTEXT_NAMESPACE
