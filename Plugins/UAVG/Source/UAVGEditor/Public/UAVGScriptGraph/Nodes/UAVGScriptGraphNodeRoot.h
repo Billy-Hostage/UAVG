@@ -12,4 +12,6 @@ class UUAVGScriptGraphNodeRoot : public UUAVGScriptGraphNode
 	GENERATED_UCLASS_BODY()
 
 private:
+protected:
+	virtual void CreateOutputPin() override;
 };

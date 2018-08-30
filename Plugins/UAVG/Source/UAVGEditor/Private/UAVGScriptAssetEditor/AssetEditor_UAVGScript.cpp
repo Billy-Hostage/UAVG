@@ -71,7 +71,6 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 
 	EditingScript->SetFlags(RF_Transactional);
 	GEditor->RegisterForUndo(this);
-	//TODO Map Undo Redo Events
 
 	CreateEditorGraph();
 
@@ -180,12 +179,17 @@ void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
 {
 	FGraphAppearanceInfo AppearanceInfo;
-	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_UAVGScript", "UAVG SCRIPT");
+	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_UAVGScriptGraph", "UAVG SCRIPT");
+	AppearanceInfo.InstructionText = LOCTEXT("AppearanceInstructionText_UAVGScriptGraph", "Right Click to Add Nodes");
+
+	SGraphEditor::FGraphEditorEvents InEvents;//TODO
+	//InEvents.OnCreateActionMenu = SGraphEditor::FOnCreateActionMenu::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCreateGraphActionMenu);
 
 	return SNew(SGraphEditor)
 		.IsEditable(true)
 		.Appearance(AppearanceInfo)
 		.GraphToEdit(EditingScript->MyEdGraph)
+		.GraphEvents(InEvents)
 		.ShowGraphStateOverlay(false);
 }
 

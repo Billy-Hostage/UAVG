@@ -6,3 +6,8 @@ UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& Obj
 	: Super(ObjectInitializer)
 {
 }
+
+void UUAVGScriptGraphNodeRoot::CreateOutputPin()
+{
+	//TODO Let it Work
+}
