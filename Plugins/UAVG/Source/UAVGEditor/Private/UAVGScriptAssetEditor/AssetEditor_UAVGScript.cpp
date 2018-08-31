@@ -25,13 +25,14 @@ const FName FAssetEditor_UAVGScrpit::PropertiesTabId(TEXT("UAVGScriptEditor_Prop
 const FName FAssetEditor_UAVGScrpit::PaletteTabId(TEXT("UAVGScriptEditor_Palette"));
 
 FAssetEditor_UAVGScrpit::FAssetEditor_UAVGScrpit()
+	:EditingScript(nullptr)
 {
-	EditingScript = nullptr;
+
 }
 
 FAssetEditor_UAVGScrpit::~FAssetEditor_UAVGScrpit()
 {
-
+	GEditor->UnregisterForUndo(this);
 }
 
 void FAssetEditor_UAVGScrpit::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
@@ -166,6 +167,15 @@ FString FAssetEditor_UAVGScrpit::GetWorldCentricTabPrefix() const
 	return TEXT("UAVGScriptEditor");
 }
 
+void FAssetEditor_UAVGScrpit::SaveAsset_Execute()
+{
+	if (EditingScript && EditingScript->MyEdGraph)
+	{
+		RebuildRuntimeScript();
+	}
+	FAssetEditorToolkit::SaveAsset_Execute();
+}
+
 void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 {
 	GraphEditor = CreateGraphEditorWidget();
@@ -193,6 +203,15 @@ TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
 		.GraphToEdit(EditingScript->MyEdGraph)
 		.GraphEvents(InEvents)
 		.ShowGraphStateOverlay(false);
+}
+
+void FAssetEditor_UAVGScrpit::RebuildRuntimeScript()
+{
+	if (EditingScript && EditingScript->MyEdGraph && EditingScript->MyEdGraph->IsA(UEdGraph_UAVGScript::StaticClass()))//TODO Error Message
+	{
+		UEdGraph_UAVGScript* ScriptGraph = CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph);
+		ScriptGraph->RebulidRuntimeScript();
+	}
 }
 
 TSharedRef<SDockTab> FAssetEditor_UAVGScrpit::SpawnTab_GraphCanvas(const FSpawnTabArgs& Args)

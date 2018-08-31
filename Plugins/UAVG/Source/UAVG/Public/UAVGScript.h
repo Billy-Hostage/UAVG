@@ -5,21 +5,22 @@
 #include "CoreMinimal.h"
 #include "UAVGScript.generated.h"
 
-UCLASS(Blueprintable)
+class UUAVGScriptRuntimeNodeRoot;
+
+//Main Script Data Asset Holder for UAVG Plugin
+UCLASS(Blueprintable, BlueprintType)
 class UAVG_API UUAVGScript : public UObject
 {
 	GENERATED_BODY()
 public:
 	UUAVGScript();
-	
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ShortTooltip = "Name of Script", ToolTip = "The Name of This UAVG Script"))
-	FName ScriptName;
 
-	UPROPERTY(BlueprintReadOnly)
-	class UUAVGScriptRuntimeNode* RootNode;
-
-	UPROPERTY(BlueprintReadOnly)
-	TArray<class UUAVGScriptRuntimeNode*> AllNodes;
+	const UUAVGScriptRuntimeNodeRoot* GetConstRuntimeRootNode() const
+	{
+		return RootNode;
+	};
+	void SetRuntimeRootNode(class UUAVGScriptGraphNodeRoot* InGNode);
+	void ClearNode();
 
 #if WITH_EDITORONLY_DATA
 
@@ -27,4 +28,13 @@ public:
 	class UEdGraph* MyEdGraph;
 
 #endif
+protected:
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ShortTooltip = "Name of Script", ToolTip = "The Name of This UAVG Script"))
+	FName ScriptName;
+
+	UPROPERTY(BlueprintReadOnly)
+	UUAVGScriptRuntimeNodeRoot* RootNode;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class UUAVGScriptRuntimeNode*> AllNodes;
 };

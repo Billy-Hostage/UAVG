@@ -39,6 +39,7 @@ private:
 	virtual FText GetBaseToolkitName() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
+	virtual void SaveAsset_Execute() override;
 
 	/** Creates all internal widgets for the tabs to point at */
 	void CreateInternalWidgets();
@@ -49,6 +50,8 @@ private:
 
 	/** Create new graph editor widget */
 	TSharedRef<class SGraphEditor> CreateGraphEditorWidget();
+
+	virtual void RebuildRuntimeScript();
 
 	/**	The tab ids for all the tabs used */
 	static const FName GraphCanvasTabId;

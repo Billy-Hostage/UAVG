@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphNode.h"
+#include "EditorStyle.h"
 #include "UAVGScriptGraphNode.generated.h"
 
 class UEdGraphPin;
@@ -15,6 +16,8 @@ class UUAVGScriptGraphNode : public UEdGraphNode
 	GENERATED_UCLASS_BODY()
 
 public:
+	class UUAVGScriptRuntimeNode* MyRTNode = nullptr;
+
 	virtual bool CanDuplicateNode() const override
 	{
 		return true;

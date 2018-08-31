@@ -28,4 +28,8 @@ public:
 	class UUAVGScriptGraphNode* CreateNode(TSubclassOf<UUAVGScriptGraphNode> NodeClass, int32 NodePosX, int32 NodePosY, bool bSelectNewNode = true, bool bIsUserAction = true);
 
 	class UUAVGScript* GetUAVGScript() const;
+
+	class UUAVGScriptGraphNodeRoot* GetRootNode();
+
+	void RebulidRuntimeScript();
 };

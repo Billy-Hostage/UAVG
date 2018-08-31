@@ -41,6 +41,8 @@ public class UAVG : ModuleRules
 				"Slate",
 				"SlateCore",
                 "GameplayTags",
+                "EditorStyle",
+                "UAVGEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
