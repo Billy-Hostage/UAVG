@@ -87,7 +87,7 @@ void UAssetGraphSchema_UAVGScript::GetAllUAVGScriptGraphNodeActions(FGraphAction
 	for (auto NodeClass : ScriptGraphNodeClasses)
 	{
 		const UUAVGScriptGraphNode* NodePtr = NodeClass->GetDefaultObject<UUAVGScriptGraphNode>();
-		if (!NodePtr->IsUserCreatable()) continue;
+		if (!NodePtr->IsUserCreatableNode()) continue;
 		Args.Add(TEXT("Name"), NodePtr->GetNodeTitle(ENodeTitleType::MenuTitle));
 		TSharedPtr<FNewNode_UAVGScriptGraphSchemaAction> Action(new FNewNode_UAVGScriptGraphSchemaAction(NODE_CATEGORY_NormalNode, FText::Format(MenuDesc, Args), FText::Format(ToolTip, Args), Grouping++, NodeClass));
 		ActionMenuBuilder.AddAction(Action);

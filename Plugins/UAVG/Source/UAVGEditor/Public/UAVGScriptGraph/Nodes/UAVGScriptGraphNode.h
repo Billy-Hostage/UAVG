@@ -61,9 +61,9 @@ public:
 		NodePosY = NewPosition.Y;
 	}
 
-	virtual bool IsUserCreatable() const
+	virtual bool IsUserCreatableNode() const
 	{
-		return false;
+		return true;
 	}
 	virtual bool IsRootNode() const
 	{

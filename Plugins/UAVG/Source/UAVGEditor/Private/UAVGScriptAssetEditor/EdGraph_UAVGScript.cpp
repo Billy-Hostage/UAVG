@@ -20,10 +20,8 @@ bool UEdGraph_UAVGScript::Modify(bool bAlwaysMarkDirty /*= true*/)
 	{
 		return false;
 	}
-
-	bool bWasSaved = Super::Modify(bAlwaysMarkDirty);
-	//TODO Save data to UAVGScript Here
-	return bWasSaved;
+	//TODO Undo Buffer
+	return Super::Modify(bAlwaysMarkDirty);
 }
 
 UUAVGScriptGraphNode* UEdGraph_UAVGScript::CreateNode(TSubclassOf<UUAVGScriptGraphNode> NodeClass, int32 NodePosX, int32 NodePosY, bool bSelectNewNode /*= true*/, bool bIsUserAction /*= true*/)
