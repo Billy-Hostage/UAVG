@@ -1,7 +1,8 @@
 //NTRHostage
 
 #include "AssetGraphSchema_UAVGScript.h"
-#include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraphNodeRoot.h"
+#include "EdGraph_UAVGScript.h"
 #include "UAVGScript.h"
 
 #define LOCTEXT_NAMESPACE "NewNode_UAVGScriptGraphSchemaAction"
@@ -29,8 +30,9 @@ void UAssetGraphSchema_UAVGScript::GetGraphContextActions(FGraphContextMenuBuild
 void UAssetGraphSchema_UAVGScript::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
 	check(Graph.IsA(UEdGraph_UAVGScript::StaticClass()));
-
+	UEdGraph_UAVGScript* ScriptGraph = CastChecked<UEdGraph_UAVGScript>(&Graph);
 	
+	ScriptGraph->CreateNode(TSubclassOf<UUAVGScriptGraphNodeRoot>(UUAVGScriptGraphNodeRoot::StaticClass()), 0, 0, true, false);
 
 	Super::CreateDefaultNodesForGraph(Graph);
 }
@@ -115,19 +117,7 @@ UEdGraphNode* FNewNode_UAVGScriptGraphSchemaAction::PerformAction(UEdGraph* Pare
 	}
 	verify(Script->Modify());
 
-	UEdGraphNode* NewNode = CreateNode(Script, ParentGraph, FromPin, Location, bSelectNewNode);
-	Script->PostEditChange();
-	Script->MarkPackageDirty();
-	ParentGraph->NotifyGraphChanged();
-
-	return NewNode;
-}
-
-UEdGraphNode* FNewNode_UAVGScriptGraphSchemaAction::CreateNode(UUAVGScript* Script, UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode)
-{
-	//TODO
-
-	return nullptr;
+	return CastChecked<UEdGraph_UAVGScript>(ParentGraph)->CreateNode(CreateNodeType, Location.X, Location.Y, bSelectNewNode);
 }
 
 #undef LOCTEXT_NAMESPACE

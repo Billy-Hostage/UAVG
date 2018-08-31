@@ -17,8 +17,6 @@ public:
 
 	UEdGraphNode* PerformAction(UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
 private:
-	UEdGraphNode* CreateNode(class UUAVGScript* Script, UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode);
-
 	TSubclassOf<class UUAVGScriptGraphNode> CreateNodeType;
 };
 
