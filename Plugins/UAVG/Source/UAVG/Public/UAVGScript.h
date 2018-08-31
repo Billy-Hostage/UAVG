@@ -15,6 +15,12 @@ public:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ShortTooltip = "Name of Script", ToolTip = "The Name of This UAVG Script"))
 	FName ScriptName;
 
+	UPROPERTY(BlueprintReadOnly)
+	class UUAVGScriptRuntimeNode* RootNode;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class UUAVGScriptRuntimeNode*> AllNodes;
+
 #if WITH_EDITORONLY_DATA
 
 	UPROPERTY()

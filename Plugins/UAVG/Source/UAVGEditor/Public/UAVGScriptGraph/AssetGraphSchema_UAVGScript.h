@@ -27,12 +27,16 @@ class UAssetGraphSchema_UAVGScript : public UEdGraphSchema
 {
 	GENERATED_UCLASS_BODY()
 public:
+	virtual void GetPaletteActions(FGraphActionMenuBuilder& OutActions) const;
+
 	/**
 	* Get all actions that can be performed when right clicking on a graph or drag-releasing on a graph from a pin
 	*
 	* @param [in,out]	ContextMenuBuilder	The context (graph, dragged pin, etc...) and output menu builder.
 	*/
 	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
+
+	virtual void CreateDefaultNodesForGraph(class UEdGraph& Graph) const override;
 private:
 	/** Adds actions for creating every type of DialogueNode */
 	void GetAllUAVGScriptGraphNodeActions(FGraphActionMenuBuilder& ActionMenuBuilder) const;

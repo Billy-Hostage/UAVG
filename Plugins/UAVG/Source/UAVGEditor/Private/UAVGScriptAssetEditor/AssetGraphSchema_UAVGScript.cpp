@@ -16,9 +16,23 @@ UAssetGraphSchema_UAVGScript::UAssetGraphSchema_UAVGScript(const FObjectInitiali
 
 }
 
+void UAssetGraphSchema_UAVGScript::GetPaletteActions(FGraphActionMenuBuilder& OutActions) const
+{
+	GetAllUAVGScriptGraphNodeActions(OutActions);
+}
+
 void UAssetGraphSchema_UAVGScript::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
 {
 	GetAllUAVGScriptGraphNodeActions(ContextMenuBuilder);
+}
+
+void UAssetGraphSchema_UAVGScript::CreateDefaultNodesForGraph(UEdGraph& Graph) const
+{
+	check(Graph.IsA(UEdGraph_UAVGScript::StaticClass()));
+
+	
+
+	Super::CreateDefaultNodesForGraph(Graph);
 }
 
 void UAssetGraphSchema_UAVGScript::InitializeAllNodeClass()
@@ -71,6 +85,7 @@ void UAssetGraphSchema_UAVGScript::GetAllUAVGScriptGraphNodeActions(FGraphAction
 	for (auto NodeClass : ScriptGraphNodeClasses)
 	{
 		const UUAVGScriptGraphNode* NodePtr = NodeClass->GetDefaultObject<UUAVGScriptGraphNode>();
+		if (!NodePtr->IsUserCreatable()) continue;
 		Args.Add(TEXT("Name"), NodePtr->GetNodeTitle(ENodeTitleType::MenuTitle));
 		TSharedPtr<FNewNode_UAVGScriptGraphSchemaAction> Action(new FNewNode_UAVGScriptGraphSchemaAction(NODE_CATEGORY_NormalNode, FText::Format(MenuDesc, Args), FText::Format(ToolTip, Args), Grouping++, NodeClass));
 		ActionMenuBuilder.AddAction(Action);

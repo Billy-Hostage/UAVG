@@ -130,7 +130,9 @@ void FAssetEditor_UAVGScrpit::CreateEditorGraph()
 	if (EditingScript->MyEdGraph == nullptr)
 	{
 		EditingScript->MyEdGraph = CastChecked<UEdGraph_UAVGScript>(FBlueprintEditorUtils::CreateNewGraph(EditingScript, NAME_None, UEdGraph_UAVGScript::StaticClass(), UAssetGraphSchema_UAVGScript::StaticClass()));
-		
+		EditingScript->MyEdGraph->bAllowDeletion = false;
+		const UEdGraphSchema* Schema = EditingScript->MyEdGraph->GetSchema();
+		Schema->CreateDefaultNodesForGraph(*(EditingScript->MyEdGraph));
 	}
 }
 

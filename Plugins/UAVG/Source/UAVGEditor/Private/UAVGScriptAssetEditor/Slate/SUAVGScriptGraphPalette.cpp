@@ -1,6 +1,7 @@
 //NTRHostage
 
 #include "SUAVGScriptGraphPalette.h"
+#include "AssetGraphSchema_UAVGScript.h"
 
 void SUAVGScriptGraphPalette::Construct(const FArguments& InArgs)
 {
@@ -10,7 +11,8 @@ void SUAVGScriptGraphPalette::Construct(const FArguments& InArgs)
 
 void SUAVGScriptGraphPalette::CollectAllActions(FGraphActionListBuilderBase& OutAllActions)
 {
+	const UAssetGraphSchema_UAVGScript* Schema = GetDefault<UAssetGraphSchema_UAVGScript>();
 	FGraphActionMenuBuilder ActionMenuBuilder;
-
+	Schema->GetPaletteActions(ActionMenuBuilder);
 	OutAllActions.Append(ActionMenuBuilder);
 }

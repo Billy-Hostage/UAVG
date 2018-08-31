@@ -57,6 +57,15 @@ public:
 		NodePosX = NewPosition.X;
 		NodePosY = NewPosition.Y;
 	}
+
+	virtual bool IsUserCreatable() const
+	{
+		return false;
+	}
+	virtual bool IsRootNode() const
+	{
+		return false;
+	}
 protected:
 	virtual void CreateInputPin()
 	{

@@ -25,5 +25,7 @@ public:
 	*/
 	virtual bool Modify(bool bAlwaysMarkDirty = true) override;
 
+	class UUAVGScriptGraphNode* CreateNode(TSubclassOf<UUAVGScriptGraphNode> NodeClass, int32 NodePosX, int32 NodePosY, bool bSelectNewNode = true);
+
 	class UUAVGScript* GetUAVGScript() const;
 };
