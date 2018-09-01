@@ -1,8 +1,10 @@
 //NTRHostage
 
 #include "EdGraph_UAVGScript.h"
+#include "UAVGScriptGraphNodeRoot.h"
+
 #include "UAVGScript.h"
-#include "UAVGScriptGraphNode.h"
+#include "UAVGScriptRTNodeRoot.h"
 
 UEdGraph_UAVGScript::UEdGraph_UAVGScript()
 {
@@ -61,8 +63,8 @@ void UEdGraph_UAVGScript::RebulidRuntimeScript()
 	UUAVGScript* EditingScript = GetUAVGScript();
 
 	EditingScript->ClearNode();
+	RootNode->MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(EditingScript->SetupNewRuntimeRootNode());
 
-	EditingScript->SetRuntimeRootNode(RootNode);
 	for (UEdGraphNode* Node : Nodes)
 	{
 		if(Node == RootNode) continue;//Skip Root Node

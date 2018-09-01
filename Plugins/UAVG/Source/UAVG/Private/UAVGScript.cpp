@@ -1,23 +1,18 @@
 //NTRHostage Coded
 
 #include "UAVGScript.h"
-#include "UAVGScriptRTNode.h"
-#ifdef WITH_EDITORONLY_DATA
-#include "UAVGEditor/Public/UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRoot.h"
-#endif
+#include "UAVGScriptRTNodeRoot.h"
 
 UUAVGScript::UUAVGScript()
 {
 	ScriptName = FName("UAVGScript");
 }
 
-void UUAVGScript::SetRuntimeRootNode(UUAVGScriptGraphNodeRoot* InGNode)
+UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeRootNode()
 {
-	check(InGNode);
-
 	RootNode = NewObject<UUAVGScriptRuntimeNodeRoot>(this, UUAVGScriptRuntimeNodeRoot::StaticClass(), NAME_None, RF_Transactional);
 	AllNodes.Add(RootNode);
-	InGNode->MyRTNode = RootNode;
+	return RootNode;
 }
 
 void UUAVGScript::ClearNode()

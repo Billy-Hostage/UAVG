@@ -6,7 +6,7 @@
 #include "UAVGScriptRTNode.generated.h"
 
 UCLASS(Abstract, BlueprintType)
-class UUAVGScriptRuntimeNode : public UObject
+class UAVG_API UUAVGScriptRuntimeNode : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -23,7 +23,5 @@ public:
 	virtual void SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes);
 	bool CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* InNode) const;
 	/*End Called When Editor Saving Graph*/
-
-	class UUAVGScriptGraphNode* MyEditorNode = nullptr;
 #endif
 };

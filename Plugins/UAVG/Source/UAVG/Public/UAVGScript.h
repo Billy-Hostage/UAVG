@@ -19,7 +19,7 @@ public:
 	{
 		return RootNode;
 	};
-	void SetRuntimeRootNode(class UUAVGScriptGraphNodeRoot* InGNode);
+	UUAVGScriptRuntimeNodeRoot* SetupNewRuntimeRootNode();
 	void ClearNode();
 
 #if WITH_EDITORONLY_DATA

@@ -1,7 +1,7 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNode.h"
 #include "SUAVGScriptGraphNode.h"
+#include "UAVGScriptGraphNode.h"
 
 void SUAVGScriptGraphNode::Construct(const FArguments& InArgs, UUAVGScriptGraphNode* InNode)
 {

@@ -7,7 +7,7 @@
 #include "UAVGScriptRTNodeRoot.generated.h"
 
 UCLASS(Blueprintable)
-class UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
+class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 {
 	GENERATED_BODY()
 public:
