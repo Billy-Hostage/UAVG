@@ -36,7 +36,7 @@ public:
 	}
 	virtual FLinearColor GetNodeTitleColor() const override
 	{
-		return GetNodeBackgroundColor();
+		return FLinearColor::Blue;
 	}
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override
 	{
@@ -47,7 +47,7 @@ public:
 
 	virtual FLinearColor GetNodeBackgroundColor() const
 	{
-		return FLinearColor::Black;
+		return FLinearColor::Gray;
 	}
 	
 	FVector2D GetPosition() const
@@ -69,11 +69,24 @@ public:
 	{
 		return false;
 	}
+
+	virtual UEdGraphPin* GetInputPin()
+	{
+		//unimplemented();
+		return nullptr;
+	}
+	virtual UEdGraphPin* GetOutputPin()
+	{
+		//unimplemented();
+		return nullptr;
+	}
 protected:
 	virtual void CreateInputPin()
 	{
+		unimplemented();
 	};
 	virtual void CreateOutputPin()
 	{
+		unimplemented();
 	};
 };

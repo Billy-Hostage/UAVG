@@ -16,7 +16,7 @@ public:
 private:
 	virtual FSlateColor GetPinColour() const
 	{
-		return FSlateColor(FLinearColor::Black);
+		return FSlateColor(FLinearColor::White);
 	}
 
 	virtual const FSlateBrush* GetPinBorder() const

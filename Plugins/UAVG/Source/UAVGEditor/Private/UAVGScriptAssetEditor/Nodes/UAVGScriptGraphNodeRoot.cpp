@@ -7,7 +7,17 @@ UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& Obj
 {
 }
 
+void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()
+{
+	//We only have a output pin in root node
+	CreateOutputPin();
+}
+
 void UUAVGScriptGraphNodeRoot::CreateOutputPin()
 {
-	//TODO Let it Work
+	static const FName PinName(TEXT("Begin"));
+	FCreatePinParams PinParams;
+	PinParams.Index = 0;//Root Begin Pin at Array Index 0
+
+	CreatePin(EGPD_Output, FName(TEXT("ChildOutputs")), PinName, PinParams);
 }

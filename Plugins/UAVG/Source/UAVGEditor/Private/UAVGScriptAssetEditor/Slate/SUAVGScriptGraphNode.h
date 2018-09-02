@@ -23,9 +23,9 @@ public:
 	void UpdateGraphNode() override;
 
 	void SetOwner(const TSharedRef<SGraphPanel>& OwnerPanel) override;
-protected:
-	void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;
 
+	void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;
+protected:
 	TSharedPtr<SGraphPin> CreatePinWidget(UEdGraphPin* Pin) const override;
 
 	UUAVGScriptGraphNode* MyGraphNode = nullptr;

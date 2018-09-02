@@ -42,12 +42,23 @@ public:
 	{
 		return NSLOCTEXT("UAVGScriptGraphNode_Root", "RootToolTip", "The root start node of this graph");
 	}
+	FLinearColor GetNodeTitleColor() const override
+	{
+		return FLinearColor::Green;
+	}
 
 	virtual bool IsRootNode() const override
 	{
 		//This is a root node.
 		return true;
 	}
+
+	UEdGraphPin* GetOutputPin() override
+	{
+		return Pins[0];
+	}
+
+	void AllocateDefaultPins() override;
 private:
 protected:
 	void CreateOutputPin() override;
