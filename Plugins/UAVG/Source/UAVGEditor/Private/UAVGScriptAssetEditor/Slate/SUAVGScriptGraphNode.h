@@ -3,7 +3,6 @@
 #pragma once
 
 #include "SGraphNode.h"
-#include "SVectorInputBox.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
 class SUAVGScriptGraphNode : public SGraphNode
@@ -18,11 +17,7 @@ public:
 
 	void CreatePinWidgets() override;
 
-	void CreateStandardPinWidget(UEdGraphPin* Pin) override;
-
 	void UpdateGraphNode() override;
-
-	void SetOwner(const TSharedRef<SGraphPanel>& OwnerPanel) override;
 
 	void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;
 protected:
@@ -30,5 +25,9 @@ protected:
 
 	UUAVGScriptGraphNode* MyGraphNode = nullptr;
 
-	TSharedPtr<SVerticalBox> PinBox;
+	TSharedPtr<class SHorizontalBox> OutputPinBox;
+
+	TSharedPtr<class SBorder> NodeBody;
+
+	TSharedPtr<SInlineEditableTextBlock> NodeTextBlock;
 };
