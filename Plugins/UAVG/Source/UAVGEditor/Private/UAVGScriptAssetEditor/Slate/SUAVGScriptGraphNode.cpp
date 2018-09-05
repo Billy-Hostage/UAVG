@@ -5,6 +5,7 @@
 
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "Widgets/SBoxPanel.h"
+#include "SGraphPanel.h"
 
 #include "UAVGScriptGraphNode.h"
 
@@ -53,7 +54,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
 			.BorderBackgroundColor(FSlateColor(FLinearColor::Black))
-			//.OnMouseButtonDown(TODO)
+			.OnMouseButtonDown(this, &SUAVGScriptGraphNode::OnMouseDown)
 			[
 				SNew(SOverlay)
 
@@ -229,6 +230,17 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 		}
 		OutputPins.Add(PinToAdd);
 	}
+}
+
+FReply SUAVGScriptGraphNode::OnMouseDown(const FGeometry& SenderGeometry, const FPointerEvent& MouseEvent)
+{
+	if (MyGraphNode)
+	{
+		GetOwnerPanel()->SelectionManager.ClickedOnNode(GraphNode, MouseEvent);
+		return FReply::Handled();
+	}
+
+	return FReply::Unhandled();
 }
 
 TSharedPtr<SGraphPin> SUAVGScriptGraphNode::CreatePinWidget(UEdGraphPin* Pin) const

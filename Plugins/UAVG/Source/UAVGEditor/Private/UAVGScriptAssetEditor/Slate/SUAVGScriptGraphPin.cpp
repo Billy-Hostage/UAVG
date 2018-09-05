@@ -15,7 +15,7 @@ void SUAVGScriptGraphPin::Construct(const FArguments& InArgs, class UEdGraphPin*
 	SBorder::Construct(SBorder::FArguments()
 		.BorderImage(this, &SUAVGScriptGraphPin::GetPinBorder)
 		.BorderBackgroundColor(this, &SUAVGScriptGraphPin::GetPinColour)
-		//.OnMouseButtonDown()
+		.OnMouseButtonDown(this, &SUAVGScriptGraphPin::OnPinMouseDown)
 		.Cursor(this, &SUAVGScriptGraphPin::GetPinCursor)
 		.Padding(FMargin(10.f))
 	);

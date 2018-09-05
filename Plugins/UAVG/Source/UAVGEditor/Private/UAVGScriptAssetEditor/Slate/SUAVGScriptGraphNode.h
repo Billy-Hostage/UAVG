@@ -20,6 +20,9 @@ public:
 	void UpdateGraphNode() override;
 
 	void AddPin(const TSharedRef<SGraphPin>& PinToAdd) override;
+
+	/** handle mouse down on the node */
+	FReply OnMouseDown(const FGeometry& SenderGeometry, const FPointerEvent& MouseEvent);
 protected:
 	TSharedPtr<SGraphPin> CreatePinWidget(UEdGraphPin* Pin) const override;
 
