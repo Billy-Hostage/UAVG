@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphSchema.h"
+#include "UAVGScriptGraphConnectionDrawingPolicy.h"
 #include "AssetGraphSchema_UAVGScript.generated.h"
 
 USTRUCT()
@@ -27,14 +28,14 @@ class UAssetGraphSchema_UAVGScript : public UEdGraphSchema
 public:
 	virtual void GetPaletteActions(FGraphActionMenuBuilder& OutActions) const;
 
-	/**
-	* Get all actions that can be performed when right clicking on a graph or drag-releasing on a graph from a pin
-	*
-	* @param [in,out]	ContextMenuBuilder	The context (graph, dragged pin, etc...) and output menu builder.
-	*/
 	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
 
 	virtual void CreateDefaultNodesForGraph(class UEdGraph& Graph) const override;
+
+	FConnectionDrawingPolicy* CreateConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float InZoomFactor, const FSlateRect& InClippingRect, class FSlateWindowElementList& InDrawElements, class UEdGraph* InGraphObj) const override
+	{
+		return new FUAVGScriptGraphConnectionDrawingPolicy(InBackLayerID, InFrontLayerID, InZoomFactor, InClippingRect, InDrawElements, InGraphObj);
+	}
 private:
 	/** Adds actions for creating every type of DialogueNode */
 	void GetAllUAVGScriptGraphNodeActions(FGraphActionMenuBuilder& ActionMenuBuilder) const;

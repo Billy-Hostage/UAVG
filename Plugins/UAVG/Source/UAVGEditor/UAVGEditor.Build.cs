@@ -7,8 +7,9 @@ public class UAVGEditor : ModuleRules
 	public UAVGEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
+        bEnforceIWYU = true;
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}
@@ -49,6 +50,7 @@ public class UAVGEditor : ModuleRules
                 "AssetTools",
                 "GraphEditor",
                 "EditorStyle",
+                "Projects"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
