@@ -4,7 +4,7 @@
 
 #include "SGraphPin.h"
 
-class SUAVGScriptGraphPin : public SGraphPin
+class UAVGEDITOR_API SUAVGScriptGraphPin : public SGraphPin
 {
 public:
 	SLATE_BEGIN_ARGS(SUAVGScriptGraphPin)

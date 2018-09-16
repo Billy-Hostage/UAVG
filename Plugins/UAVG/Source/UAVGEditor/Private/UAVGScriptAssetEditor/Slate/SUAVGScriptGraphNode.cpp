@@ -9,6 +9,33 @@
 
 #include "UAVGScriptGraphNode.h"
 
+TSharedRef<FDragUAVGScriptGraphNode> FDragUAVGScriptGraphNode::New(const TSharedRef<SGraphPanel>& InGraphPanel, const TSharedRef<SGraphNode>& InDraggedNode)
+{
+	TSharedRef<FDragUAVGScriptGraphNode> Operation = MakeShareable(new FDragUAVGScriptGraphNode);
+	Operation->StartTime = FPlatformTime::Seconds();
+	Operation->GraphPanel = InGraphPanel;
+	Operation->DraggedNodes.Add(InDraggedNode);
+
+	Operation->Construct();
+	return Operation;
+}
+
+TSharedRef<FDragUAVGScriptGraphNode> FDragUAVGScriptGraphNode::New(const TSharedRef<SGraphPanel>& InGraphPanel, const TArray< TSharedRef<SGraphNode> >& InDraggedNodes)
+{
+	TSharedRef<FDragUAVGScriptGraphNode> Operation = MakeShareable(new FDragUAVGScriptGraphNode);
+	Operation->StartTime = FPlatformTime::Seconds();
+	Operation->GraphPanel = InGraphPanel;
+	Operation->DraggedNodes = InDraggedNodes;
+
+	Operation->Construct();
+	return Operation;
+}
+
+UUAVGScriptGraphNode* FDragUAVGScriptGraphNode::GetDropTargetNode() const
+{
+	return Cast<UUAVGScriptGraphNode>(GetHoveredNode());
+}
+
 void SUAVGScriptGraphNode::Construct(const FArguments& InArgs, UUAVGScriptGraphNode* InNode)
 {
 	check(InNode);
@@ -53,7 +80,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 			SNew(SBorder)
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
-			.BorderBackgroundColor(FSlateColor(FLinearColor::Black))
+			.BorderBackgroundColor(this, &SUAVGScriptGraphNode::GetNodeBackgroundColor)
 			.OnMouseButtonDown(this, &SUAVGScriptGraphNode::OnMouseDown)
 			[
 				SNew(SOverlay)
@@ -90,7 +117,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 						[
 							SAssignNew(NodeBody, SBorder)
 							.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-							.BorderBackgroundColor(FSlateColor(FLinearColor::Black))
+							.BorderBackgroundColor(this, &SUAVGScriptGraphNode::GetNodeTitleColor)
 							.HAlign(HAlign_Fill)
 							.VAlign(VAlign_Center)
 							.Visibility(EVisibility::SelfHitTestInvisible)
@@ -232,6 +259,20 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 	}
 }
 
+FReply SUAVGScriptGraphNode::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton) && !(GEditor->bIsSimulatingInEditor || GEditor->PlayWorld))
+	{
+		if (MyGraphNode)
+		{
+			const TSharedRef<SGraphPanel>& Panel = GetOwnerPanel().ToSharedRef();
+			const TSharedRef<SGraphNode>& Node = SharedThis(this);
+			return FReply::Handled().BeginDragDrop(FDragUAVGScriptGraphNode::New(Panel, Node));
+		}
+	}
+	return FReply::Unhandled();
+}
+
 FReply SUAVGScriptGraphNode::OnMouseDown(const FGeometry& SenderGeometry, const FPointerEvent& MouseEvent)
 {
 	if (MyGraphNode)
@@ -246,4 +287,14 @@ FReply SUAVGScriptGraphNode::OnMouseDown(const FGeometry& SenderGeometry, const 
 TSharedPtr<SGraphPin> SUAVGScriptGraphNode::CreatePinWidget(UEdGraphPin* Pin) const
 {
 	return SNew(SUAVGScriptGraphPin, Pin);
+}
+
+FSlateColor SUAVGScriptGraphNode::GetNodeTitleColor() const
+{
+	return FSlateColor(MyGraphNode->GetNodeTitleColor());
+}
+
+FSlateColor SUAVGScriptGraphNode::GetNodeBackgroundColor() const
+{
+	return FSlateColor(MyGraphNode->GetNodeBackgroundColor());
 }

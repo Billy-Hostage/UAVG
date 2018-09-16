@@ -50,7 +50,8 @@ public class UAVGEditor : ModuleRules
                 "AssetTools",
                 "GraphEditor",
                 "EditorStyle",
-                "Projects"
+                "Projects",
+                "InputCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

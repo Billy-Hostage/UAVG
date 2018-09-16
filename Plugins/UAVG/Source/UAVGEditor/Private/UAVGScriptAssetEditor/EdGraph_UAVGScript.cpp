@@ -62,6 +62,7 @@ void UEdGraph_UAVGScript::RebulidRuntimeScript()
 	UUAVGScriptGraphNodeRoot* RootNode = GetRootNode();
 	UUAVGScript* EditingScript = GetUAVGScript();
 
+	//Save Root Node first
 	EditingScript->ClearNode();
 	RootNode->MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(EditingScript->SetupNewRuntimeRootNode());
 

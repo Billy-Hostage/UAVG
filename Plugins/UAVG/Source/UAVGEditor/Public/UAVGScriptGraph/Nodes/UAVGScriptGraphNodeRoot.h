@@ -44,10 +44,10 @@ public:
 	}
 	FLinearColor GetNodeTitleColor() const override
 	{
-		return FLinearColor::Green;
+		return FLinearColor::Gray;
 	}
 
-	virtual bool IsRootNode() const override
+	bool IsRootNode() const override
 	{
 		//This is a root node.
 		return true;

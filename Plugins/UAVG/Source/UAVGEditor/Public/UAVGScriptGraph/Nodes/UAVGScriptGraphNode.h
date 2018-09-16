@@ -18,6 +18,8 @@ class UUAVGScriptGraphNode : public UEdGraphNode
 public:
 	class UUAVGScriptRuntimeNode* MyRTNode = nullptr;
 
+	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
+
 	virtual bool CanDuplicateNode() const override
 	{
 		return true;
@@ -36,7 +38,7 @@ public:
 	}
 	virtual FLinearColor GetNodeTitleColor() const override
 	{
-		return FLinearColor::Blue;
+		return FLinearColor::Black;
 	}
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override
 	{
@@ -47,7 +49,7 @@ public:
 
 	virtual FLinearColor GetNodeBackgroundColor() const
 	{
-		return FLinearColor::Gray;
+		return FLinearColor::Black;
 	}
 	
 	FVector2D GetPosition() const
@@ -72,12 +74,10 @@ public:
 
 	virtual UEdGraphPin* GetInputPin()
 	{
-		//unimplemented();
 		return nullptr;
 	}
 	virtual UEdGraphPin* GetOutputPin()
 	{
-		//unimplemented();
 		return nullptr;
 	}
 protected:

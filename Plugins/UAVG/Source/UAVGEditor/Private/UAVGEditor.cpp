@@ -9,13 +9,15 @@
 
 #define LOCTEXT_NAMESPACE "FUAVGEditorModule"
 
+DEFINE_LOG_CATEGORY(LogUAVGEditor);
+
 class FGraphPanelNodeFactory_UAVGScriptGraphNode : public FGraphPanelNodeFactory
 {
 	virtual TSharedPtr<class SGraphNode> CreateNode(UEdGraphNode* Node) const override
 	{
 		if (UUAVGScriptGraphNode* UASNode = Cast<UUAVGScriptGraphNode>(Node))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Creating %s Slate UI"), *UASNode->GetName())
+			UE_LOG(LogUAVGEditor, Log, TEXT("Creating '%s' Slate Element"), *UASNode->GetName())
 			return SNew(SUAVGScriptGraphNode, UASNode);
 		}
 		return nullptr;

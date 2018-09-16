@@ -15,7 +15,7 @@ void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()
 
 void UUAVGScriptGraphNodeRoot::CreateOutputPin()
 {
-	static const FName PinName(TEXT("Begin"));
+	const FName PinName(TEXT("Begin"));
 	FCreatePinParams PinParams;
 	PinParams.Index = 0;//Root Begin Pin at Array Index 0
 

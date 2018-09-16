@@ -6,7 +6,7 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "SGraphPalette.h"
 
-class SUAVGScriptGraphPalette : public SGraphPalette
+class UAVGEDITOR_API SUAVGScriptGraphPalette : public SGraphPalette
 {
 public:
 	SLATE_BEGIN_ARGS(SUAVGScriptGraphPalette)

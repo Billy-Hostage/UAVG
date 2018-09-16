@@ -41,7 +41,5 @@ public:
 protected:
 	UEdGraph* Graph;
 
-	TMap<UEdGraphNode*, int32> NodeWidgetMap;
-
 	void Internal_DrawLineWithArrow(const FVector2D& StartAnchorPoint, const FVector2D& EndAnchorPoint, const FConnectionParams& Params);
 };
