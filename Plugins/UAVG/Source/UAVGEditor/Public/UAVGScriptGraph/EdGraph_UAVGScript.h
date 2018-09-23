@@ -22,5 +22,6 @@ public:
 
 	class UUAVGScriptGraphNodeRoot* GetRootNode();
 
+	//execute on Asset Save
 	void RebulidRuntimeScript();
 };

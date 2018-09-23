@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UAVGScript.generated.h"
 
+class UUAVGScriptRuntimeNode;
 class UUAVGScriptRuntimeNodeRoot;
 
 //Main Script Data Asset Holder for UAVG Plugin
@@ -19,8 +20,9 @@ public:
 	{
 		return RootNode;
 	};
-	UUAVGScriptRuntimeNodeRoot* SetupNewRuntimeRootNode();
-	void ClearNode();
+	UUAVGScriptRuntimeNodeRoot* SetupNewRuntimeScript();
+
+	bool AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode);
 
 #if WITH_EDITORONLY_DATA
 

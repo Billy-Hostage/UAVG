@@ -17,7 +17,6 @@ class FGraphPanelNodeFactory_UAVGScriptGraphNode : public FGraphPanelNodeFactory
 	{
 		if (UUAVGScriptGraphNode* UASNode = Cast<UUAVGScriptGraphNode>(Node))
 		{
-			UE_LOG(LogUAVGEditor, Log, TEXT("Creating '%s' Slate Element"), *UASNode->GetName())
 			return SNew(SUAVGScriptGraphNode, UASNode);
 		}
 		return nullptr;

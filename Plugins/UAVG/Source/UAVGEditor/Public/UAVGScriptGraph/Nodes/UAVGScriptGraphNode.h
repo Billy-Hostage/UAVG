@@ -8,6 +8,7 @@
 #include "UAVGScriptGraphNode.generated.h"
 
 class UEdGraphPin;
+class UUAVGScriptRuntimeNode;
 
 //Abstract Base Node Class
 UCLASS(Abstract, MinimalAPI)
@@ -16,7 +17,10 @@ class UUAVGScriptGraphNode : public UEdGraphNode
 	GENERATED_UCLASS_BODY()
 
 public:
-	class UUAVGScriptRuntimeNode* MyRTNode = nullptr;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript)
+	{
+		unimplemented();
+	}
 
 	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
 
@@ -80,13 +84,25 @@ public:
 	{
 		return nullptr;
 	}
+
+	virtual void SetupRTNode(class UUAVGScript* RTScript)
+	{
+		unimplemented();
+	}
+	const UUAVGScriptRuntimeNode* GetConstRTNode() const
+	{
+		return MyRTNode;
+	}
 protected:
 	virtual void CreateInputPin()
 	{
 		unimplemented();
-	};
+	}
 	virtual void CreateOutputPin()
 	{
 		unimplemented();
-	};
+	}
+
+	UPROPERTY()
+	UUAVGScriptRuntimeNode* MyRTNode = nullptr;
 };

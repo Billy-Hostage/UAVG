@@ -1,5 +1,8 @@
 //NTRHostage
 
+#include "UAVGScript.h"
+
+#include "UAVGScriptGraphNode.h"
 #include "UAVGScriptGraphNodeRoot.h"
 
 UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& ObjectInitializer)
@@ -7,10 +10,22 @@ UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& Obj
 {
 }
 
+void UUAVGScriptGraphNodeRoot::SaveToRTNode(UUAVGScript* RTScript)
+{
+	//TODO Save Script Info
+}
+
 void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()
 {
 	//We only have a output pin in root node
 	CreateOutputPin();
+}
+
+void UUAVGScriptGraphNodeRoot::SetupRTNode(class UUAVGScript* RTScript)
+{
+	check(RTScript != nullptr);
+	if (MyRTNode == nullptr)
+		MyRTNode = RTScript->SetupNewRuntimeScript();
 }
 
 void UUAVGScriptGraphNodeRoot::CreateOutputPin()

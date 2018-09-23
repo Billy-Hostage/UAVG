@@ -31,11 +31,12 @@ UUAVGScriptGraphNode* UEdGraph_UAVGScript::CreateNode(TSubclassOf<UUAVGScriptGra
 	UUAVGScriptGraphNode* ResultNode = nullptr;
 
 	ResultNode = NewObject<UUAVGScriptGraphNode>(this, NodeClass.Get(), NAME_None, RF_Transactional);
-	
+
 	ResultNode->CreateNewGuid();
 	ResultNode->PostPlacedNewNode();
 	ResultNode->AllocateDefaultPins();
-	
+	ResultNode->SetupRTNode(GetUAVGScript());
+
 	this->AddNode(ResultNode, bIsUserAction, bSelectNewNode);
 	GetUAVGScript()->PostEditChange();
 	GetUAVGScript()->MarkPackageDirty();
@@ -59,16 +60,12 @@ UUAVGScriptGraphNodeRoot* UEdGraph_UAVGScript::GetRootNode()
 
 void UEdGraph_UAVGScript::RebulidRuntimeScript()
 {
-	UUAVGScriptGraphNodeRoot* RootNode = GetRootNode();
 	UUAVGScript* EditingScript = GetUAVGScript();
 
-	//Save Root Node first
-	EditingScript->ClearNode();
-	RootNode->MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(EditingScript->SetupNewRuntimeRootNode());
-
-	for (UEdGraphNode* Node : Nodes)
+	UUAVGScriptGraphNode* GraphNode = nullptr;
+	for (int32 index = 0; index < Nodes.Num(); ++index)
 	{
-		if(Node == RootNode) continue;//Skip Root Node
-		//TODO
+		GraphNode = CastChecked<UUAVGScriptGraphNode>(Nodes[index]);
+		GraphNode->SaveToRTNode(EditingScript);
 	}
 }

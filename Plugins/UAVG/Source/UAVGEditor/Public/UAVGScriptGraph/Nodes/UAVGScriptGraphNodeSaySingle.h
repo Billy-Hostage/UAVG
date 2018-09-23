@@ -11,6 +11,9 @@ class UUAVGScriptGraphNodeSaySingle : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
+	virtual void SetupRTNode(class UUAVGScript* RTScript) override;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
+
 	virtual bool IsUserCreatableNode()const override
 	{
 		return true;
@@ -59,4 +62,10 @@ public:
 protected:
 	virtual void CreateOutputPin() override;
 	virtual void CreateInputPin() override;
+
+protected:
+	///Properties Here
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (DisplayName = "Text"))
+	FText SaySingleText;
 };

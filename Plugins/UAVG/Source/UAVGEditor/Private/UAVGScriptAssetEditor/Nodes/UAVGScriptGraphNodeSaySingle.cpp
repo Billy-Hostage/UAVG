@@ -1,10 +1,27 @@
 //NTRHostage
 
+#include "UAVGScript.h"
+
 #include "UAVGScriptGraphNodeSaySingle.h"
+#include "UAVGScriptGraphPin.h"
 
 UUAVGScriptGraphNodeSaySingle::UUAVGScriptGraphNodeSaySingle(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void UUAVGScriptGraphNodeSaySingle::SetupRTNode(class UUAVGScript* RTScript)
+{
+	check(RTScript != nullptr);
+	if (MyRTNode == nullptr)
+	{
+		//TODO
+	}
+}
+
+void UUAVGScriptGraphNodeSaySingle::SaveToRTNode(UUAVGScript* RTScript)
+{
+	//TODO
 }
 
 FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType) const

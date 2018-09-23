@@ -8,15 +8,16 @@ UUAVGScript::UUAVGScript()
 	ScriptName = FName("UAVGScript");
 }
 
-UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeRootNode()
+UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeScript()
 {
 	RootNode = NewObject<UUAVGScriptRuntimeNodeRoot>(this, UUAVGScriptRuntimeNodeRoot::StaticClass(), NAME_None, RF_Transactional);
+	AllNodes.Empty();
 	AllNodes.Add(RootNode);
 	return RootNode;
 }
 
-void UUAVGScript::ClearNode()
+bool UUAVGScript::AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode)
 {
-	RootNode = nullptr;
-	AllNodes.Empty();
+	//TODO
+	return true;
 }

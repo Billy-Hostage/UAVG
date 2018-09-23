@@ -11,6 +11,8 @@ class UUAVGScriptGraphNodeRoot : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
+	void SaveToRTNode(class UUAVGScript* RTScript) override;
+
 	virtual bool CanDuplicateNode() const override
 	{
 		return false;
@@ -59,6 +61,8 @@ public:
 	}
 
 	void AllocateDefaultPins() override;
+
+	void SetupRTNode(class UUAVGScript* RTScript) override;
 private:
 protected:
 	void CreateOutputPin() override;
