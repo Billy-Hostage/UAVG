@@ -81,7 +81,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
 			.BorderBackgroundColor(this, &SUAVGScriptGraphNode::GetNodeBackgroundColor)
-			.OnMouseButtonDown(this, &SUAVGScriptGraphNode::OnMouseDown)
+			//.OnMouseButtonDown(this, &SUAVGScriptGraphNode::OnMouseDown)
 			[
 				SNew(SOverlay)
 
