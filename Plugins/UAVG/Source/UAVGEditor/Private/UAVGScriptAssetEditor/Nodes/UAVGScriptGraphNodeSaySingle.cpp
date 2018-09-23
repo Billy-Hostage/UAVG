@@ -1,9 +1,10 @@
 //NTRHostage
 
-#include "UAVGScript.h"
-
 #include "UAVGScriptGraphNodeSaySingle.h"
+
+#include "UAVGScript.h"
 #include "UAVGScriptGraphPin.h"
+#include "UAVGScriptRTNodeSaySingle.h"
 
 UUAVGScriptGraphNodeSaySingle::UUAVGScriptGraphNodeSaySingle(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -15,12 +16,19 @@ void UUAVGScriptGraphNodeSaySingle::SetupRTNode(class UUAVGScript* RTScript)
 	check(RTScript != nullptr);
 	if (MyRTNode == nullptr)
 	{
-		//TODO
+		UUAVGScriptRuntimeNodeSaySingle* RTNode = NewObject<UUAVGScriptRuntimeNodeSaySingle>
+			(RTScript, UUAVGScriptRuntimeNodeSaySingle::StaticClass(), NAME_None, RF_Transactional);
+		MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(RTNode);
+		if (MyRTNode != nullptr)
+		{
+			RTScript->AddRuntimeNode(MyRTNode);
+		}
 	}
 }
 
 void UUAVGScriptGraphNodeSaySingle::SaveToRTNode(UUAVGScript* RTScript)
 {
+	Super::SaveToRTNode(RTScript);
 	//TODO
 }
 

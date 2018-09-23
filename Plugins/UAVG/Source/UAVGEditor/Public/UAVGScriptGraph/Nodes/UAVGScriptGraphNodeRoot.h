@@ -63,7 +63,11 @@ public:
 	void AllocateDefaultPins() override;
 
 	void SetupRTNode(class UUAVGScript* RTScript) override;
-private:
 protected:
 	void CreateOutputPin() override;
+protected:
+	///Properties Here
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name"))
+	FName ScriptName = "UAVGScirpt";
 };

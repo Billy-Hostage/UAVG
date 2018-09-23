@@ -19,8 +19,8 @@ public:
 
 #if WITH_EDITORONLY_DATA
 	/*Called When Editor Saving Graph*/
-	virtual void SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes);
-	virtual void SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes);
+	virtual bool SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes);
+	virtual bool SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes);
 	bool CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* InNode) const;
 	/*End Called When Editor Saving Graph*/
 #endif

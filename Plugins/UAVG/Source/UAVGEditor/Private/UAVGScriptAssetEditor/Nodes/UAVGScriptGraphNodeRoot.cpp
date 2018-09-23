@@ -1,9 +1,9 @@
 //NTRHostage
 
-#include "UAVGScript.h"
-
-#include "UAVGScriptGraphNode.h"
 #include "UAVGScriptGraphNodeRoot.h"
+
+#include "UAVGScript.h"
+#include "UAVGScriptGraphNode.h"
 
 UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -12,7 +12,8 @@ UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& Obj
 
 void UUAVGScriptGraphNodeRoot::SaveToRTNode(UUAVGScript* RTScript)
 {
-	//TODO Save Script Info
+	Super::SaveToRTNode(RTScript);
+	//TODO
 }
 
 void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()

@@ -28,10 +28,15 @@ public:
 
 	/** FGCObject interface */
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+
+	//Begin Own Functions
+	void SetDetailsViewTarget(class UObject* Target) const;
+
+	void OnSelectionChanged(const FGraphPanelSelectionSet& SelectionSet) const;
 private:
 	class UUAVGScript* EditingScript;
 
-	void CreateEditorGraph();
+	void TryCreateEditorGraph();
 
 	/** IToolkit interface */
 	virtual FName GetToolkitFName() const override;

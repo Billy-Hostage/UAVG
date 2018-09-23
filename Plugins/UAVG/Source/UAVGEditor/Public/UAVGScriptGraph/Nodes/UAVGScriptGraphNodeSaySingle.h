@@ -62,10 +62,9 @@ public:
 protected:
 	virtual void CreateOutputPin() override;
 	virtual void CreateInputPin() override;
-
 protected:
 	///Properties Here
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (DisplayName = "Text"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Say Single", meta = (DisplayName = "Say Text"))
 	FText SaySingleText;
 };

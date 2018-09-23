@@ -13,20 +13,22 @@ bool UUAVGScriptRuntimeNode::CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* 
 	return true;
 }
 
-void UUAVGScriptRuntimeNode::SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes)
+bool UUAVGScriptRuntimeNode::SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes)
 {
 	for (auto Node : InChildNodes)
 	{
-		if (!CheckNodeCanBePaentOrChild(Node)) return;
+		if (!CheckNodeCanBePaentOrChild(Node)) return false;//Failed
 	}
 	MyChildNodes = InChildNodes;
+	return true;
 }
 
-void UUAVGScriptRuntimeNode::SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes)
+bool UUAVGScriptRuntimeNode::SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes)
 {
 	for (auto Node : InParentNodes)
 	{
-		if (!CheckNodeCanBePaentOrChild(Node)) return;
+		if (!CheckNodeCanBePaentOrChild(Node)) return false;//Falied
 	}
 	MyParentNodes = InParentNodes;
+	return true;
 }

@@ -66,6 +66,26 @@ void FAssetEditor_UAVGScrpit::UnregisterTabSpawners(const TSharedRef<class FTabM
 	InTabManager->UnregisterTabSpawner(PropertiesTabId);
 }
 
+void FAssetEditor_UAVGScrpit::SetDetailsViewTarget(class UObject* Target) const
+{
+	if (DetailsView.IsValid())
+	{
+		DetailsView->SetObject(Target, false /*What's this for?*/);
+	}
+}
+
+void FAssetEditor_UAVGScrpit::OnSelectionChanged(const FGraphPanelSelectionSet& SelectionSet) const
+{
+	if (SelectionSet.Array().Num() <= 0)
+	{
+		SetDetailsViewTarget(CastChecked<UObject>(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode()));
+	}
+	else
+	{
+		SetDetailsViewTarget(SelectionSet.Array()[0]);
+	}
+}
+
 void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UUAVGScript* InScrpit)
 {
 	EditingScript = InScrpit;
@@ -73,7 +93,7 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 	EditingScript->SetFlags(RF_Transactional);
 	GEditor->RegisterForUndo(this);
 
-	CreateEditorGraph();
+	TryCreateEditorGraph();
 
 	CreateInternalWidgets();
 	
@@ -126,7 +146,7 @@ void FAssetEditor_UAVGScrpit::AddReferencedObjects(FReferenceCollector& Collecto
 	Collector.AddReferencedObject(EditingScript);
 }
 
-void FAssetEditor_UAVGScrpit::CreateEditorGraph()
+void FAssetEditor_UAVGScrpit::TryCreateEditorGraph()
 {
 	if (EditingScript->MyEdGraph == nullptr)
 	{
@@ -178,14 +198,14 @@ void FAssetEditor_UAVGScrpit::SaveAsset_Execute()
 
 void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 {
-	GraphEditor = CreateGraphEditorWidget();
-
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::ObjectsUseNameArea, false);
 	DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
-	DetailsView->SetObject(EditingScript);
+	DetailsView->SetObject(CastChecked<UObject>(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode()));
 
 	Palette = SNew(SUAVGScriptGraphPalette);
+
+	GraphEditor = CreateGraphEditorWidget();
 }
 
 TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
@@ -195,6 +215,7 @@ TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
 	AppearanceInfo.InstructionText = LOCTEXT("AppearanceInstructionText_UAVGScriptGraph", "Right Click to Add Nodes");
 
 	SGraphEditor::FGraphEditorEvents InEvents;//TODO
+	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FAssetEditor_UAVGScrpit::OnSelectionChanged);
 	//InEvents.OnCreateActionMenu = SGraphEditor::FOnCreateActionMenu::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCreateGraphActionMenu);
 
 	return SNew(SGraphEditor)

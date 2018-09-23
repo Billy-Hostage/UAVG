@@ -17,10 +17,7 @@ class UUAVGScriptGraphNode : public UEdGraphNode
 	GENERATED_UCLASS_BODY()
 
 public:
-	virtual void SaveToRTNode(class UUAVGScript* RTScript)
-	{
-		unimplemented();
-	}
+	virtual void SaveToRTNode(class UUAVGScript* RTScript);
 
 	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
 
@@ -89,7 +86,7 @@ public:
 	{
 		unimplemented();
 	}
-	const UUAVGScriptRuntimeNode* GetConstRTNode() const
+	UUAVGScriptRuntimeNode* GetRTNode()
 	{
 		return MyRTNode;
 	}

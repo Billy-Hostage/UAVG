@@ -5,7 +5,6 @@
 
 UUAVGScript::UUAVGScript()
 {
-	ScriptName = FName("UAVGScript");
 }
 
 UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeScript()

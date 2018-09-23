@@ -31,9 +31,6 @@ public:
 
 #endif
 protected:
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ShortTooltip = "Name of Script", ToolTip = "The Name of This UAVG Script"))
-	FName ScriptName;
-
 	UPROPERTY(BlueprintReadOnly)
 	UUAVGScriptRuntimeNodeRoot* RootNode;
 
