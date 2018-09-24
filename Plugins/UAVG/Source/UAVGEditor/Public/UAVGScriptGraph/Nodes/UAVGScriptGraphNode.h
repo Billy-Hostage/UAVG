@@ -10,6 +10,8 @@
 class UEdGraphPin;
 class UUAVGScriptRuntimeNode;
 
+DECLARE_LOG_CATEGORY_EXTERN(LogUAVGScriptGraphNode, Log, All);
+
 //Abstract Base Node Class
 UCLASS(Abstract, MinimalAPI)
 class UUAVGScriptGraphNode : public UEdGraphNode
@@ -102,4 +104,6 @@ protected:
 
 	UPROPERTY()
 	UUAVGScriptRuntimeNode* MyRTNode = nullptr;
+private:
+	static void GetPinConnectedNodes(class UEdGraphPin* Pin, TArray<UUAVGScriptRuntimeNode*>& OutNodes);
 };

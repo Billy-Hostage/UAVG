@@ -12,4 +12,9 @@ class UAVG_API AUAVGActor : public AActor
 	GENERATED_BODY()
 public:
 	AUAVGActor();
+
+	virtual void BeginPlay() override;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UAVG", meta = (DisplayName = "Script"))
+	class UUAVGScript* MyScript = nullptr;
 };

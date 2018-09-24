@@ -4,6 +4,8 @@
 
 #include "UAVGScriptRTNode.h"
 
+DEFINE_LOG_CATEGORY(LogUAVGScriptGraphNode);
+
 UUAVGScriptGraphNode::UUAVGScriptGraphNode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -16,35 +18,33 @@ void UUAVGScriptGraphNode::SaveToRTNode(class UUAVGScript* RTScript)
 	TArray<UUAVGScriptRuntimeNode*> ParentRTNodes;
 	TArray<UUAVGScriptRuntimeNode*> ChildRTNodes;
 
-	if (GetInputPin() != nullptr)
+	if (GetInputPin() != nullptr)//Get Parent Nodes
 	{
 		UUAVGScriptRuntimeNode* LinkedNode = nullptr;
 		TArray<UEdGraphPin*> LinkedPins = GetInputPin()->LinkedTo;
 		for (UEdGraphPin* Pin : LinkedPins)
 		{
 			if (!Pin) continue;
-			LinkedNode = CastChecked<UUAVGScriptRuntimeNode>
-				(CastChecked<UUAVGScriptGraphNode>(Pin->GetOwningNode())->GetRTNode());
-			if (LinkedNode)
-				ParentRTNodes.Add(LinkedNode);
+			
+			GetPinConnectedNodes(Pin, ParentRTNodes);
 		}
 	}
-	if (GetOutputPin() != nullptr)
+	if (GetOutputPin() != nullptr)//Get Child Nodes
 	{
 		UUAVGScriptRuntimeNode* LinkedNode = nullptr;
 		TArray<UEdGraphPin*> LinkedPins = GetOutputPin()->LinkedTo;
 		for (UEdGraphPin* Pin : LinkedPins)
 		{
 			if (!Pin) continue;
-			LinkedNode = CastChecked<UUAVGScriptRuntimeNode>
-				(CastChecked<UUAVGScriptGraphNode>(Pin->GetOwningNode())->GetRTNode());
-			if (LinkedNode)
-				ChildRTNodes.Add(LinkedNode);
+
+			GetPinConnectedNodes(Pin, ChildRTNodes);
 		}
 	}
 
-	MyRTNode->SetParent(ParentRTNodes);
-	MyRTNode->SetChild(ChildRTNodes);
+	if (!(MyRTNode->SetParent(ParentRTNodes) && MyRTNode->SetChild(ChildRTNodes)))
+	{
+		UE_LOG(LogUAVGScriptGraphNode, Error, TEXT("Parent || Child Binding Failed at Node %s"), *GetName());
+	}
 }
 
 void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
@@ -63,4 +63,11 @@ void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
 			NodeConnectionListChanged();
 		}
 	}
+}
+
+void UUAVGScriptGraphNode::GetPinConnectedNodes(class UEdGraphPin* Pin, TArray<UUAVGScriptRuntimeNode*>& OutNodes)
+{
+	UUAVGScriptRuntimeNode* LinkedNode = CastChecked<UUAVGScriptRuntimeNode>
+		(CastChecked<UUAVGScriptGraphNode>(Pin->GetOwningNode())->GetRTNode());
+	OutNodes.Add(LinkedNode);
 }

@@ -12,4 +12,7 @@ class UAVG_API UUAVGScriptRuntimeNodeSaySingle : public UUAVGScriptRuntimeNode
 	GENERATED_BODY()
 public:
 	UUAVGScriptRuntimeNodeSaySingle();
+
+	UPROPERTY(BlueprintReadOnly)
+	FText SaySingleText;
 };

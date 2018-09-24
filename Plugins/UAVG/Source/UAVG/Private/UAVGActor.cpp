@@ -6,3 +6,8 @@ AUAVGActor::AUAVGActor()
 {
 
 }
+
+void AUAVGActor::BeginPlay()
+{
+	Super::BeginPlay();
+}

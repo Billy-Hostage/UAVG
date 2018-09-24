@@ -8,6 +8,8 @@
 class UUAVGScriptRuntimeNode;
 class UUAVGScriptRuntimeNodeRoot;
 
+DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeScript, Log, All);
+
 //Main Script Data Asset Holder for UAVG Plugin
 UCLASS(Blueprintable, BlueprintType)
 class UAVG_API UUAVGScript : public UObject
@@ -23,6 +25,9 @@ public:
 	UUAVGScriptRuntimeNodeRoot* SetupNewRuntimeScript();
 
 	bool AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode);
+
+	UFUNCTION(BlueprintCallable)
+	const FText& TestScript();
 
 #if WITH_EDITORONLY_DATA
 

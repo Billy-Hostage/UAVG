@@ -12,4 +12,7 @@ class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 	GENERATED_BODY()
 public:
 	UUAVGScriptRuntimeNodeRoot();
+
+	UPROPERTY(BlueprintReadOnly)
+	FName ScriptName;
 };

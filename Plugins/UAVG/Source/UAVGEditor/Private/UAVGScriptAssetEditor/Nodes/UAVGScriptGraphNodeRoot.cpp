@@ -13,7 +13,9 @@ UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& Obj
 void UUAVGScriptGraphNodeRoot::SaveToRTNode(UUAVGScript* RTScript)
 {
 	Super::SaveToRTNode(RTScript);
-	//TODO
+	UUAVGScriptRuntimeNodeRoot* RTRootNode = CastChecked<UUAVGScriptRuntimeNodeRoot>(MyRTNode);
+	
+	RTRootNode->ScriptName = ScriptName;
 }
 
 void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()

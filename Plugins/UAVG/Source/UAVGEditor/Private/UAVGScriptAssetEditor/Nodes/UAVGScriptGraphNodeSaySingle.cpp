@@ -16,8 +16,7 @@ void UUAVGScriptGraphNodeSaySingle::SetupRTNode(class UUAVGScript* RTScript)
 	check(RTScript != nullptr);
 	if (MyRTNode == nullptr)
 	{
-		UUAVGScriptRuntimeNodeSaySingle* RTNode = NewObject<UUAVGScriptRuntimeNodeSaySingle>
-			(RTScript, UUAVGScriptRuntimeNodeSaySingle::StaticClass(), NAME_None, RF_Transactional);
+		UUAVGScriptRuntimeNodeSaySingle* RTNode = NewObject<UUAVGScriptRuntimeNodeSaySingle>(RTScript);
 		MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(RTNode);
 		if (MyRTNode != nullptr)
 		{
@@ -29,7 +28,9 @@ void UUAVGScriptGraphNodeSaySingle::SetupRTNode(class UUAVGScript* RTScript)
 void UUAVGScriptGraphNodeSaySingle::SaveToRTNode(UUAVGScript* RTScript)
 {
 	Super::SaveToRTNode(RTScript);
-	//TODO
+	UUAVGScriptRuntimeNodeSaySingle* RTSaySingleNode = CastChecked<UUAVGScriptRuntimeNodeSaySingle>(MyRTNode);
+
+	RTSaySingleNode->SaySingleText = SaySingleText;
 }
 
 FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType) const
