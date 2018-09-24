@@ -13,6 +13,11 @@ class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeRoot();
 
+	///Properties Here
+
 	UPROPERTY(BlueprintReadOnly)
 	FName ScriptName;
+
+	UPROPERTY(BlueprintReadOnly)
+	uint8 CharacterDisplayDelayInMs = 200;
 };

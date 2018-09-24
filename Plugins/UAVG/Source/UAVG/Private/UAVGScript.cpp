@@ -2,6 +2,7 @@
 
 #include "UAVGScript.h"
 #include "UAVGScriptRTNodeRoot.h"
+#include "UAVGActor.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGRuntimeScript);
 
@@ -9,11 +10,35 @@ UUAVGScript::UUAVGScript()
 {
 }
 
+void UUAVGScript::TickUAVGScript(AUAVGActor* Ticker)
+{
+	if (CurrentStatus == EUAVGScriptStatus::Speaking)
+	{
+		//TODO Spaeking Here
+	}
+}
+
+void UUAVGScript::UAVGScriptNext(FUAVGActorNextResponse& InResponse)
+{
+	switch (CurrentStatus)
+	{
+	case EUAVGScriptStatus::ReadyForNext:
+		//Goto Next Node Here
+		InResponse.Type = EUAVGActorNextResponseType::Success;
+		break;
+	default:
+		InResponse.Type = EUAVGActorNextResponseType::Failed;
+		break;
+	}
+}
+
 UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeScript()
 {
 	RootNode = NewObject<UUAVGScriptRuntimeNodeRoot>(this, UUAVGScriptRuntimeNodeRoot::StaticClass(), NAME_None, RF_Transactional);
 	AllNodes.Empty();
 	AddRuntimeNode(RootNode);
+	CurrentNode = Cast<UUAVGScriptRuntimeNode>(RootNode);
+	CurrentStatus = EUAVGScriptStatus::ReadyForNext;
 	return RootNode;
 }
 

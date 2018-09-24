@@ -70,4 +70,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name"))
 	FName ScriptName = "UAVGScirpt";
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Display Delay (ms)"))
+	uint8 CharacterDisplayDelayInMs = 200;
 };
