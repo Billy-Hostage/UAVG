@@ -14,5 +14,8 @@ public:
 	UUAVGScriptRuntimeNodeSaySingle();
 
 	UPROPERTY(BlueprintReadOnly)
-	FText SaySingleText;
+	TArray<FText> SaySingleTextsArray;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<uint8> DisplayCharacterDelayInMs;
 };

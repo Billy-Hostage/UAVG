@@ -30,7 +30,8 @@ void UUAVGScriptGraphNodeSaySingle::SaveToRTNode(UUAVGScript* RTScript)
 	Super::SaveToRTNode(RTScript);
 	UUAVGScriptRuntimeNodeSaySingle* RTSaySingleNode = CastChecked<UUAVGScriptRuntimeNodeSaySingle>(MyRTNode);
 
-	RTSaySingleNode->SaySingleText = SaySingleText;
+	RTSaySingleNode->SaySingleTextsArray = SaySingleTextArray;
+	RTSaySingleNode->DisplayCharacterDelayInMs = DisplayCharacterDelayInMs;              
 }
 
 FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType) const

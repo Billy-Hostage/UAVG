@@ -66,5 +66,8 @@ protected:
 	///Properties Here
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Say Single", meta = (DisplayName = "Say Text"))
-	FText SaySingleText;
+	TArray<FText> SaySingleTextArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Say Single", meta = (DisplayName = "Display Text Delay"))
+	TArray<uint8> DisplayCharacterDelayInMs;
 };
