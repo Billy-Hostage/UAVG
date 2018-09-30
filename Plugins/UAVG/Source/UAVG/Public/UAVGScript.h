@@ -18,7 +18,7 @@ class UAVG_API UUAVGScript : public UObject
 public:
 	UUAVGScript();
 
-	const UUAVGScriptRuntimeNodeRoot* GetConstRuntimeRootNode() const
+	UUAVGScriptRuntimeNodeRoot* GetRuntimeRootNode() const
 	{
 		return RootNode;
 	};

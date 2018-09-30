@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UAVGScriptGraphNode.h"
+#include "UAVGText.h"
 #include "UAVGScriptGraphNodeSaySingle.generated.h"
 
 UCLASS(MinimalAPI)
@@ -66,8 +67,5 @@ protected:
 	///Properties Here
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Say Single", meta = (DisplayName = "Say Text"))
-	TArray<FText> SaySingleTextArray;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Say Single", meta = (DisplayName = "Display Text Delay"))
-	TArray<uint8> DisplayCharacterDelayInMs;
+	TArray<FUAVGText> SaySingleTextArray;
 };

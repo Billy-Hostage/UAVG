@@ -31,7 +31,6 @@ void UUAVGScriptGraphNodeSaySingle::SaveToRTNode(UUAVGScript* RTScript)
 	UUAVGScriptRuntimeNodeSaySingle* RTSaySingleNode = CastChecked<UUAVGScriptRuntimeNodeSaySingle>(MyRTNode);
 
 	RTSaySingleNode->SaySingleTextsArray = SaySingleTextArray;
-	RTSaySingleNode->DisplayCharacterDelayInMs = DisplayCharacterDelayInMs;              
 }
 
 FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType) const
@@ -40,11 +39,11 @@ FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType
 	{
 	case ENodeTitleType::ListView:
 	case ENodeTitleType::EditableTitle:
-		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleList", "Say Single");
+		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleList", "Say Single Line");
 	case ENodeTitleType::FullTitle:
 	case ENodeTitleType::MenuTitle:
 	default:
-		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleFullTitle", "Say Single Node");
+		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleFullTitle", "Say Single Line Node");
 	}
 }
 

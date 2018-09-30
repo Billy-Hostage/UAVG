@@ -7,6 +7,14 @@ UUAVGScriptRuntimeNode::UUAVGScriptRuntimeNode()
 
 }
 
+UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNode::GetNextNode()
+{
+	if (MyChildNodes.Num() <= 0)
+		return nullptr;
+
+	return MyChildNodes[0];
+}
+
 bool UUAVGScriptRuntimeNode::CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* InNode) const
 {
 	if (InNode == this || InNode == nullptr) return false;//TODO Error Message

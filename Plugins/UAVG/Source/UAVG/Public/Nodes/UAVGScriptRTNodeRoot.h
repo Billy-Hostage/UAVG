@@ -13,11 +13,13 @@ class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeRoot();
 
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+
 	///Properties Here
 
 	UPROPERTY(BlueprintReadOnly)
 	FName ScriptName;
 
 	UPROPERTY(BlueprintReadOnly)
-	uint8 CharacterDisplayDelayInMs = 200;
+	uint8 DefaultCharacterDisplayDelayInMs = 200;
 };

@@ -39,6 +39,6 @@ const FText& UUAVGScript::TestScript()
 	//temporary testing code
 	UUAVGScriptRuntimeNodeSaySingle* SaySingleNode = Cast<UUAVGScriptRuntimeNodeSaySingle>(RootNode->MyChildNodes[0]);
 	if (!SaySingleNode) return FText::GetEmpty();
-	/*if(SaySingleNode->SaySingleTextsArray.)*/
-	return SaySingleNode->SaySingleTextsArray[0];
+	if (!SaySingleNode->SaySingleTextsArray.IsValidIndex(0)) return FText::GetEmpty();
+	return SaySingleNode->SaySingleTextsArray[0].TextLine;
 }

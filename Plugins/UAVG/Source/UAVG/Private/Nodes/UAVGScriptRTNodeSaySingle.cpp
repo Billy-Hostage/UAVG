@@ -6,3 +6,11 @@ UUAVGScriptRuntimeNodeSaySingle::UUAVGScriptRuntimeNodeSaySingle()
 {
 
 }
+
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSaySingle::OnArrive()
+{
+	FUAVGScriptRuntimeNodeArriveResponse Response;
+	Response.bShouldUpdateDesiredTexts = true;
+	Response.DesiredTexts = SaySingleTextsArray;
+	return Response;
+}

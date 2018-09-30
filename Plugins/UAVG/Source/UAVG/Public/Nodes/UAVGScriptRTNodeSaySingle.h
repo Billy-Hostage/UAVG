@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UAVGScriptRTNode.h"
+#include "UAVGText.h"
 #include "UAVGScriptRTNodeSaySingle.generated.h"
 
 UCLASS(Blueprintable)
@@ -13,9 +14,8 @@ class UAVG_API UUAVGScriptRuntimeNodeSaySingle : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeSaySingle();
 
-	UPROPERTY(BlueprintReadOnly)
-	TArray<FText> SaySingleTextsArray;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
 
 	UPROPERTY(BlueprintReadOnly)
-	TArray<uint8> DisplayCharacterDelayInMs;
+	TArray<FUAVGText> SaySingleTextsArray;
 };
