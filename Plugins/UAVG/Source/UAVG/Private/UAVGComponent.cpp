@@ -8,21 +8,16 @@
 #include "UAVGScriptRTNodeRoot.h"
 #include "UAVGScriptRTNodeSaySingle.h"
 
-UUAVGComponent::UUAVGComponent()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-}
-
 void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (!(MyScript && UIInterface && ActorInterface)) return;
 
 	switch (GetUAVGState())
 	{
 	case EUAVGRuntimeState::URS_Speaking:
-		Speak();
+		Speak(DeltaTime);
+		break;
+	default:
 		break;
 	}
 }
@@ -108,35 +103,102 @@ FUAVGComponentNextRespose UUAVGComponent::Next(FUAVGComponentNextCommand Command
 	return Response;
 }
 
+void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
+{
+	DesiredText = NewText;
+	DisplayingNums.Init(-1, DesiredText.Num());
+	SpeakComplete.Init(false, DesiredText.Num());
+
+	for (int32 i = 0; i < DesiredText.Num(); ++i)
+	{
+		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
+		{
+			DisplayingNums[i] = 0;
+			if (DesiredText[i].CharacterDisplayDelayInMs > 0)
+			{
+				
+			}
+			else
+			{
+				//Just Update Texts and Mark as Complete
+				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
+				IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
+				SpeakComplete[i] = true;
+			}
+		}
+		else//Empty Text is Always Completed
+		{
+			SpeakComplete[i] = true;
+		}
+	}
+}
+
+FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
+{
+	FString MyString = InText.TextLine.ToString();
+
+	if (InNum > MyString.Len())
+		return InText.TextLine;
+
+	MyString = MyString.Left(InNum);
+	return FText::FromString(MyString);
+}
+
 void UUAVGComponent::NextLine(FUAVGComponentNextRespose& OutResponse)
 {
 	LastNode = CurrentNode;
 	CurrentNode = CurrentNode->GetNextNode();
 	if (CurrentNode == nullptr)
 	{
-		//We Reached the End of Script
-		CurrentState = EUAVGRuntimeState::URS_Finished;
+		OnScriptEnded();
 		OutResponse.bSucceed = true;
 		return;
 	}
+
 	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
-	if(ArriveResponse.bShouldUpdateDesiredTexts)
-		DesiredText = ArriveResponse.DesiredTexts;
+	if (ArriveResponse.bShouldUpdateDesiredTexts)
+		UpdateDesiredText(ArriveResponse.DesiredTexts);
 	OutResponse.bSucceed = true;
-	CurrentState = EUAVGRuntimeState::URS_Speaking;
-}
-
-void UUAVGComponent::Speak()
-{
-	if (DesiredText.Num() <= 0) return;
-
-	//TODO Speak Character by Character.
 	IUAVGActorInterface::Execute_OnNewLine(ActorInterface, FUAVGActorLineInfo(DesiredText));
 	IUAVGUIInterface::Execute_OnNewLine(UIInterface, FUAVGUILineInfo(DesiredText));
+	CurrentState = EUAVGRuntimeState::URS_Speaking;
+	SpeakDurationInMs = 0;//Reset timer
+}
+
+void UUAVGComponent::Speak(float DeltaTime)
+{
+	check(DeltaTime > 0.f);
+	if (DesiredText.Num() <= 0) return;
+
+	SpeakDurationInMs += FMath::RoundHalfToEven(DeltaTime * 1000.f);
+
 	for (int32 i = 0; i < DesiredText.Num(); ++i)
 	{
-		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
-		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
+		if (SpeakComplete[i]) continue;
+		if (DisplayingNums[i] < 0) continue;
+		int32 NewNums = SpeakDurationInMs / DesiredText[i].CharacterDisplayDelayInMs;
+		if (NewNums >= DesiredText[i].TextLine.ToString().Len())
+		{
+			SpeakComplete[i] = true;
+		}
+		DisplayingNums[i] = NewNums;
+		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
+		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
+	}
+	CheckIfSpeakCompleted();
+}
+
+void UUAVGComponent::CheckIfSpeakCompleted()
+{
+	for (bool b : SpeakComplete)
+	{
+		if (!b) return;
 	}
 	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
+}
+
+void UUAVGComponent::OnScriptEnded()
+{
+	/*OnFinished()*/
+	CurrentState = EUAVGRuntimeState::URS_Finished;
 }

@@ -56,7 +56,10 @@ class UAVG_API UUAVGComponent : public UActorComponent
 {
 	GENERATED_BODY()
 public:
-	UUAVGComponent();
+	UUAVGComponent()
+	{
+		PrimaryComponentTick.bCanEverTick = true;
+	}
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -87,12 +90,26 @@ public:
 private:
 	EUAVGRuntimeState CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 
+	uint32 SpeakDurationInMs = 0;
+
 	class UUAVGScriptRuntimeNode* LastNode = nullptr;
 	class UUAVGScriptRuntimeNode* CurrentNode = nullptr;
 
+	///These arrays are aligned.
+	TArray<bool> SpeakComplete;
+	TArray<int32> DisplayingNums;
 	TArray<FUAVGText> DesiredText;
+
+	void UpdateDesiredText(TArray<FUAVGText> NewText);
+	void UpdateDisplayNum(int32 Index);
+
+	FText BuildTextByIndex(const FUAVGText& InText, uint8 InNum);
+
+	void CheckIfSpeakCompleted();
 protected:
 	void NextLine(FUAVGComponentNextRespose& OutResponse);
 
-	void Speak();
+	void Speak(float DeltaTime);
+
+	void OnScriptEnded();
 };
