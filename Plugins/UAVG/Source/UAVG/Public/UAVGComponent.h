@@ -90,7 +90,7 @@ public:
 private:
 	EUAVGRuntimeState CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 
-	uint32 SpeakDurationInMs = 0;
+	int32 SpeakDurationInMs = 0;
 
 	class UUAVGScriptRuntimeNode* LastNode = nullptr;
 	class UUAVGScriptRuntimeNode* CurrentNode = nullptr;
@@ -108,8 +108,14 @@ private:
 	void CheckIfSpeakCompleted();
 protected:
 	void NextLine(FUAVGComponentNextRespose& OutResponse);
+	void TrySkip();
 
 	void Speak(float DeltaTime);
 
 	void OnScriptEnded();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")
+	bool bCanPerformSkip = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")
+	int32 EachSkipTimeInMs = 200;
 };

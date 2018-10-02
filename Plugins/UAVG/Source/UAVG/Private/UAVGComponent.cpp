@@ -88,8 +88,7 @@ FUAVGComponentNextRespose UUAVGComponent::Next(FUAVGComponentNextCommand Command
 		UE_LOG(LogTemp, Warning, TEXT("TODO : Implement CustomEvent"));
 		break;
 	case EUAVGRuntimeState::URS_Speaking:
-		//TODO
-		UE_LOG(LogTemp, Warning, TEXT("TODO : Implement Skip"));
+		TrySkip();
 		break;
 	case EUAVGRuntimeState::URS_MAX:
 	case EUAVGRuntimeState::URS_NULL:
@@ -114,7 +113,7 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
 		{
 			DisplayingNums[i] = 0;
-			if (DesiredText[i].CharacterDisplayDelayInMs > 0)
+			if (DesiredText[i].GetCharacterDisplayDelayInMs() > 0)
 			{
 				
 			}
@@ -165,6 +164,14 @@ void UUAVGComponent::NextLine(FUAVGComponentNextRespose& OutResponse)
 	SpeakDurationInMs = 0;//Reset timer
 }
 
+void UUAVGComponent::TrySkip()
+{
+	if (!bCanPerformSkip) return;
+	if(!ensure(GetUAVGState() == EUAVGRuntimeState::URS_Speaking)) return;
+
+	SpeakDurationInMs += EachSkipTimeInMs;
+}
+
 void UUAVGComponent::Speak(float DeltaTime)
 {
 	check(DeltaTime > 0.f);
@@ -176,7 +183,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 	{
 		if (SpeakComplete[i]) continue;
 		if (DisplayingNums[i] < 0) continue;
-		int32 NewNums = SpeakDurationInMs / DesiredText[i].CharacterDisplayDelayInMs;
+		int32 NewNums = SpeakDurationInMs / DesiredText[i].GetCharacterDisplayDelayInMs();
 		if (NewNums >= DesiredText[i].TextLine.ToString().Len())
 		{
 			SpeakComplete[i] = true;

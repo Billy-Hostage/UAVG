@@ -17,6 +17,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Text Line"))
 	FText TextLine;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Delay (ms)", ShortTooltip = "ms"))
-	uint8 CharacterDisplayDelayInMs = 200;
+	uint32 GetCharacterDisplayDelayInMs() const
+	{
+		if (TextLine.IsEmpty() || DisplayTimeInMs == 0) return 0;
+		if (DisplayTimeInMs < 0) return CharacterDisplayDelayInMs;
+		return DisplayTimeInMs / TextLine.ToString().Len();
+	}
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Delay (ms)", ShortTooltip = "ms", Tooltip = "Only Works when 'Display Delay' is Set to Negative"))
+	int32 CharacterDisplayDelayInMs = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Display Delay (ms)", ShortTooltip = "ms", Tooltip = "Leave here Negative Number to Use 'Character Display Delay' "))
+	int32 DisplayTimeInMs = 3000;
 };
