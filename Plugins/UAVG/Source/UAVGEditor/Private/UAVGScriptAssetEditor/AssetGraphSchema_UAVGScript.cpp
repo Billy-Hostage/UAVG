@@ -4,6 +4,7 @@
 #include "UAVGScriptGraphNodeRoot.h"
 #include "EdGraph_UAVGScript.h"
 #include "UAVGScript.h"
+#include "ScopedTransaction.h"
 
 #define LOCTEXT_NAMESPACE "NewNode_UAVGScriptGraphSchemaAction"
 #define SNAP_GRID (16)
@@ -58,6 +59,17 @@ const FPinConnectionResponse UAssetGraphSchema_UAVGScript::CanCreateConnection(c
 	}
 
 	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, LOCTEXT("CanCreateConnectionMessage_OK", "Create Link"));
+}
+
+bool UAssetGraphSchema_UAVGScript::SafeDeleteNodeFromGraph(UEdGraph* Graph, UEdGraphNode* Node) const
+{
+	UUAVGScriptGraphNode* UNode = CastChecked<UUAVGScriptGraphNode>(Node);
+	if (UNode->CanUserDeleteNode())
+	{
+		//TODO
+		return true;
+	}
+	return false;
 }
 
 void UAssetGraphSchema_UAVGScript::InitializeAllNodeClass()
