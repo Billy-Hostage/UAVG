@@ -38,4 +38,13 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void OnNewLine(const FUAVGUILineInfo& Info);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnLineComplete();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnScriptComplete();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void TriggerCustomEvent(const FString& EventName, const TArray<FString>& Arguments);
 };

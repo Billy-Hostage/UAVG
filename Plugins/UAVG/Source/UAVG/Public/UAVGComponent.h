@@ -5,33 +5,24 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "UAVGText.h"
+#include "UAVGScriptRTNode.h"//We want to use the structs in this header file
 #include "UAVGComponent.generated.h"
 
 UENUM(BlueprintType)
 enum class EUAVGRuntimeState : uint8
 {
-	URS_NULL,
-	URS_NotInitialized,
-	URS_ReadyForNext,
-	URS_WaitingForAnswer,
-	URS_Speaking,
-	URS_WaitingForCustomEvent,
-	URS_Finished,
-	URS_MAX
-};
-
-UENUM(BlueprintType)
-enum class EUAVGComponentNextCommandType : uint8
-{
-	UNC_NULL,
-	UNC_SimpleNextLine,
-	UNC_Answer,
-	UNC_CustomEventCompleted,
-	UNC_MAX
+	URS_NULL UMETA(Hidden),
+	URS_NotInitialized UMETA(DisplayName = "Not Initialized"),
+	URS_ReadyForNext UMETA(DisplayName = "Ready For Next"),
+	URS_WaitingForAnswer UMETA(DisplayName = "Waiting For Answer"),
+	URS_Speaking UMETA(DisplayName = "Speaking"),
+	URS_WaitingForCustomEvent UMETA(DisplayName = "Waiting For Custom Event"),
+	URS_Finished UMETA(DisplayName = "Finished"),
+	URS_MAX UMETA(Hidden)
 };
 
 USTRUCT(BlueprintType)
-struct FUAVGComponentNextRespose
+struct FUAVGComponentNextResponse
 {
 	GENERATED_BODY()
 public:
@@ -42,15 +33,9 @@ public:
 	EUAVGRuntimeState CurrentState = EUAVGRuntimeState::URS_NULL;
 };
 
-USTRUCT(BlueprintType)
-struct FUAVGComponentNextCommand
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EUAVGComponentNextCommandType CommandType = EUAVGComponentNextCommandType::UNC_SimpleNextLine;
-};
-
+/*
+ * This is the basic Runtime Component for UAVG Plugin
+*/
 UCLASS(meta = (BlueprintSpawnableComponent))
 class UAVG_API UUAVGComponent : public UActorComponent
 {
@@ -72,14 +57,21 @@ public:
 	/*UFUNCTION(BlueprintCallable, Category = "UAVG|Save")*/
 	/*UUAVGSave* Save()*/
 
+	//This should be called when user is trying to do "Next" Operation
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
-	FUAVGComponentNextRespose Next(FUAVGComponentNextCommand Command);
+	FUAVGComponentNextResponse Next();
+
+	//This should be called when a custom event is handled by user
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
+	void EventHandled();
 protected:
 	UObject* UIInterface = nullptr;
 	AActor* ActorInterface = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UAVG|Config")
 	class UUAVGScript* MyScript = nullptr;
+
+	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 public:
 	///Getters
 	UFUNCTION(BlueprintPure, Category = "UAVG|State")
@@ -100,20 +92,26 @@ private:
 	TArray<int32> DisplayingNums;
 	TArray<FUAVGText> DesiredText;
 
+	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
+	void OnReachEventNode(FUAVGComponentNextResponse& OutResponse);
+
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);
 
 	FText BuildTextByIndex(const FUAVGText& InText, uint8 InNum);
 
-	void CheckIfSpeakCompleted();
+	void CheckIfLineCompleted();
 protected:
-	void NextLine(FUAVGComponentNextRespose& OutResponse);
+	void NextNode(FUAVGComponentNextResponse& OutResponse);
 	void TrySkip();
 
 	void Speak(float DeltaTime);
 
 	void OnScriptEnded();
+	///Configs Here
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config")
+	bool bCanNext = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")
 	bool bCanPerformSkip = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")

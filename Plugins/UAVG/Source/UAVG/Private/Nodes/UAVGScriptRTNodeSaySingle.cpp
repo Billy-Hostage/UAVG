@@ -9,8 +9,9 @@ UUAVGScriptRuntimeNodeSaySingle::UUAVGScriptRuntimeNodeSaySingle()
 
 FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSaySingle::OnArrive()
 {
-	FUAVGScriptRuntimeNodeArriveResponse Response;
-	Response.bShouldUpdateDesiredTexts = true;
+	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_Say);
+
 	Response.DesiredTexts = SaySingleTextsArray;
+
 	return Response;
 }

@@ -6,11 +6,33 @@
 #include "UAVGText.h"
 #include "UAVGScriptRTNode.generated.h"
 
+UENUM(BlueprintType)
+enum class EUAVGRuntimeNodeType : uint8
+{
+	URNT_NULL,
+	URNT_Root,
+	URNT_Say,
+	URNT_CustomEvent,
+	URNT_MAX,
+};
+
 struct FUAVGScriptRuntimeNodeArriveResponse
 {
 public:
-	bool bShouldUpdateDesiredTexts = false;
+	FUAVGScriptRuntimeNodeArriveResponse()
+	{
+	}
+	FUAVGScriptRuntimeNodeArriveResponse(EUAVGRuntimeNodeType Type)
+	{
+		NodeType = Type;
+	}
+
+	EUAVGRuntimeNodeType NodeType = EUAVGRuntimeNodeType::URNT_NULL;
+
 	TArray<FUAVGText> DesiredTexts;
+
+	FString EventName;
+	TArray<FString> EventArguments;
 };
 
 UCLASS(Abstract, BlueprintType)

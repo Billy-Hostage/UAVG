@@ -7,7 +7,6 @@
 #include "ScopedTransaction.h"
 
 #define LOCTEXT_NAMESPACE "NewNode_UAVGScriptGraphSchemaAction"
-#define SNAP_GRID (16)
 
 TArray<TSubclassOf<UUAVGScriptGraphNode>> UAssetGraphSchema_UAVGScript::ScriptGraphNodeClasses;
 const FText UAssetGraphSchema_UAVGScript::NODE_CATEGORY_NormalNode(LOCTEXT("UAVGScriptNormalNodeAction", "Normal Nodes"));
@@ -67,7 +66,7 @@ bool UAssetGraphSchema_UAVGScript::SafeDeleteNodeFromGraph(UEdGraph* Graph, UEdG
 	if (UNode->CanUserDeleteNode())
 	{
 		//TODO
-		return true;
+		//return true;
 	}
 	return false;
 }
@@ -124,7 +123,7 @@ void UAssetGraphSchema_UAVGScript::GetAllUAVGScriptGraphNodeActions(FGraphAction
 		const UUAVGScriptGraphNode* NodePtr = NodeClass->GetDefaultObject<UUAVGScriptGraphNode>();
 		if (!NodePtr->IsUserCreatableNode()) continue;//Sikp some node
 		Args.Add(TEXT("Name"), NodePtr->GetNodeTitle(ENodeTitleType::ListView));
-		TSharedPtr<FNewNode_UAVGScriptGraphSchemaAction> Action(new FNewNode_UAVGScriptGraphSchemaAction(NODE_CATEGORY_NormalNode, FText::Format(MenuDesc, Args), FText::Format(ToolTip, Args), Grouping++, NodeClass));
+		TSharedPtr<FNewNode_UAVGScriptGraphSchemaAction> Action(new FNewNode_UAVGScriptGraphSchemaAction(NODE_CATEGORY_NormalNode, FText::Format(MenuDesc, Args), FText::Format(ToolTip, Args), Grouping, NodeClass));
 		ActionMenuBuilder.AddAction(Action);
 	}
 }
@@ -143,6 +142,7 @@ FNewNode_UAVGScriptGraphSchemaAction::FNewNode_UAVGScriptGraphSchemaAction(const
 UEdGraphNode* FNewNode_UAVGScriptGraphSchemaAction::PerformAction(UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode /*= true*/)
 {
 	const FScopedTransaction Transaction(LOCTEXT("UAVGScriptEditorNewNode", "UAVGScript Editor: New Node"));
+	//TODO Undo will crash editor cus Node in editor is not "Removed"
 	UUAVGScript* Script = CastChecked<UEdGraph_UAVGScript>(ParentGraph)->GetUAVGScript();
 
 	verify(ParentGraph->Modify());
@@ -167,7 +167,7 @@ UEdGraphNode* FNewNode_UAVGScriptGraphSchemaAction::PerformAction(UEdGraph* Pare
 	}
 	NewNode->NodePosX = XLocation;
 	NewNode->NodePosY = Location.Y;
-	NewNode->SnapToGrid(SNAP_GRID);
+	NewNode->SnapToGrid(16);
 	NewNode->AutowireNewNode(FromPin);
 	return NewNode;
 }

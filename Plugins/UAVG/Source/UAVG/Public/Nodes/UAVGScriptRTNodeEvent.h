@@ -11,6 +11,8 @@ class UAVG_API UUAVGScriptRuntimeNodeEvent : public UUAVGScriptRuntimeNode
 {
 	GENERATED_BODY()
 public:
+	FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+
 	UUAVGScriptRuntimeNodeEvent();
 	
 	///Properties Here

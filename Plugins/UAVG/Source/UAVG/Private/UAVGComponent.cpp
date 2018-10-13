@@ -2,6 +2,7 @@
 
 #include "UAVGComponent.h"
 
+#include "GameFramework/Actor.h"
 #include "IUAVGActorInterface.h"
 #include "IUAVGUIInterface.h"
 #include "UAVGScript.h"
@@ -61,40 +62,44 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 
 	if (bInstantNext)
 	{
-		Next(FUAVGComponentNextCommand());
+		Next();
 	}
 
 	return true;
 }
 
-FUAVGComponentNextRespose UUAVGComponent::Next(FUAVGComponentNextCommand Command)
+FUAVGComponentNextResponse UUAVGComponent::Next()
 {
-	FUAVGComponentNextRespose Response;
+	FUAVGComponentNextResponse Response;
 	
 	switch (GetUAVGState())
 	{
-	case EUAVGRuntimeState::URS_Finished:
-		UE_LOG(LogTemp, Error, TEXT("This Script is Already Finished!"));
-		break;
 	case EUAVGRuntimeState::URS_ReadyForNext:
-		NextLine(Response);
-		break;
-	case EUAVGRuntimeState::URS_WaitingForAnswer:
-		//TODO
-		UE_LOG(LogTemp, Warning, TEXT("TODO : Implement Answer"));
-		break;
-	case EUAVGRuntimeState::URS_WaitingForCustomEvent:
-		//TODO
-		UE_LOG(LogTemp, Warning, TEXT("TODO : Implement CustomEvent"));
+		if (bCanNext)
+		{
+			NextNode(Response);
+		}
 		break;
 	case EUAVGRuntimeState::URS_Speaking:
 		TrySkip();
 		break;
+	case EUAVGRuntimeState::URS_Finished:
+		UE_LOG(LogTemp, Error, TEXT("Script Already Finished!"));
+		break;
+	case EUAVGRuntimeState::URS_WaitingForAnswer:
+		UE_LOG(LogTemp, Error, TEXT("Waiting for a Answer"));
+		break;
+	case EUAVGRuntimeState::URS_WaitingForCustomEvent:
+		UE_LOG(LogTemp, Error, TEXT("Waiting for a Event"));
+		break;
+	case EUAVGRuntimeState::URS_NotInitialized:
+		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s is not initialized!"), *GetName());
+		break;
 	case EUAVGRuntimeState::URS_MAX:
 	case EUAVGRuntimeState::URS_NULL:
-	case EUAVGRuntimeState::URS_NotInitialized:
 	default:
-		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s is not initialized!"), *GetName());
+		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s Unexpected State"), *GetName());
+		check(false);
 		break;
 	}
 
@@ -102,34 +107,16 @@ FUAVGComponentNextRespose UUAVGComponent::Next(FUAVGComponentNextCommand Command
 	return Response;
 }
 
-void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
+void UUAVGComponent::EventHandled()
 {
-	DesiredText = NewText;
-	DisplayingNums.Init(-1, DesiredText.Num());
-	SpeakComplete.Init(false, DesiredText.Num());
-
-	for (int32 i = 0; i < DesiredText.Num(); ++i)
+	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForCustomEvent)
 	{
-		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
-		{
-			DisplayingNums[i] = 0;
-			if (DesiredText[i].GetCharacterDisplayDelayInMs() > 0)
-			{
-				
-			}
-			else
-			{
-				//Just Update Texts and Mark as Complete
-				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
-				IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
-				SpeakComplete[i] = true;
-			}
-		}
-		else//Empty Text is Always Completed
-		{
-			SpeakComplete[i] = true;
-		}
+		UE_LOG(LogTemp, Error, TEXT("We are not waiting for a Event!"));
+		return;
 	}
+
+	FUAVGComponentNextResponse NextResponse;
+	NextNode(NextResponse);
 }
 
 FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
@@ -143,7 +130,7 @@ FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 	return FText::FromString(MyString);
 }
 
-void UUAVGComponent::NextLine(FUAVGComponentNextRespose& OutResponse)
+void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 {
 	LastNode = CurrentNode;
 	CurrentNode = CurrentNode->GetNextNode();
@@ -155,13 +142,21 @@ void UUAVGComponent::NextLine(FUAVGComponentNextRespose& OutResponse)
 	}
 
 	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
-	if (ArriveResponse.bShouldUpdateDesiredTexts)
-		UpdateDesiredText(ArriveResponse.DesiredTexts);
-	OutResponse.bSucceed = true;
-	IUAVGActorInterface::Execute_OnNewLine(ActorInterface, FUAVGActorLineInfo(DesiredText));
-	IUAVGUIInterface::Execute_OnNewLine(UIInterface, FUAVGUILineInfo(DesiredText));
-	CurrentState = EUAVGRuntimeState::URS_Speaking;
-	SpeakDurationInMs = 0;//Reset timer
+	LastNodeResponse = ArriveResponse;//Cache it
+
+	switch (ArriveResponse.NodeType)
+	{
+	case EUAVGRuntimeNodeType::URNT_Say:
+		OnReachSayNode(OutResponse);
+		break;
+	case EUAVGRuntimeNodeType::URNT_CustomEvent:
+		OnReachEventNode(OutResponse);
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("Unexpected Node Type!"));
+		OutResponse.bSucceed = false;
+		break;
+	}
 }
 
 void UUAVGComponent::TrySkip()
@@ -192,20 +187,68 @@ void UUAVGComponent::Speak(float DeltaTime)
 		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
 		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
 	}
-	CheckIfSpeakCompleted();
+	CheckIfLineCompleted();
 }
 
-void UUAVGComponent::CheckIfSpeakCompleted()
+void UUAVGComponent::CheckIfLineCompleted()
 {
 	for (bool b : SpeakComplete)
 	{
 		if (!b) return;
 	}
 	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
+	IUAVGActorInterface::Execute_OnLineComplete(ActorInterface);
+	IUAVGUIInterface::Execute_OnLineComplete(UIInterface);
 }
 
 void UUAVGComponent::OnScriptEnded()
 {
-	/*OnFinished()*/
 	CurrentState = EUAVGRuntimeState::URS_Finished;
+	IUAVGActorInterface::Execute_OnScriptComplete(ActorInterface);
+	IUAVGUIInterface::Execute_OnScriptComplete(UIInterface);
+}
+
+void UUAVGComponent::OnReachSayNode(FUAVGComponentNextResponse& OutResponse)
+{
+	CurrentState = EUAVGRuntimeState::URS_Speaking;
+	UpdateDesiredText(LastNodeResponse.DesiredTexts);
+	OutResponse.bSucceed = true;
+	IUAVGActorInterface::Execute_OnNewLine(ActorInterface, FUAVGActorLineInfo(DesiredText));
+	IUAVGUIInterface::Execute_OnNewLine(UIInterface, FUAVGUILineInfo(DesiredText));
+	SpeakDurationInMs = 0;//Reset timer
+}
+
+void UUAVGComponent::OnReachEventNode(FUAVGComponentNextResponse& OutResponse)
+{
+	CurrentState = EUAVGRuntimeState::URS_WaitingForCustomEvent;
+	IUAVGActorInterface::Execute_TriggerCustomEvent(ActorInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
+	IUAVGUIInterface::Execute_TriggerCustomEvent(UIInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
+	OutResponse.bSucceed = true;
+}
+
+void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
+{
+	DesiredText = NewText;
+
+	DisplayingNums.Init(-1, DesiredText.Num());
+	SpeakComplete.Init(false, DesiredText.Num());
+
+	for (int32 i = 0; i < DesiredText.Num(); ++i)
+	{
+		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
+		{
+			DisplayingNums[i] = 0;
+			if (DesiredText[i].GetCharacterDisplayDelayInMs() <= 0)
+			{
+			//Just Update Texts and Mark as Complete
+			IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
+			IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
+			SpeakComplete[i] = true;
+			}
+		}
+		else//Empty Text is Always Completed
+		{
+			SpeakComplete[i] = true;
+		}
+	}
 }
