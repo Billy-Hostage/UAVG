@@ -92,6 +92,8 @@ public:
 	{
 		return MyRTNode;
 	}
+
+	virtual void GetContextMenuActions(const FGraphNodeContextMenuBuilder& Context) const override;
 protected:
 	virtual void CreateInputPin()
 	{

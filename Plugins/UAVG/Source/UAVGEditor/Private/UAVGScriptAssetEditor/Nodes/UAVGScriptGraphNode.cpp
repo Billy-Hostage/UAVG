@@ -3,6 +3,10 @@
 #include "UAVGScriptGraphNode.h"
 
 #include "UAVGScriptRTNode.h"
+#include "Framework/Commands/GenericCommands.h"
+
+#include "EdGraph/EdGraphPin.h"
+#include "EdGraph/EdGraphSchema.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGScriptGraphNode);
 
@@ -62,6 +66,17 @@ void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
 		{
 			NodeConnectionListChanged();
 		}
+	}
+}
+
+void UUAVGScriptGraphNode::GetContextMenuActions(const FGraphNodeContextMenuBuilder& Context) const
+{
+	if (Context.Node && !IsRootNode())
+	{
+		Context.MenuBuilder->BeginSection("UAVGScriptGraphNode_BaseNodeEdit");
+
+		if (CanUserDeleteNode())
+			Context.MenuBuilder->AddMenuEntry(FGenericCommands::Get().Delete);
 	}
 }
 

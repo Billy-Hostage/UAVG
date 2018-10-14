@@ -63,6 +63,7 @@ private:
 	TSharedRef<class SGraphEditor> CreateGraphEditorWidget();
 
 	virtual void RebuildRuntimeScript();
+	virtual void RefreshUAVGEditor() const;
 
 	/**	The tab ids for all the tabs used */
 	static const FName GraphCanvasTabId;

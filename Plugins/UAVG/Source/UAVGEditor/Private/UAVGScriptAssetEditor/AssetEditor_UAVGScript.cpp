@@ -72,13 +72,14 @@ void FAssetEditor_UAVGScrpit::UnregisterTabSpawners(const TSharedRef<class FTabM
 
 	InTabManager->UnregisterTabSpawner(GraphCanvasTabId);
 	InTabManager->UnregisterTabSpawner(PropertiesTabId);
+	InTabManager->UnregisterTabSpawner(PaletteTabId);
 }
 
 void FAssetEditor_UAVGScrpit::SetDetailsViewTarget(class UObject* Target) const
 {
 	if (DetailsView.IsValid())
 	{
-		DetailsView->SetObject(Target, false /*What's this for?*/);
+		DetailsView->SetObject(Target, true /*What's this for?*/);
 	}
 }
 
@@ -149,13 +150,7 @@ void FAssetEditor_UAVGScrpit::PostUndo(bool bSuccess)
 {
 	if (bSuccess)
 	{
-		if (GraphEditor.IsValid())
-		{
-			GraphEditor->ClearSelectionSet();
-			GraphEditor->NotifyGraphChanged();
-			SetDetailsViewTarget(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode());
-			FSlateApplication::Get().DismissAllMenus();
-		}
+		RefreshUAVGEditor();
 	}
 }
 
@@ -179,6 +174,7 @@ void FAssetEditor_UAVGScrpit::BindEditorCommands()
 {
 	if (GraphEditorCommands.IsValid())
 		return;
+	FGraphEditorCommands::Register();
 	GraphEditorCommands = MakeShareable(new FUICommandList);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
@@ -188,13 +184,40 @@ void FAssetEditor_UAVGScrpit::BindEditorCommands()
 
 void FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes() const
 {
-	//TODO
+	if (!GraphEditor.IsValid() || EditingScript == nullptr)
+		return;
+	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
+
+	UUAVGScriptGraphNode* NodeObj = nullptr;
+	for (UObject* Obj : SelectedNodes)
+	{
+		EditingScript->MyEdGraph->RemoveNode(Cast<UEdGraphNode>(Obj));
+	}
+
+	RefreshUAVGEditor();
 }
 
 bool FAssetEditor_UAVGScrpit::CanDeleteNodes() const
 {
-	//TODO
-	return false;
+	if (!GraphEditor.IsValid())
+		return false;
+	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
+	
+	UUAVGScriptGraphNode* NodeObj = nullptr;
+	for (UObject* Obj : SelectedNodes)
+	{
+		NodeObj = Cast<UUAVGScriptGraphNode>(Obj);
+		if (NodeObj == nullptr)
+		{
+			return false;
+		}
+		else if(!NodeObj->CanUserDeleteNode())
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 FName FAssetEditor_UAVGScrpit::GetToolkitFName() const
@@ -272,6 +295,17 @@ void FAssetEditor_UAVGScrpit::RebuildRuntimeScript()
 	{
 		UEdGraph_UAVGScript* ScriptGraph = CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph);
 		ScriptGraph->RebulidRuntimeScript();
+	}
+}
+
+void FAssetEditor_UAVGScrpit::RefreshUAVGEditor() const
+{
+	if (GraphEditor.IsValid())
+	{
+		GraphEditor->ClearSelectionSet();
+		GraphEditor->NotifyGraphChanged();
+		SetDetailsViewTarget(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode());
+		FSlateApplication::Get().DismissAllMenus();
 	}
 }
 
