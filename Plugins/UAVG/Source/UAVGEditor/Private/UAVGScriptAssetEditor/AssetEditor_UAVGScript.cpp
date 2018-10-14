@@ -5,16 +5,24 @@
 #include "EdGraph_UAVGScript.h"
 #include "AssetGraphSchema_UAVGScript.h"
 #include "UAVGScript.h"
+#include "UAVGScriptGraphNodeRoot.h"
 
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
 #include "SUAVGScriptGraphPalette.h"
 
+#include "Framework/Commands/GenericCommands.h"
+#include "GraphEditorActions.h"
+#include "ModuleManager.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "ScopedTransaction.h"
 #include "GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "Widgets/Docking/SDockTab.h"
+#include "PropertyEditorModule.h"
+#include "Framework/Application/SlateApplication.h"
 #include "EditorStyleSet.h"
+#include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
 DEFINE_LOG_CATEGORY(LogUAVGScriptAssetEditor);
@@ -27,7 +35,7 @@ const FName FAssetEditor_UAVGScrpit::PaletteTabId(TEXT("UAVGScriptEditor_Palette
 FAssetEditor_UAVGScrpit::FAssetEditor_UAVGScrpit()
 	:EditingScript(nullptr)
 {
-
+	GEditor->RegisterForUndo(this);
 }
 
 FAssetEditor_UAVGScrpit::~FAssetEditor_UAVGScrpit()
@@ -91,11 +99,12 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 	EditingScript = InScrpit;
 
 	EditingScript->SetFlags(RF_Transactional);
-	GEditor->RegisterForUndo(this);
 
 	TryCreateEditorGraph();
 
 	CreateInternalWidgets();
+
+	BindEditorCommands();
 	
 	TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_UAVGScriptEditor_Layout_v2")->AddArea
 	(
@@ -138,7 +147,16 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 
 void FAssetEditor_UAVGScrpit::PostUndo(bool bSuccess)
 {
-	//TODO Rearrange and save
+	if (bSuccess)
+	{
+		if (GraphEditor.IsValid())
+		{
+			GraphEditor->ClearSelectionSet();
+			GraphEditor->NotifyGraphChanged();
+			SetDetailsViewTarget(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode());
+			FSlateApplication::Get().DismissAllMenus();
+		}
+	}
 }
 
 void FAssetEditor_UAVGScrpit::AddReferencedObjects(FReferenceCollector& Collector)
@@ -155,6 +173,28 @@ void FAssetEditor_UAVGScrpit::TryCreateEditorGraph()
 		const UEdGraphSchema* Schema = EditingScript->MyEdGraph->GetSchema();
 		Schema->CreateDefaultNodesForGraph(*(EditingScript->MyEdGraph));
 	}
+}
+
+void FAssetEditor_UAVGScrpit::BindEditorCommands()
+{
+	if (GraphEditorCommands.IsValid())
+		return;
+	GraphEditorCommands = MakeShareable(new FUICommandList);
+
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
+		FExecuteAction::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_UAVGScrpit::CanDeleteNodes));
+}
+
+void FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes() const
+{
+	//TODO
+}
+
+bool FAssetEditor_UAVGScrpit::CanDeleteNodes() const
+{
+	//TODO
+	return false;
 }
 
 FName FAssetEditor_UAVGScrpit::GetToolkitFName() const
@@ -201,7 +241,7 @@ void FAssetEditor_UAVGScrpit::CreateInternalWidgets()
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::ObjectsUseNameArea, false);
 	DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
-	DetailsView->SetObject(CastChecked<UObject>(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode()));
+	DetailsView->SetObject(CastChecked<UEdGraph_UAVGScript>(EditingScript->MyEdGraph)->GetRootNode());
 
 	Palette = SNew(SUAVGScriptGraphPalette);
 
@@ -214,7 +254,7 @@ TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
 	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_UAVGScriptGraph", "UAVG SCRIPT");
 	AppearanceInfo.InstructionText = LOCTEXT("AppearanceInstructionText_UAVGScriptGraph", "Right Click to Add Nodes");
 
-	SGraphEditor::FGraphEditorEvents InEvents;//TODO
+	SGraphEditor::FGraphEditorEvents InEvents;
 	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FAssetEditor_UAVGScrpit::OnSelectionChanged);
 	//InEvents.OnCreateActionMenu = SGraphEditor::FOnCreateActionMenu::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCreateGraphActionMenu);
 

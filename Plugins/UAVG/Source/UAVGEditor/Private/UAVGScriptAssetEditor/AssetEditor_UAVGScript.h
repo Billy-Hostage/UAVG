@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IUAVGScriptEditor.h"
+#include "GraphEditor.h"
 #include "EditorUndoClient.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGScriptAssetEditor, Log, All);
@@ -38,6 +39,11 @@ private:
 
 	void TryCreateEditorGraph();
 
+	void BindEditorCommands();
+
+	void OnCommandDeleteSelectedNodes() const;
+	bool CanDeleteNodes() const;
+
 	/** IToolkit interface */
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetToolkitName() const override;
@@ -71,4 +77,6 @@ private:
 
 	/** Palette of Sound Node types */
 	TSharedPtr<class SUAVGScriptGraphPalette> Palette;
+
+	TSharedPtr<FUICommandList> GraphEditorCommands;
 };
