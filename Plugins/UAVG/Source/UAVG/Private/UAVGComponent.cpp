@@ -8,6 +8,9 @@
 #include "UAVGScript.h"
 #include "UAVGScriptRTNodeRoot.h"
 #include "UAVGScriptRTNodeSaySingle.h"
+#include "UAVGSaveGame.h"
+
+#include "Kismet/GameplayStatics.h"
 
 void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -66,6 +69,13 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 	}
 
 	return true;
+}
+
+UUAVGSaveGame* UUAVGComponent::Save()
+{
+	UUAVGSaveGame* SaveObj = CastChecked<UUAVGSaveGame>(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	WarpUpSaveObject(SaveObj);
+	return SaveObj;
 }
 
 FUAVGComponentNextResponse UUAVGComponent::Next()
@@ -251,4 +261,9 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 			SpeakComplete[i] = true;
 		}
 	}
+}
+
+void UUAVGComponent::WarpUpSaveObject(UUAVGSaveGame* InSave)
+{
+
 }

@@ -52,10 +52,10 @@ public:
 	bool InitializeNew(UObject* UIObject, AActor* ParentActor, bool bInstantNext = true);
 
 	/*UFUNCTION(BlueprintCallable, Category = "UAVG|Save")*/
-	/*bool InitializeFromSave(class UUAVGSave* SaveData);*/
+	/*bool InitializeFromSave(class UUAVGSaveGame* SaveData);*/
 
-	/*UFUNCTION(BlueprintCallable, Category = "UAVG|Save")*/
-	/*UUAVGSave* Save()*/
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
+	class UUAVGSaveGame* Save();
 
 	//This should be called when user is trying to do "Next" Operation
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
@@ -103,11 +103,15 @@ private:
 	void CheckIfLineCompleted();
 protected:
 	void NextNode(FUAVGComponentNextResponse& OutResponse);
+
 	void TrySkip();
 
 	void Speak(float DeltaTime);
 
 	void OnScriptEnded();
+
+	void WarpUpSaveObject(class UUAVGSaveGame* InSave);
+
 	///Configs Here
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config")
