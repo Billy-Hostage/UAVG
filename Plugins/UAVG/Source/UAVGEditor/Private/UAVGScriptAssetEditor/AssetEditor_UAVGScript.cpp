@@ -103,9 +103,10 @@ void FAssetEditor_UAVGScrpit::InitUAVGScriptAssetEditor(const EToolkitMode::Type
 
 	TryCreateEditorGraph();
 
-	CreateInternalWidgets();
-
+	FGraphEditorCommands::Register();
 	BindEditorCommands();
+
+	CreateInternalWidgets();
 	
 	TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_UAVGScriptEditor_Layout_v2")->AddArea
 	(
@@ -174,24 +175,39 @@ void FAssetEditor_UAVGScrpit::BindEditorCommands()
 {
 	if (GraphEditorCommands.IsValid())
 		return;
-	FGraphEditorCommands::Register();
 	GraphEditorCommands = MakeShareable(new FUICommandList);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
-		FExecuteAction::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes),
-		FCanExecuteAction::CreateSP(this, &FAssetEditor_UAVGScrpit::CanDeleteNodes));
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanDeleteNodes));
 }
 
 void FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes() const
 {
 	if (!GraphEditor.IsValid() || EditingScript == nullptr)
 		return;
-	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
+
+	const FScopedTransaction Transaction(FGenericCommands::Get().Delete->GetDescription());
+	GraphEditor->GetCurrentGraph()->Modify();
+	TSet<UObject*> SelectedNodes = GraphEditor->GetSelectedNodes();
+	GraphEditor->ClearSelectionSet();
 
 	UUAVGScriptGraphNode* NodeObj = nullptr;
 	for (UObject* Obj : SelectedNodes)
 	{
-		EditingScript->MyEdGraph->RemoveNode(Cast<UEdGraphNode>(Obj));
+		NodeObj = CastChecked<UUAVGScriptGraphNode>(Obj);
+		if (NodeObj == nullptr || !NodeObj->CanUserDeleteNode())
+			continue;
+
+		NodeObj->Modify();
+
+		const UEdGraphSchema* Schema = NodeObj->GetSchema();
+		if (Schema != nullptr)
+		{
+			Schema->BreakNodeLinks(*NodeObj);
+		}
+
+		NodeObj->DestroyNode();
 	}
 
 	RefreshUAVGEditor();
@@ -199,25 +215,23 @@ void FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes() const
 
 bool FAssetEditor_UAVGScrpit::CanDeleteNodes() const
 {
-	if (!GraphEditor.IsValid())
+	if (!GraphEditor.IsValid() || EditingScript == nullptr)
 		return false;
+
 	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
 	
 	UUAVGScriptGraphNode* NodeObj = nullptr;
 	for (UObject* Obj : SelectedNodes)
 	{
 		NodeObj = Cast<UUAVGScriptGraphNode>(Obj);
-		if (NodeObj == nullptr)
+		
+		if (NodeObj != nullptr && NodeObj->CanUserDeleteNode())
 		{
-			return false;
-		}
-		else if(!NodeObj->CanUserDeleteNode())
-		{
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 FName FAssetEditor_UAVGScrpit::GetToolkitFName() const
@@ -282,6 +296,7 @@ TSharedRef<SGraphEditor> FAssetEditor_UAVGScrpit::CreateGraphEditorWidget()
 	//InEvents.OnCreateActionMenu = SGraphEditor::FOnCreateActionMenu::CreateSP(this, &FAssetEditor_UAVGScrpit::OnCreateGraphActionMenu);
 
 	return SNew(SGraphEditor)
+		.AdditionalCommands(GraphEditorCommands)
 		.IsEditable(true)
 		.Appearance(AppearanceInfo)
 		.GraphToEdit(EditingScript->MyEdGraph)
