@@ -17,6 +17,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Text Line"))
 	FText TextLine;
 
+	//TODO Make this better
 	uint32 GetCharacterDisplayDelayInMs() const
 	{
 		if (TextLine.IsEmpty() || DisplayTimeInMs == 0) return 0;

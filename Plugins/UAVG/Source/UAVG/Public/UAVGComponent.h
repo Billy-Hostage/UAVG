@@ -18,6 +18,7 @@ enum class EUAVGRuntimeState : uint8
 	URS_Speaking UMETA(DisplayName = "Speaking"),
 	URS_WaitingForCustomEvent UMETA(DisplayName = "Waiting For Custom Event"),
 	URS_Finished UMETA(DisplayName = "Finished"),
+	URS_FatalError UMETA(DisplayName = "Fatal Error"),
 	URS_MAX UMETA(Hidden)
 };
 
@@ -51,8 +52,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG")
 	bool InitializeNew(UObject* UIObject, AActor* ParentActor, bool bInstantNext = true);
 
-	/*UFUNCTION(BlueprintCallable, Category = "UAVG|Save")*/
-	/*bool InitializeFromSave(class UUAVGSaveGame* SaveData);*/
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
+	bool InitializeFromSave(UObject* UIObject, AActor* ParentActor, class UUAVGSaveGame* SaveData);
+
+	/*UFUNCTION(BlueprintCallable, Category = "UAVG")
+	void Reset();*/
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
 	class UUAVGSaveGame* Save();
@@ -103,6 +107,7 @@ private:
 	void CheckIfLineCompleted();
 protected:
 	void NextNode(FUAVGComponentNextResponse& OutResponse);
+	void ProcessNode(FUAVGComponentNextResponse& OutResponse);
 
 	void TrySkip();
 
@@ -110,7 +115,8 @@ protected:
 
 	void OnScriptEnded();
 
-	void WarpUpSaveObject(class UUAVGSaveGame* InSave);
+	void WarpSaveObject(class UUAVGSaveGame* InSave);
+	void UnWarpSaveObject(class UUAVGSaveGame* InSave);
 
 	///Configs Here
 

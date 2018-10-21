@@ -21,13 +21,17 @@ void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 	case EUAVGRuntimeState::URS_Speaking:
 		Speak(DeltaTime);
 		break;
-	default:
-		break;
 	}
 }
 
 bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool bInstantNext/* = true*/)
 {
+	if (GetUAVGState() != EUAVGRuntimeState::URS_NotInitialized)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Component %s has been initialized already."), *GetName());
+		return false;
+	}
+
 	if (MyScript == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("MyScript cant be null!"));
@@ -71,10 +75,79 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 	return true;
 }
 
+bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, class UUAVGSaveGame* SaveData)
+{
+	if (GetUAVGState() != EUAVGRuntimeState::URS_NotInitialized)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Component %s has been initialized already."), *GetName());
+		return false;
+	}
+
+	if (!SaveData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid SaveData"));
+		return false;
+	}
+	if (SaveData->MyScript != MyScript)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Incompatible SaveData"));
+		return false;
+	}
+
+	if (MyScript == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MyScript cant be null!"));
+		return false;
+	}
+	if (ParentActor == nullptr) ParentActor = GetOwner();
+
+	if (UIObject && UIObject->GetClass()->ImplementsInterface(UUAVGUIInterface::StaticClass()))
+	{
+		UIInterface = UIObject;
+	}
+	if (ParentActor && ParentActor->GetClass()->ImplementsInterface(UUAVGActorInterface::StaticClass()))
+	{
+		ActorInterface = ParentActor;
+	}
+
+	UnWarpSaveObject(SaveData);
+	if (CurrentNode)
+	{
+		CurrentNode->UnWarpUAVGSaveGame(SaveData);
+		FUAVGComponentNextResponse Response;
+		ProcessNode(Response);
+		return true;
+	}
+
+	return false;
+}
+
 UUAVGSaveGame* UUAVGComponent::Save()
 {
-	UUAVGSaveGame* SaveObj = CastChecked<UUAVGSaveGame>(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
-	WarpUpSaveObject(SaveObj);
+	if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Component %s hasn't been initialized yet."), *GetName());
+		return nullptr;
+	}
+	else if (GetUAVGState() == EUAVGRuntimeState::URS_FatalError)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
+		return nullptr;
+	}
+	else if (GetUAVGState() == EUAVGRuntimeState::URS_Finished)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s has finished"), *GetName());
+		return nullptr;
+	}
+
+	UUAVGSaveGame* SaveObj = CastChecked<UUAVGSaveGame>
+		(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	if(!ensure(SaveObj)) return nullptr;
+
+	WarpSaveObject(SaveObj);
+	if (CurrentNode)
+		CurrentNode->WarpUAVGSaveGame(SaveObj);
+
 	return SaveObj;
 }
 
@@ -105,11 +178,14 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 	case EUAVGRuntimeState::URS_NotInitialized:
 		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s is not initialized!"), *GetName());
 		break;
+	case EUAVGRuntimeState::URS_FatalError:
+		UE_LOG(LogTemp, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
+		break;
 	case EUAVGRuntimeState::URS_MAX:
 	case EUAVGRuntimeState::URS_NULL:
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s Unexpected State"), *GetName());
-		check(false);
+		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		break;
 	}
 
@@ -151,6 +227,11 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 		return;
 	}
 
+	ProcessNode(OutResponse);
+}
+
+void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
+{
 	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
 	LastNodeResponse = ArriveResponse;//Cache it
 
@@ -164,6 +245,7 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("Unexpected Node Type!"));
+		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		OutResponse.bSucceed = false;
 		break;
 	}
@@ -263,7 +345,21 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 	}
 }
 
-void UUAVGComponent::WarpUpSaveObject(UUAVGSaveGame* InSave)
+void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 {
+	if (!InSave)
+		return;
 
+	InSave->MyScript = MyScript;
+	InSave->CurrentNode = CurrentNode;
+	InSave->LastNode = LastNode;
+}
+
+void UUAVGComponent::UnWarpSaveObject(class UUAVGSaveGame* InSave)
+{
+	if (!InSave)
+		return;
+
+	CurrentNode = InSave->CurrentNode;
+	LastNode = InSave->LastNode;
 }

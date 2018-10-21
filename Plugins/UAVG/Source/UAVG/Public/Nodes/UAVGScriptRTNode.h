@@ -48,6 +48,9 @@ public:
 	}
 	virtual UUAVGScriptRuntimeNode* GetNextNode();
 
+	virtual void WarpUAVGSaveGame(class UUAVGSaveGame* InSave){}
+	virtual void UnWarpUAVGSaveGame(class UUAVGSaveGame* InSave){}
+
 	/*Called When Editor Saving Graph*/
 	virtual bool SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes);
 	virtual bool SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes);

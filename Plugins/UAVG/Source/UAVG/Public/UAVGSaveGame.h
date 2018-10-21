@@ -14,8 +14,11 @@ public:
 	UUAVGSaveGame();
 
 	UPROPERTY()
-	TArray<class UUAVGScriptRuntimeNode*> CurrentNodes;
+	class UUAVGScript* MyScript;
 
 	UPROPERTY()
-	TArray<class UUAVGScriptRuntimeNode*> LastNodes;
+	class UUAVGScriptRuntimeNode* CurrentNode;
+
+	UPROPERTY()
+	class UUAVGScriptRuntimeNode* LastNode;
 };
