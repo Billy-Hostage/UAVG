@@ -122,7 +122,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	return false;
 }
 
-UUAVGSaveGame* UUAVGComponent::Save()
+UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 {
 	if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
 	{
@@ -140,8 +140,12 @@ UUAVGSaveGame* UUAVGComponent::Save()
 		return nullptr;
 	}
 
-	UUAVGSaveGame* SaveObj = CastChecked<UUAVGSaveGame>
-		(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	if (!SaveObj)
+	{
+		SaveObj = CastChecked<UUAVGSaveGame>
+			(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	}
+
 	if(!ensure(SaveObj)) return nullptr;
 
 	WarpSaveObject(SaveObj);
@@ -243,6 +247,9 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 	case EUAVGRuntimeNodeType::URNT_CustomEvent:
 		OnReachEventNode(OutResponse);
 		break;
+	case EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor:
+		OnReachEnvironmentDescriptorNode(OutResponse);
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("Unexpected Node Type!"));
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
@@ -316,6 +323,21 @@ void UUAVGComponent::OnReachEventNode(FUAVGComponentNextResponse& OutResponse)
 	IUAVGActorInterface::Execute_TriggerCustomEvent(ActorInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
 	IUAVGUIInterface::Execute_TriggerCustomEvent(UIInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
 	OutResponse.bSucceed = true;
+}
+
+void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse& OutResponse)
+{
+	if (!LastNodeResponse.EnvironmentToAdd.IsEmpty())
+	{
+		EnvironmentDescriptor.Add(LastNodeResponse.EnvironmentToAdd, LastNodeResponse.AdditonalEnvironmentArguments);
+	}
+	if (!LastNodeResponse.EnvironmentToRemove.IsEmpty())
+	{
+		if (EnvironmentDescriptor.Contains(LastNodeResponse.EnvironmentToRemove))
+		{
+			EnvironmentDescriptor.Remove(LastNodeResponse.EnvironmentToRemove);
+		}
+	}
 }
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)

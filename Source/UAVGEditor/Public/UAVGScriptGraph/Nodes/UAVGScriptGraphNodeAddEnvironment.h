@@ -11,6 +11,9 @@ class UUAVGScriptGraphNodeAddEnvironment : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
+	virtual void SetupRTNode(class UUAVGScript* RTScript) override;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
+
 	virtual bool IsUserCreatableNode()const override
 	{
 		return true;
@@ -39,7 +42,7 @@ public:
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual FText GetTooltipText() const override
 	{
-		return NSLOCTEXT("UAVGScriptGraphNode_AddEnvironment", "AddEnvironmentToolTip", "A Node to Add a Environment descriptor");
+		return NSLOCTEXT("UAVGScriptGraphNode_AddEnvironment", "AddEnvironmentToolTip", "A Node to Add a Environment Descriptor");
 	}
 	virtual FLinearColor GetNodeTitleColor() const override
 	{
@@ -55,10 +58,16 @@ public:
 		return Pins[0];
 	}
 
-
+	virtual void AllocateDefaultPins() override;
 protected:
-
+	virtual void CreateOutputPin() override;
+	virtual void CreateInputPin() override;
 protected:
 	///Properties Here
 
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Environment Descriptor", ToolTip = "The Environment String Descriptor to Add"))
+	FString EnvironmentToAdd;
+
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "Additional Arguments Being Passed When Calling Events in Interfaces"))
+	TArray<FString> AdditonalArguments;
 };
