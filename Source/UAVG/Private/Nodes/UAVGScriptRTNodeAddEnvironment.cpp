@@ -6,6 +6,7 @@ UUAVGScriptRuntimeNodeAddEnvironment::UUAVGScriptRuntimeNodeAddEnvironment()
 {
 
 }
+<<<<<<< HEAD
 
 FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeAddEnvironment::OnArrive()
 {
@@ -16,3 +17,5 @@ FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeAddEnvironment::OnArr
 
 	return Response;
 }
+=======
+>>>>>>> dev-env
