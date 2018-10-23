@@ -59,7 +59,7 @@ public:
 	void Reset();*/
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
-	class UUAVGSaveGame* Save();
+	class UUAVGSaveGame* Save(class UUAVGSaveGame* SaveObj);
 
 	//This should be called when user is trying to do "Next" Operation
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")

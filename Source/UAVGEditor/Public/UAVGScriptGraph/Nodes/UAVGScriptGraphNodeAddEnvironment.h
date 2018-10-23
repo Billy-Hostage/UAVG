@@ -11,6 +11,9 @@ class UUAVGScriptGraphNodeAddEnvironment : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
+	virtual void SetupRTNode(class UUAVGScript* RTScript) override;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
+
 	virtual bool IsUserCreatableNode()const override
 	{
 		return true;
@@ -55,10 +58,16 @@ public:
 		return Pins[0];
 	}
 
-
+	virtual void AllocateDefaultPins() override;
 protected:
-
+	virtual void CreateOutputPin() override;
+	virtual void CreateInputPin() override;
 protected:
 	///Properties Here
 
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Environment Descriptor", ToolTip = "The Environment String Descriptor to Add"))
+	FString EnvironmentToAdd;
+
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "Additional Arguments Being Passed When Calling Events in Interfaces"))
+	TArray<FString> AdditonalArguments;
 };

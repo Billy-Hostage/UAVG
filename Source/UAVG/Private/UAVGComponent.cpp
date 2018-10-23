@@ -122,7 +122,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	return false;
 }
 
-UUAVGSaveGame* UUAVGComponent::Save()
+UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 {
 	if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
 	{
@@ -140,8 +140,12 @@ UUAVGSaveGame* UUAVGComponent::Save()
 		return nullptr;
 	}
 
-	UUAVGSaveGame* SaveObj = CastChecked<UUAVGSaveGame>
-		(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	if (!SaveObj)
+	{
+		SaveObj = CastChecked<UUAVGSaveGame>
+			(UGameplayStatics::CreateSaveGameObject(UUAVGSaveGame::StaticClass()));
+	}
+
 	if(!ensure(SaveObj)) return nullptr;
 
 	WarpSaveObject(SaveObj);
