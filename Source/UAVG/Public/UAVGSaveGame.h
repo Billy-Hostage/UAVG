@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "UAVGComponent.h"
 #include "UAVGSaveGame.generated.h"
 
 UCLASS(BlueprintType)
@@ -21,4 +22,7 @@ public:
 
 	UPROPERTY()
 	class UUAVGScriptRuntimeNode* LastNode;
+
+	UPROPERTY()
+	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
 };

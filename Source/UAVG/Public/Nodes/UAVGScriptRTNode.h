@@ -38,7 +38,7 @@ public:
 	FString EnvironmentToAdd;
 	TArray<FString> AdditonalEnvironmentArguments;
 	
-	TArray<FString> EnvironmentToRemove;
+	TArray<FString> EnvironmentsToRemove;
 };
 
 UCLASS(Abstract, BlueprintType)

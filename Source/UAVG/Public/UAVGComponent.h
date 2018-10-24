@@ -16,7 +16,7 @@ enum class EUAVGRuntimeState : uint8
 	URS_ReadyForNext UMETA(DisplayName = "Ready For Next"),
 	URS_WaitingForAnswer UMETA(DisplayName = "Waiting For Answer"),
 	URS_Speaking UMETA(DisplayName = "Speaking"),
-	URS_WaitingForCustomEvent UMETA(DisplayName = "Waiting For Custom Event"),
+	URS_WaitingForEvent UMETA(DisplayName = "Waiting For Event"),
 	URS_Finished UMETA(DisplayName = "Finished"),
 	URS_FatalError UMETA(DisplayName = "Fatal Error"),
 	URS_MAX UMETA(Hidden)
@@ -32,6 +32,19 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "UAVG|Response")
 	EUAVGRuntimeState CurrentState = EUAVGRuntimeState::URS_NULL;
+};
+
+USTRUCT(BlueprintType)
+struct FUAVGEnvironmentDescriptor
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(BlueprintReadOnly)
+	FString Descriptor;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FString> AdditonalArguments;
 };
 
 /*
@@ -74,8 +87,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "UAVG|Config")
 	class UUAVGScript* MyScript = nullptr;
-
-	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 public:
 	///Getters
 	UFUNCTION(BlueprintPure, Category = "UAVG|State")
@@ -96,7 +107,9 @@ private:
 	TArray<int32> DisplayingNums;
 	TArray<FUAVGText> DesiredText;
 
-	TMap<FString, TArray<FString>> EnvironmentDescriptor;
+	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
+
+	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 
 	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEventNode(FUAVGComponentNextResponse& OutResponse);
@@ -120,6 +133,7 @@ protected:
 
 	void WarpSaveObject(class UUAVGSaveGame* InSave);
 	void UnWarpSaveObject(class UUAVGSaveGame* InSave);
+	void UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescriptor> SavedDescriptor);
 
 	///Configs Here
 

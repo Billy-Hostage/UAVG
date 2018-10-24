@@ -176,7 +176,7 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 	case EUAVGRuntimeState::URS_WaitingForAnswer:
 		UE_LOG(LogTemp, Error, TEXT("Waiting for a Answer"));
 		break;
-	case EUAVGRuntimeState::URS_WaitingForCustomEvent:
+	case EUAVGRuntimeState::URS_WaitingForEvent:
 		UE_LOG(LogTemp, Error, TEXT("Waiting for a Event"));
 		break;
 	case EUAVGRuntimeState::URS_NotInitialized:
@@ -199,7 +199,7 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 
 void UUAVGComponent::EventHandled()
 {
-	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForCustomEvent)
+	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForEvent)
 	{
 		UE_LOG(LogTemp, Error, TEXT("We are not waiting for a Event!"));
 		return;
@@ -319,7 +319,7 @@ void UUAVGComponent::OnReachSayNode(FUAVGComponentNextResponse& OutResponse)
 
 void UUAVGComponent::OnReachEventNode(FUAVGComponentNextResponse& OutResponse)
 {
-	CurrentState = EUAVGRuntimeState::URS_WaitingForCustomEvent;
+	CurrentState = EUAVGRuntimeState::URS_WaitingForEvent;
 	IUAVGActorInterface::Execute_TriggerCustomEvent(ActorInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
 	IUAVGUIInterface::Execute_TriggerCustomEvent(UIInterface, LastNodeResponse.EventName, LastNodeResponse.EventArguments);
 	OutResponse.bSucceed = true;
@@ -329,15 +329,45 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 {
 	if (!LastNodeResponse.EnvironmentToAdd.IsEmpty())
 	{
-		EnvironmentDescriptor.Add(LastNodeResponse.EnvironmentToAdd, LastNodeResponse.AdditonalEnvironmentArguments);
-	}
-	if (!LastNodeResponse.EnvironmentToRemove.IsEmpty())
-	{
-		if (EnvironmentDescriptor.Contains(LastNodeResponse.EnvironmentToRemove))
+		for (const FUAVGEnvironmentDescriptor& e : EnvironmentDescriptor)
 		{
-			EnvironmentDescriptor.Remove(LastNodeResponse.EnvironmentToRemove);
+			if (e.Descriptor == LastNodeResponse.EnvironmentToAdd)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Descriptor %s Duplicated."), *e.Descriptor);
+				return;
+			}
 		}
+		FUAVGEnvironmentDescriptor ToAdd;
+		ToAdd.Descriptor = LastNodeResponse.EnvironmentToAdd;
+		ToAdd.AdditonalArguments = LastNodeResponse.AdditonalEnvironmentArguments;
+		EnvironmentDescriptor.Add(ToAdd);
+		IUAVGActorInterface::Execute_OnEnvironmentDescriptorAdded(ActorInterface, ToAdd, EnvironmentDescriptor);
+		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, ToAdd, EnvironmentDescriptor);
 	}
+
+	if (LastNodeResponse.EnvironmentsToRemove.Num() > 0)
+	{
+		TArray<FUAVGEnvironmentDescriptor> Removed;
+		for (const FString& DesStr : LastNodeResponse.EnvironmentsToRemove)
+		{
+			//maybe better ways?
+			for (int32 i = 0; i < EnvironmentDescriptor.Num(); ++i)
+			{
+				if (EnvironmentDescriptor[i].Descriptor == DesStr)
+				{
+					Removed.Add(EnvironmentDescriptor[i]);
+					EnvironmentDescriptor.RemoveAt(i);
+				}
+			}
+		}
+		IUAVGActorInterface::Execute_OnEnvironmentDescriptorRemoved(ActorInterface, Removed, EnvironmentDescriptor);
+		IUAVGUIInterface::Execute_OnEnvironmentDescriptorRemoved(UIInterface, Removed, EnvironmentDescriptor);
+	}
+
+	FUAVGComponentNextResponse Response;
+	NextNode(Response);
+
+	OutResponse.bSucceed = true;
 }
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
@@ -375,6 +405,7 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 	InSave->MyScript = MyScript;
 	InSave->CurrentNode = CurrentNode;
 	InSave->LastNode = LastNode;
+	InSave->EnvironmentDescriptor = EnvironmentDescriptor;
 }
 
 void UUAVGComponent::UnWarpSaveObject(class UUAVGSaveGame* InSave)
@@ -384,4 +415,16 @@ void UUAVGComponent::UnWarpSaveObject(class UUAVGSaveGame* InSave)
 
 	CurrentNode = InSave->CurrentNode;
 	LastNode = InSave->LastNode;
+	UnWarpEnvironmentDescriptor(InSave->EnvironmentDescriptor);
+}
+
+void UUAVGComponent::UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescriptor> SavedDescriptor)
+{
+	for (FUAVGEnvironmentDescriptor NewDes : SavedDescriptor)
+	{
+		EnvironmentDescriptor.Add(NewDes);
+
+		IUAVGActorInterface::Execute_OnEnvironmentDescriptorAdded(ActorInterface, NewDes, EnvironmentDescriptor);
+		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, NewDes, EnvironmentDescriptor);
+	}
 }
