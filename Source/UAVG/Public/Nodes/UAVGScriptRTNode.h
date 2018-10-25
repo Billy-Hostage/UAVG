@@ -13,6 +13,7 @@ enum class EUAVGRuntimeNodeType : uint8
 	URNT_Root,
 	URNT_Say,
 	URNT_CustomEvent,
+	URNT_EnvironmentDescriptor,
 	URNT_MAX,
 };
 
@@ -33,6 +34,11 @@ public:
 
 	FString EventName;
 	TArray<FString> EventArguments;
+
+	FString EnvironmentToAdd;
+	TArray<FString> AdditonalEnvironmentArguments;
+	
+	TArray<FString> EnvironmentsToRemove;
 };
 
 UCLASS(Abstract, BlueprintType)
