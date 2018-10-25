@@ -384,10 +384,10 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 			DisplayingNums[i] = 0;
 			if (DesiredText[i].GetCharacterDisplayDelayInMs() <= 0)
 			{
-			//Just Update Texts and Mark as Complete
-			IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
-			IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
-			SpeakComplete[i] = true;
+				//Just Update Texts and Mark as Complete
+				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
+				IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
+				SpeakComplete[i] = true;
 			}
 		}
 		else//Empty Text is Always Completed
