@@ -152,6 +152,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 													SAssignNew(NodeTextBlock, SInlineEditableTextBlock)
 													.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
 													.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+													.IsReadOnly(true)
 												]
 												+SVerticalBox::Slot()
 												.AutoHeight()
