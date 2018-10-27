@@ -12,6 +12,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+DEFINE_LOG_CATEGORY(LogUAVGRuntimeComponent);
+
 void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -28,13 +30,13 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_NotInitialized)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Component %s has been initialized already."), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Component %s has been initialized already."), *GetName());
 		return false;
 	}
 
 	if (MyScript == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MyScript cant be null!"));
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("MyScript cant be null!"));
 		return false;
 	}
 	if (ParentActor == nullptr) ParentActor = GetOwner();
@@ -51,17 +53,17 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 
 	if (UIInterface == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UIInterface cant be null!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UIInterface cant be null!"));
 		return false;
 	}
 	if (ActorInterface == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ActorInterface cant be null!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("ActorInterface cant be null!"));
 		return false;
 	}
 	if (CurrentNode == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Root Node Not Found in Script."));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Root Node Not Found in Script."));
 		return false;
 	}
 
@@ -79,24 +81,24 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_NotInitialized)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Component %s has been initialized already."), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Component %s has been initialized already."), *GetName());
 		return false;
 	}
 
 	if (!SaveData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid SaveData"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Invalid SaveData"));
 		return false;
 	}
 	if (SaveData->MyScript != MyScript)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Incompatible SaveData"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Incompatible SaveData"));
 		return false;
 	}
 
 	if (MyScript == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MyScript cant be null!"));
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("MyScript cant be null!"));
 		return false;
 	}
 	if (ParentActor == nullptr) ParentActor = GetOwner();
@@ -126,17 +128,17 @@ UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 {
 	if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Component %s hasn't been initialized yet."), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Component %s hasn't been initialized yet."), *GetName());
 		return nullptr;
 	}
 	else if (GetUAVGState() == EUAVGRuntimeState::URS_FatalError)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
 		return nullptr;
 	}
 	else if (GetUAVGState() == EUAVGRuntimeState::URS_Finished)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s has finished"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UAVGComponent %s has finished"), *GetName());
 		return nullptr;
 	}
 
@@ -171,24 +173,24 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 		TrySkip();
 		break;
 	case EUAVGRuntimeState::URS_Finished:
-		UE_LOG(LogTemp, Error, TEXT("Script Already Finished!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Script Already Finished!"));
 		break;
 	case EUAVGRuntimeState::URS_WaitingForAnswer:
-		UE_LOG(LogTemp, Error, TEXT("Waiting for a Answer"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Answer"));
 		break;
 	case EUAVGRuntimeState::URS_WaitingForEvent:
-		UE_LOG(LogTemp, Error, TEXT("Waiting for a Event"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Event"));
 		break;
 	case EUAVGRuntimeState::URS_NotInitialized:
-		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s is not initialized!"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UAVGComponent %s is not initialized!"), *GetName());
 		break;
 	case EUAVGRuntimeState::URS_FatalError:
-		UE_LOG(LogTemp, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
 		break;
 	case EUAVGRuntimeState::URS_MAX:
 	case EUAVGRuntimeState::URS_NULL:
 	default:
-		UE_LOG(LogTemp, Error, TEXT("UAVGComponent %s Unexpected State"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UAVGComponent %s Unexpected State"), *GetName());
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		break;
 	}
@@ -201,10 +203,10 @@ void UUAVGComponent::EventHandled()
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForEvent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("We are not waiting for a Event!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("We are not waiting for a Event!"));
 		return;
 	}
-
+	
 	FUAVGComponentNextResponse NextResponse;
 	NextNode(NextResponse);
 }
@@ -251,7 +253,7 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 		OnReachEnvironmentDescriptorNode(OutResponse);
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("Unexpected Node Type!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		OutResponse.bSucceed = false;
 		break;
@@ -333,7 +335,7 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 		{
 			if (e.Descriptor == LastNodeResponse.EnvironmentToAdd)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Descriptor %s Duplicated."), *e.Descriptor);
+				UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Descriptor %s Duplicated."), *e.Descriptor);
 				return;
 			}
 		}
@@ -367,7 +369,7 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 	FUAVGComponentNextResponse Response;
 	NextNode(Response);
 
-	OutResponse.bSucceed = true;
+	OutResponse.bSucceed = Response.bSucceed;
 }
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)

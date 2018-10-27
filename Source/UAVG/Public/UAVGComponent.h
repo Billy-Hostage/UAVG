@@ -8,6 +8,8 @@
 #include "UAVGScriptRTNode.h"//We want to use the structs in this header file
 #include "UAVGComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeComponent, Log, All);
+
 UENUM(BlueprintType)
 enum class EUAVGRuntimeState : uint8
 {
