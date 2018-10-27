@@ -331,20 +331,31 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 {
 	if (!LastNodeResponse.EnvironmentToAdd.IsEmpty())
 	{
-		for (const FUAVGEnvironmentDescriptor& e : EnvironmentDescriptor)
+		bool flagIsChange = false;
+
+		for (int32 i = 0; i < EnvironmentDescriptor.Num(); ++i)
 		{
-			if (e.Descriptor == LastNodeResponse.EnvironmentToAdd)
+			if (EnvironmentDescriptor[i].Descriptor == LastNodeResponse.EnvironmentToAdd)
 			{
-				UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Descriptor %s Duplicated."), *e.Descriptor);
-				return;
+				//Change a Existing Descriptor
+				ChangeEnvironmentDescriptor(i);
+				flagIsChange = true;
+				OutResponse.bSucceed = true;
+				break;
 			}
 		}
-		FUAVGEnvironmentDescriptor ToAdd;
-		ToAdd.Descriptor = LastNodeResponse.EnvironmentToAdd;
-		ToAdd.AdditonalArguments = LastNodeResponse.AdditonalEnvironmentArguments;
-		EnvironmentDescriptor.Add(ToAdd);
-		IUAVGActorInterface::Execute_OnEnvironmentDescriptorAdded(ActorInterface, ToAdd, EnvironmentDescriptor);
-		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, ToAdd, EnvironmentDescriptor);
+
+		if (!flagIsChange)
+		{
+			//Add a new Descriptor to array
+			FUAVGEnvironmentDescriptor ToAdd;
+			ToAdd.Descriptor = LastNodeResponse.EnvironmentToAdd;
+			ToAdd.AdditonalArguments = LastNodeResponse.AdditonalEnvironmentArguments;
+			EnvironmentDescriptor.Add(ToAdd);
+			IUAVGActorInterface::Execute_OnEnvironmentDescriptorAdded(ActorInterface, ToAdd, EnvironmentDescriptor);
+			IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, ToAdd, EnvironmentDescriptor);
+			OutResponse.bSucceed = true;
+		}
 	}
 
 	if (LastNodeResponse.EnvironmentsToRemove.Num() > 0)
@@ -364,12 +375,13 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 		}
 		IUAVGActorInterface::Execute_OnEnvironmentDescriptorRemoved(ActorInterface, Removed, EnvironmentDescriptor);
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorRemoved(UIInterface, Removed, EnvironmentDescriptor);
+		OutResponse.bSucceed = true;
 	}
 
 	FUAVGComponentNextResponse Response;
 	NextNode(Response);
 
-	OutResponse.bSucceed = Response.bSucceed;
+	OutResponse.bSucceed = OutResponse.bSucceed && Response.bSucceed;
 }
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
@@ -428,5 +440,17 @@ void UUAVGComponent::UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescript
 
 		IUAVGActorInterface::Execute_OnEnvironmentDescriptorAdded(ActorInterface, NewDes, EnvironmentDescriptor);
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, NewDes, EnvironmentDescriptor);
+	}
+}
+
+void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
+{
+	if (EnvironmentDescriptor.IsValidIndex(IndexToChange))
+	{
+		FUAVGEnvironmentDescriptor OldDescriptor = EnvironmentDescriptor[IndexToChange];//Cache the old one(Not Reference)
+		EnvironmentDescriptor[IndexToChange].AdditonalArguments = LastNodeResponse.AdditonalEnvironmentArguments;
+
+		IUAVGActorInterface::Execute_OnEnvironmentDescriptorChanged(ActorInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
+		IUAVGUIInterface::Execute_OnEnvironmentDescriptorChanged(UIInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
 	}
 }

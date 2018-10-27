@@ -123,6 +123,8 @@ private:
 	FText BuildTextByIndex(const FUAVGText& InText, uint8 InNum);
 
 	void CheckIfLineCompleted();
+
+	void ChangeEnvironmentDescriptor(int32 IndexToChange);
 protected:
 	void NextNode(FUAVGComponentNextResponse& OutResponse);
 	void ProcessNode(FUAVGComponentNextResponse& OutResponse);

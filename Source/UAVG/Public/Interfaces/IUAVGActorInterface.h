@@ -54,4 +54,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void OnEnvironmentDescriptorRemoved(const TArray<FUAVGEnvironmentDescriptor>& Removed, const TArray<FUAVGEnvironmentDescriptor>& CurrentEnvironmentDescriptor);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnEnvironmentDescriptorChanged(const FUAVGEnvironmentDescriptor& Old, const FUAVGEnvironmentDescriptor& New, const TArray<FUAVGEnvironmentDescriptor>& CurrentEnvironmentDescriptor);
 };
