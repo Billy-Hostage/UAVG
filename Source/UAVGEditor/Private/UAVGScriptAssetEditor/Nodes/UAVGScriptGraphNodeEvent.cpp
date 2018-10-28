@@ -37,11 +37,11 @@ FText UUAVGScriptGraphNodeEvent::GetNodeTitle(ENodeTitleType::Type TitleType) co
 {
 	switch (TitleType)
 	{
-	case ENodeTitleType::ListView:
-	case ENodeTitleType::EditableTitle:
-		return NSLOCTEXT("UAVGScriptGraphNode_Event", "EventList", "Trigger Event");
 	case ENodeTitleType::FullTitle:
 	case ENodeTitleType::MenuTitle:
+	case ENodeTitleType::EditableTitle:
+		return NSLOCTEXT("UAVGScriptGraphNode_Event", "EventList", "Trigger Event");
+	case ENodeTitleType::ListView:
 	default:
 		return NSLOCTEXT("UAVGScriptGraphNode_Event", "EventFullTitle", "Trigger Event Node");
 	}

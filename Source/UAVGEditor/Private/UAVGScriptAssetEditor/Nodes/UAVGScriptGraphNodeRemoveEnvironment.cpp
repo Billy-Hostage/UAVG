@@ -36,11 +36,11 @@ FText UUAVGScriptGraphNodeRemoveEnvironment::GetNodeTitle(ENodeTitleType::Type T
 {
 	switch (TitleType)
 	{
-	case ENodeTitleType::ListView:
-	case ENodeTitleType::EditableTitle:
-		return NSLOCTEXT("UAVGScriptGraphNode_RemoveEnvironment", "RemoveEnvironmentList", "Remove Environment Descriptor");
 	case ENodeTitleType::FullTitle:
 	case ENodeTitleType::MenuTitle:
+	case ENodeTitleType::EditableTitle:
+		return NSLOCTEXT("UAVGScriptGraphNode_RemoveEnvironment", "RemoveEnvironmentList", "Remove Environment Descriptor");
+	case ENodeTitleType::ListView:
 	default:
 		return NSLOCTEXT("UAVGScriptGraphNode_RemoveEnvironment", "RemoveEnvironmentFullTitle", "Remove Environment Descriptor Node");
 	}

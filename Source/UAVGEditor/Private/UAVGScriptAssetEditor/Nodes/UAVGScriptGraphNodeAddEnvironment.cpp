@@ -37,11 +37,11 @@ FText UUAVGScriptGraphNodeAddEnvironment::GetNodeTitle(ENodeTitleType::Type Titl
 {
 	switch (TitleType)
 	{
-	case ENodeTitleType::ListView:
-	case ENodeTitleType::EditableTitle:
-		return NSLOCTEXT("UAVGScriptGraphNode_AddEnvironment", "AddEnvironmentList", "Add Environment Descriptor");
 	case ENodeTitleType::FullTitle:
 	case ENodeTitleType::MenuTitle:
+	case ENodeTitleType::EditableTitle:
+		return NSLOCTEXT("UAVGScriptGraphNode_AddEnvironment", "AddEnvironmentList", "Add Environment Descriptor");
+	case ENodeTitleType::ListView:
 	default:
 		return NSLOCTEXT("UAVGScriptGraphNode_AddEnvironment", "AddEnvironmentFullTitle", "Add Environment Descriptor Node");
 	}

@@ -37,11 +37,11 @@ FText UUAVGScriptGraphNodeSaySingle::GetNodeTitle(ENodeTitleType::Type TitleType
 {
 	switch (TitleType)
 	{
-	case ENodeTitleType::ListView:
-	case ENodeTitleType::EditableTitle:
-		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleList", "Say Single Line");
 	case ENodeTitleType::FullTitle:
 	case ENodeTitleType::MenuTitle:
+	case ENodeTitleType::EditableTitle:
+		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleList", "Say Single Line");
+	case ENodeTitleType::ListView:
 	default:
 		return NSLOCTEXT("UAVGScriptGraphNode_SaySingle", "SaySingleFullTitle", "Say Single Line Node");
 	}
