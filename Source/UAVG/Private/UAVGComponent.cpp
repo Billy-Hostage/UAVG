@@ -124,6 +124,28 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	return false;
 }
 
+void UUAVGComponent::Reset()
+{
+	switch (GetUAVGState())
+	{
+	case EUAVGRuntimeState::URS_NotInitialized:
+	case EUAVGRuntimeState::URS_NULL:
+	case EUAVGRuntimeState::URS_MAX:
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("UAVGComponent %s no need to reset"), *GetName());
+		return;//Stop here
+	}
+
+	CurrentNode = nullptr;
+	LastNode = nullptr;
+	UIInterface = nullptr;
+	ActorInterface = nullptr;
+	SpeakDurationInMs = 0;
+	SpeakComplete.Empty();
+	DisplayingNums.Empty();
+	DesiredText.Empty();
+	CurrentState = EUAVGRuntimeState::URS_NotInitialized;
+}
+
 UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 {
 	if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
@@ -209,6 +231,30 @@ void UUAVGComponent::EventHandled()
 	
 	FUAVGComponentNextResponse NextResponse;
 	NextNode(NextResponse);
+}
+
+void UUAVGComponent::ChangeScript(UUAVGScript* NewScript)
+{
+	if (NewScript && NewScript->IsValidLowLevel())
+	{
+		if (GetUAVGState() == EUAVGRuntimeState::URS_Finished)
+		{
+			Reset();
+			MyScript = NewScript;
+		}
+		else if (GetUAVGState() == EUAVGRuntimeState::URS_NotInitialized)
+		{
+			MyScript = NewScript;
+		}
+		else
+		{
+			UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UAVGComponent %s cant swap script"), *GetName());
+		}
+	}
+	else
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Script invalid"));
+	}
 }
 
 FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)

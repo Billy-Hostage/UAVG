@@ -70,8 +70,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
 	bool InitializeFromSave(UObject* UIObject, AActor* ParentActor, class UUAVGSaveGame* SaveData);
 
-	/*UFUNCTION(BlueprintCallable, Category = "UAVG")
-	void Reset();*/
+	UFUNCTION(BlueprintCallable, Category = "UAVG")
+	void Reset();
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
 	class UUAVGSaveGame* Save(class UUAVGSaveGame* SaveObj);
@@ -83,6 +83,10 @@ public:
 	//This should be called when a custom event is handled by user
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void EventHandled();
+
+	//Change a Script(When not Initialized)
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
+	void ChangeScript(UUAVGScript* NewScript);
 protected:
 	UObject* UIInterface = nullptr;
 	AActor* ActorInterface = nullptr;
