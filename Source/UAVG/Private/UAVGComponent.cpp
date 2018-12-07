@@ -463,7 +463,8 @@ void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResp
 	MyScript = LastNodeResponse.SubScriptToRun;
 	CurrentNode = Cast<UUAVGScriptRuntimeNode>(MyScript->GetRuntimeRootNode());
 	
-	NextNode();
+	FUAVGComponentNextResponse R;
+	NextNode(R);
 	
 	OutResponse.bSucceed = true;
 }
