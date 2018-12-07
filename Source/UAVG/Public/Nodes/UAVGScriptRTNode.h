@@ -14,6 +14,7 @@ enum class EUAVGRuntimeNodeType : uint8
 	URNT_Say,
 	URNT_CustomEvent,
 	URNT_EnvironmentDescriptor,
+	URNT_RunSubScript,
 	URNT_MAX,
 };
 
@@ -39,6 +40,8 @@ public:
 	TArray<FString> AdditonalEnvironmentArguments;
 	
 	TArray<FString> EnvironmentsToRemove;
+	
+	class UUAVGScript* SubScriptToRun;
 };
 
 UCLASS(Abstract, BlueprintType)

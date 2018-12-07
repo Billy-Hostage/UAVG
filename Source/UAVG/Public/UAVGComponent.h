@@ -93,6 +93,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "UAVG|Config")
 	class UUAVGScript* MyScript = nullptr;
+	
+	///These Arrays are alliegned
+	UPROPERTY()
+	TArray<class UUAVGScript*> ScriptStack;
+	UPROPERTY()
+	TArray<class UUAVGScriptRuntimeNode*> CurrentNodeStack;
+	UPROPERTY()
+	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
 public:
 	///Getters
 	UFUNCTION(BlueprintPure, Category = "UAVG|State")
@@ -120,6 +128,7 @@ private:
 	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEventNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse& OutResponse);
+	void OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResponse);
 
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);

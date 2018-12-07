@@ -143,6 +143,9 @@ void UUAVGComponent::Reset()
 	SpeakComplete.Empty();
 	DisplayingNums.Empty();
 	DesiredText.Empty();
+	ScriptStack.Empty();
+	CurrentNodeStack.Empty();
+	LastNodeStack.Empty();
 	CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 }
 
@@ -274,9 +277,20 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 	CurrentNode = CurrentNode->GetNextNode();
 	if (CurrentNode == nullptr)
 	{
-		OnScriptEnded();
-		OutResponse.bSucceed = true;
-		return;
+		if(ScriptStack.Num() == 0)
+		{
+			OnScriptEnded();
+			OutResponse.bSucceed = true;
+			return;
+		}
+		else
+		{
+			MyScript = ScriptStack.Pop(true);
+			CurrentNode = CurrentNodeStack.Pop(true);
+			LastNode = LastNodeStack.Pop(true);
+			NextNode(OutResponse);
+			return;
+		}
 	}
 
 	ProcessNode(OutResponse);
@@ -297,6 +311,9 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 		break;
 	case EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor:
 		OnReachEnvironmentDescriptorNode(OutResponse);
+		break;
+	case EUAVGRuntimeNodeType::URNT_RunSubScript:
+		OnReachRunSubScriptNode(OutResponse);
 		break;
 	default:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
@@ -430,6 +447,27 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 	OutResponse.bSucceed = OutResponse.bSucceed && Response.bSucceed;
 }
 
+void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResponse)
+{
+	if(!LastNodeResponse.SubScriptToRun)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("RunSubScriptNode SubScript Empty!"));
+		OutResponse.bSucceed = false;
+		return;
+	}
+	
+	ScriptStack.Push(MyScript);
+	CurrentNodeStack.Push(CurrentNode);
+	LastNodeStack.Push(LastNode);
+	
+	MyScript = LastNodeResponse.SubScriptToRun;
+	CurrentNode = Cast<UUAVGScriptRuntimeNode>(MyScript->GetRuntimeRootNode());
+	
+	NextNode();
+	
+	OutResponse.bSucceed = true;
+}
+
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 {
 	DesiredText = NewText;
@@ -466,15 +504,21 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 	InSave->CurrentNode = CurrentNode;
 	InSave->LastNode = LastNode;
 	InSave->EnvironmentDescriptor = EnvironmentDescriptor;
+	InSave->ScriptStack = ScriptStack;
+	InSave->CurrentNodeStack = CurrentNodeStack;
+	InSave->LastNodeStack = LastNodeStack;
 }
 
-void UUAVGComponent::UnWarpSaveObject(class UUAVGSaveGame* InSave)
+void UUAVGComponent::UnWarpSaveObject(UUAVGSaveGame* InSave)
 {
 	if (!InSave)
 		return;
 
 	CurrentNode = InSave->CurrentNode;
 	LastNode = InSave->LastNode;
+	ScriptStack = InSave->ScriptStack;
+	CurrentNodeStack = InSave->CurrentNodeStack;
+	LastNodeStack = InSave->LastNodeStack;
 	UnWarpEnvironmentDescriptor(InSave->EnvironmentDescriptor);
 }
 
