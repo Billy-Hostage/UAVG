@@ -92,8 +92,22 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	}
 	if (SaveData->MyScript != MyScript)
 	{
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Incompatible SaveData"));
-		return false;
+		bool bIsIncompatible = true;
+
+		for (UUAVGScript* PossibleScript : SaveData->ScriptStack)
+		{
+			if(PossibleScript == MyScript)
+			{
+				bIsIncompatible = false;
+				break;
+			}
+		}
+
+		if (bIsIncompatible)
+		{
+			UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Possible Incompatible SaveData"));
+			return false;
+		}
 	}
 
 	if (MyScript == nullptr)
