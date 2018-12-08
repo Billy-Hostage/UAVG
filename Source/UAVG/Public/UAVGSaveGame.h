@@ -25,4 +25,11 @@ public:
 
 	UPROPERTY()
 	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
+
+	UPROPERTY()
+	TArray<class UUAVGScript*> ScriptStack;
+	UPROPERTY()
+	TArray<class UUAVGScriptRuntimeNode*> CurrentNodeStack;
+	UPROPERTY()
+	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
 };
