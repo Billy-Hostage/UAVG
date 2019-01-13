@@ -3,17 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/UnrealType.h"
 #include "UAVGScriptGraphNode.h"
 #include "UAVGScriptGraphNodeSelection.generated.h"
 
-//TODO
+//TODO Save with this node will crash
 UCLASS(MinimalAPI)
 class UUAVGScriptGraphNodeSelection : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
-	//virtual void SetupRTNode(class UUAVGScript* RTScript) override;
-	//virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
+	virtual void SetupRTNode(class UUAVGScript* RTScript) override;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
 
 	virtual bool IsUserCreatableNode()const override
 	{
@@ -50,15 +51,22 @@ public:
 		return FLinearColor::Gray;
 	}
 
+	virtual TArray<UEdGraphPin*> GetOutputPins();
+
 	virtual UEdGraphPin* GetInputPin() override
 	{
 		return Pins[0];
 	}
 
 	virtual void AllocateDefaultPins() override;
+
+	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 protected:
-	void CreateOutputPin(int32 Index);
+	virtual void CreateOutputPins(int32 Index);
 	virtual void CreateInputPin() override;
 protected:
 	///Properties Here
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FText> Selections;
 };

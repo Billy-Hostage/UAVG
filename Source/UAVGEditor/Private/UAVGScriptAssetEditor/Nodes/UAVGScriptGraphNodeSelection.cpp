@@ -1,7 +1,8 @@
 //NTRHostage
 
+#include "UAVGScriptGraphNodeSelection.h"
+
 #include "UAVGScriptGraphPin.h"
-#include "UUAVGScriptGraphNodeSelection.h"
 
 UUAVGScriptGraphNodeSelection::UUAVGScriptGraphNodeSelection(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -49,16 +50,17 @@ FText UUAVGScriptGraphNodeSelection::GetNodeTitle(ENodeTitleType::Type TitleType
 
 void UUAVGScriptGraphNodeSelection::AllocateDefaultPins()
 {
-	//We have both a output and input pin.
+	Selections.Init(FText::GetEmpty(), 2);
 	CreateInputPin();
-	CreateOutputPin(1);
+	CreateOutputPins(1);
+	CreateOutputPins(2);
 }
 
-void UUAVGScriptGraphNodeSelection::CreateOutputPin(int32 Index)
+void UUAVGScriptGraphNodeSelection::CreateOutputPins(int32 Index)
 {
 	if(!ensure(Index >= 1)) return;
 
-	const FName PinName(*(FString::Format("Out%d", Index)));
+	const FName PinName(*(FString::Printf(TEXT("Out%d"), Index)));
 	FCreatePinParams PinParams;
 	PinParams.Index = Index;
 
@@ -72,4 +74,45 @@ void UUAVGScriptGraphNodeSelection::CreateInputPin()
 	PinParams.Index = 0;
 
 	CreatePin(EGPD_Input, FName(TEXT("ParentInputs")), PinName, PinParams);
+}
+
+TArray<UEdGraphPin*> UUAVGScriptGraphNodeSelection::GetOutputPins()
+{
+	TArray<UEdGraphPin*> ToReturn;
+	ToReturn = Pins;
+	ToReturn.RemoveAt(0);
+	return ToReturn;
+}
+
+//TODO Remove Magic Numbers
+void UUAVGScriptGraphNodeSelection::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+	if (PropertyChangedEvent.GetPropertyName().ToString() == "Selections")
+	{
+		int32 ModifiedArrayIndex = PropertyChangedEvent.GetArrayIndex("Selections");
+		if(PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayAdd)
+		{
+			CreateOutputPins(ModifiedArrayIndex + 1);
+			GetGraph()->NotifyGraphChanged();
+		}
+		else if(PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayRemove)
+		{
+			RemovePinAt(ModifiedArrayIndex, EEdGraphPinDirection::EGPD_Output);
+		}
+		else if(PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayClear)
+		{
+			int32 OldOutPinNums = Pins.Num() - 1; //get rid of the input pin
+			for(int32 i  = 0; i < OldOutPinNums; ++i)
+			{
+				RemovePinAt(0, EEdGraphPinDirection::EGPD_Output);//remove output pins one by one
+			}
+		}
+		else if(PropertyChangedEvent.ChangeType == EPropertyChangeType::Duplicate)
+		{
+			CreateOutputPins(ModifiedArrayIndex);//TODO Strange Behaviour
+			GetGraph()->NotifyGraphChanged();
+		}
+	}
+	
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
 }

@@ -8,6 +8,7 @@
 #include "SGraphPanel.h"
 
 #include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraphNodeSelection.h"
 
 TSharedRef<FDragUAVGScriptGraphNode> FDragUAVGScriptGraphNode::New(const TSharedRef<SGraphPanel>& InGraphPanel, const TSharedRef<SGraphNode>& InDraggedNode)
 {
@@ -52,7 +53,22 @@ void SUAVGScriptGraphNode::CreatePinWidgets()
 	UEdGraphPin* InputPin = MyGraphNode->GetInputPin();
 	UEdGraphPin* OutputPin = MyGraphNode->GetOutputPin();
 	if (InputPin) CreateStandardPinWidget(InputPin);
-	if (OutputPin) CreateStandardPinWidget(OutputPin);
+	if (OutputPin)
+	{
+		CreateStandardPinWidget(OutputPin);
+	}
+	else
+	{
+		UUAVGScriptGraphNodeSelection* SelectionGraphNode = Cast<UUAVGScriptGraphNodeSelection>(MyGraphNode);
+		if(SelectionGraphNode)
+		{
+			TArray<UEdGraphPin*> OPins = SelectionGraphNode->GetOutputPins();
+			for(UEdGraphPin* Pin : OPins)
+			{
+				CreateStandardPinWidget(Pin);
+			}
+		}
+	}
 }
 
 //Update The Node to match EdNode's Data
