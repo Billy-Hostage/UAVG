@@ -72,6 +72,7 @@ void SUAVGScriptGraphNode::CreatePinWidgets()
 }
 
 //Update The Node to match EdNode's Data
+//TODO Refactor Needed
 void SUAVGScriptGraphNode::UpdateGraphNode()
 {
 	InputPins.Empty();
@@ -168,6 +169,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 													SAssignNew(NodeTextBlock, SInlineEditableTextBlock)
 													.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
 													.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+													.Justification(ETextJustify::Center)
 													.IsReadOnly(true)
 												]
 												+SVerticalBox::Slot()
@@ -268,6 +270,7 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
 				.FillWidth(1.0f)
+				.Padding(0, 0, 20.0f, 0)
 				[
 					PinToAdd
 				];
