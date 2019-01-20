@@ -214,8 +214,8 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 	case EUAVGRuntimeState::URS_Finished:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Script Already Finished!"));
 		break;
-	case EUAVGRuntimeState::URS_WaitingForAnswer:
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Answer"));
+	case EUAVGRuntimeState::URS_WaitingForSelection:
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Selection"));
 		break;
 	case EUAVGRuntimeState::URS_WaitingForEvent:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Event"));
@@ -287,7 +287,8 @@ FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 
 void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 {
-	LastNode = CurrentNode;
+	CurrentNode->OnLeave(this);
+	LastNode = CurrentNode;//Save the last node
 	CurrentNode = CurrentNode->GetNextNode();
 	if (CurrentNode == nullptr)
 	{
@@ -313,6 +314,7 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 {
 	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
+	OldNodeResponse = LastNodeResponse;
 	LastNodeResponse = ArriveResponse;//Cache it
 
 	switch (ArriveResponse.NodeType)
@@ -328,6 +330,9 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 		break;
 	case EUAVGRuntimeNodeType::URNT_RunSubScript:
 		OnReachRunSubScriptNode(OutResponse);
+		break;
+	case EUAVGRuntimeNodeType::URNT_Selection:
+		OnReachSelectionNode(OutResponse);
 		break;
 	default:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
@@ -480,6 +485,16 @@ void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResp
 	FUAVGComponentNextResponse R;
 	NextNode(R);
 	
+	OutResponse.bSucceed = true;
+}
+
+void UUAVGComponent::OnReachSelectionNode(FUAVGComponentNextResponse& OutResponse)
+{
+	CurrentState = EUAVGRuntimeState::URS_WaitingForSelection;
+	
+	IUAVGActorInterface::Execute_OnFaceSelection(ActorInterface, FUAVGActorSelectionInfo(LastNodeResponse.SelectionTexts));
+	IUAVGUIInterface::Execute_OnFaceSelection(UIInterface, FUAVGUISelectionInfo(LastNodeResponse.SelectionTexts));
+
 	OutResponse.bSucceed = true;
 }
 

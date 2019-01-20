@@ -16,9 +16,9 @@ enum class EUAVGRuntimeState : uint8
 	URS_NULL UMETA(Hidden),
 	URS_NotInitialized UMETA(DisplayName = "Not Initialized"),
 	URS_ReadyForNext UMETA(DisplayName = "Ready For Next"),
-	URS_WaitingForAnswer UMETA(DisplayName = "Waiting For Answer"),
 	URS_Speaking UMETA(DisplayName = "Speaking"),
 	URS_WaitingForEvent UMETA(DisplayName = "Waiting For Event"),
+	URS_WaitingForSelection UMETA(DisplayName = "Waiting For Selection"),
 	URS_Finished UMETA(DisplayName = "Finished"),
 	URS_FatalError UMETA(DisplayName = "Fatal Error"),
 	URS_MAX UMETA(Hidden)
@@ -123,12 +123,14 @@ private:
 
 	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
 
+	FUAVGScriptRuntimeNodeArriveResponse OldNodeResponse;
 	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 
 	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEventNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResponse);
+	void OnReachSelectionNode(FUAVGComponentNextResponse& OutResponse);
 
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);

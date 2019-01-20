@@ -23,6 +23,23 @@ public:
 	TArray<FUAVGText> DesiredText;
 };
 
+USTRUCT(BlueprintType)
+struct FUAVGUISelectionInfo
+{
+	GENERATED_BODY()
+public:
+	FUAVGUISelectionInfo()
+	{
+	}
+
+	FUAVGUISelectionInfo(TArray<FText> InSelection) : SelectionTexts(InSelection)
+	{
+	}
+
+	UPROPERTY(BlueprintReadOnly, meta = (DisplayName = "UAVG|Info"))
+	TArray<FText> SelectionTexts;
+};
+
 UINTERFACE(Blueprintable)
 class UUAVGUIInterface : public UInterface
 {
@@ -39,6 +56,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void OnNewLine(const FUAVGUILineInfo& Info);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnFaceSelection(const FUAVGUISelectionInfo& Info);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void OnLineComplete();

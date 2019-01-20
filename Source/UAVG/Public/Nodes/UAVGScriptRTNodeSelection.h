@@ -17,11 +17,16 @@ public:
 
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr) override;
 
+	virtual void SetSelectionIndex(int32 SelectionIndex, class UUAVGComponent* InComponent);
+
 	///These Arrays are alligned
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FText> Selections;
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UUAVGScriptRuntimeNode*> SelectionNodes;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 DefaultIndex = 0;
 
 	bool EditorAddSelectionNodes(UUAVGScriptRuntimeNode* InNode);
 	void EditorClearSelections();

@@ -24,14 +24,40 @@ void UUAVGScriptRuntimeNodeSelection::EditorClearSelections()
 
 UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNodeSelection::GetNextNode(class UUAVGComponent* InComponent)
 {
-	return nullptr; //TODO
+	if(!SelectedIndexs.Contains(InComponent))
+	{
+		return SelectionNodes.IsValidIndex(SelectedIndexs[InComponent])? SelectionNodes[SelectedIndexs[InComponent]] : nullptr;
+	}
+	else
+	{
+		return SelectionNodes.IsValidIndex(DefaultIndex)? SelectionNodes[DefaultIndex] : nullptr;
+	}
+}
+
+void UUAVGScriptRuntimeNodeSelection::SetSelectionIndex(int32 SelectionIndex, class UUAVGComponent* InComponent)
+{
+	if(!ensure(InComponent)) return;
+	if(!Selections.IsValidIndex(SelectionIndex))
+	{
+		SelectedIndexs.Add(InComponent, DefaultIndex);
+	}
+	SelectedIndexs.Add(InComponent, SelectionIndex);
 }
 
 FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSelection::OnArrive()
 {
-	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor);
+	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_Selection);
 
-	//TODO
+	if(Selections.Num() != SelectionNodes.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selections and SelectionNodes Arrays are not alligned. %d != %d"), Selections.Num(), SelectionNodes.Num());
+	}
+	if(Selections.Num() == 0 || SelectionNodes.Num() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Selections or SelectionNodes Arrays are empty. %d == 0 || %d == 0"), Selections.Num(), SelectionNodes.Num());
+	}
+
+	Response.SelectionTexts = Selections;
 
 	return Response;
 }

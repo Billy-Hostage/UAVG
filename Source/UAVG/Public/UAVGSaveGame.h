@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "UAVGComponent.h"
+#include "Nodes/UAVGScriptRTNode.h"
 #include "UAVGSaveGame.generated.h"
 
 UCLASS(BlueprintType)

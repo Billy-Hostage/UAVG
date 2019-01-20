@@ -15,6 +15,7 @@ enum class EUAVGRuntimeNodeType : uint8
 	URNT_CustomEvent,
 	URNT_EnvironmentDescriptor,
 	URNT_RunSubScript,
+	URNT_Selection,
 	URNT_MAX,
 };
 
@@ -23,12 +24,12 @@ struct FUAVGScriptRuntimeNodeArriveResponse
 public:
 	FUAVGScriptRuntimeNodeArriveResponse()
 	{
+		NodeType = EUAVGRuntimeNodeType::URNT_NULL;
 	}
 	FUAVGScriptRuntimeNodeArriveResponse(EUAVGRuntimeNodeType Type)
 	{
 		NodeType = Type;
 	}
-
 	EUAVGRuntimeNodeType NodeType = EUAVGRuntimeNodeType::URNT_NULL;
 
 	TArray<FUAVGText> DesiredTexts;
@@ -42,6 +43,8 @@ public:
 	TArray<FString> EnvironmentsToRemove;
 	
 	class UUAVGScript* SubScriptToRun;
+
+	TArray<FText> SelectionTexts;
 };
 
 UCLASS(Abstract, BlueprintType)
@@ -55,6 +58,11 @@ public:
 	{
 		return FUAVGScriptRuntimeNodeArriveResponse();
 	}
+
+	virtual void OnLeave(class UUAVGComponent* InComponent)
+	{
+	}
+
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr);
 
 	virtual void WarpUAVGSaveGame(class UUAVGSaveGame* InSave){}
