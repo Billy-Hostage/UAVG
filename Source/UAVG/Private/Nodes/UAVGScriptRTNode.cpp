@@ -7,7 +7,7 @@ UUAVGScriptRuntimeNode::UUAVGScriptRuntimeNode()
 
 }
 
-UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNode::GetNextNode()
+UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNode::GetNextNode(class UUAVGComponent* InComponent)
 {
 	if (MyChildNodes.Num() <= 0)
 		return nullptr;

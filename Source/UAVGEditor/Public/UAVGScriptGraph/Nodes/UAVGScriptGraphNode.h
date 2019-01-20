@@ -106,6 +106,6 @@ protected:
 
 	UPROPERTY()
 	UUAVGScriptRuntimeNode* MyRTNode = nullptr;
-private:
+
 	static void GetPinConnectedNodes(class UEdGraphPin* Pin, TArray<UUAVGScriptRuntimeNode*>& OutNodes);
 };

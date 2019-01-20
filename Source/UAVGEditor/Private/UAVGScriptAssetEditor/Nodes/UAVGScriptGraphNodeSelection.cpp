@@ -2,6 +2,8 @@
 
 #include "UAVGScriptGraphNodeSelection.h"
 
+#include "UAVGScriptRTNode.h"
+#include "UAVGScriptRTNodeSelection.h"
 #include "UAVGScriptGraphPin.h"
 
 UUAVGScriptGraphNodeSelection::UUAVGScriptGraphNodeSelection(const FObjectInitializer& ObjectInitializer)
@@ -14,24 +16,52 @@ void UUAVGScriptGraphNodeSelection::SetupRTNode(class UUAVGScript* RTScript)
 	check(RTScript != nullptr);
 	if (MyRTNode == nullptr)
 	{
-		//TODO
-		//UUAVGScriptRuntimeNodeAddEnvironment* RTNode = NewObject<UUAVGScriptRuntimeNodeAddEnvironment>(RTScript);
-		//MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(RTNode);
-		//if (MyRTNode != nullptr)
-		//{
-			//RTScript->AddRuntimeNode(MyRTNode);
-		//}
+		UUAVGScriptRuntimeNodeSelection* RTNode = NewObject<UUAVGScriptRuntimeNodeSelection>(RTScript);
+		MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(RTNode);
+		if (MyRTNode != nullptr)
+		{
+			RTScript->AddRuntimeNode(MyRTNode);
+		}
 	}
 }
 
 void UUAVGScriptGraphNodeSelection::SaveToRTNode(class UUAVGScript* RTScript)
 {
-	Super::SaveToRTNode(RTScript);
-	//TODO
-	//UUAVGScriptRuntimeNodeAddEnvironment* RTAddEnvNode = CastChecked<UUAVGScriptRuntimeNodeAddEnvironment>(MyRTNode);
-	
-	//RTAddEnvNode->EnvironmentToAdd = EnvironmentToAdd;
-	//RTAddEnvNode->AdditonalArguments = AdditonalArguments;
+	//Not saving the the regular Child Nodes array
+	check(RTScript != nullptr);
+	TArray<UUAVGScriptRuntimeNode*> ParentRTNodes;
+	if (GetInputPin() != nullptr)//Get Parent Nodes
+	{
+		UUAVGScriptRuntimeNode* LinkedNode = nullptr;
+		TArray<UEdGraphPin*> LinkedPins = GetInputPin()->LinkedTo;
+		for (UEdGraphPin* Pin : LinkedPins)
+		{
+			if (!Pin) continue;
+			
+			GetPinConnectedNodes(Pin, ParentRTNodes);
+		}
+	}
+
+	if (!(MyRTNode->SetParent(ParentRTNodes)))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Parent Binding Failed at Node %s"), *GetName());
+	}
+
+	//Selection Nodes Special Logic
+
+	UUAVGScriptRuntimeNodeSelection* RTSelectionNode = CastChecked<UUAVGScriptRuntimeNodeSelection>(MyRTNode);
+	RTSelectionNode->EditorClearSelections();
+	RTSelectionNode->Selections = Selections;
+
+	for(UEdGraphPin* SelectionPin : GetOutputPins())
+	{
+		UUAVGScriptRuntimeNode* NextNode = CastChecked<UUAVGScriptGraphNode>
+			((SelectionPin->LinkedTo)[0]->GetOwningNode())->GetRTNode();//Only save the first Input pin linked to the output selection pin
+		if(!RTSelectionNode->EditorAddSelectionNodes(NextNode))//Save falied
+		{
+			UE_LOG(LogTemp, Error, TEXT("AddSelectionNodes Falied at Node %s"), *GetName());
+		}
+	}
 }
 
 FText UUAVGScriptGraphNodeSelection::GetNodeTitle(ENodeTitleType::Type TitleType) const
@@ -80,7 +110,7 @@ TArray<UEdGraphPin*> UUAVGScriptGraphNodeSelection::GetOutputPins()
 {
 	TArray<UEdGraphPin*> ToReturn;
 	ToReturn = Pins;
-	ToReturn.RemoveAt(0);
+	ToReturn.RemoveAt(0);//Remove the Input Pin
 	return ToReturn;
 }
 
@@ -93,7 +123,7 @@ void UUAVGScriptGraphNodeSelection::PostEditChangeChainProperty(FPropertyChanged
 		if(PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayAdd)
 		{
 			CreateOutputPins(ModifiedArrayIndex + 1);
-			GetGraph()->NotifyGraphChanged();
+			GetGraph()->NotifyGraphChanged();//Update Slate UI
 		}
 		else if(PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayRemove)
 		{
