@@ -16,9 +16,9 @@ enum class EUAVGRuntimeState : uint8
 	URS_NULL UMETA(Hidden),
 	URS_NotInitialized UMETA(DisplayName = "Not Initialized"),
 	URS_ReadyForNext UMETA(DisplayName = "Ready For Next"),
-	URS_WaitingForAnswer UMETA(DisplayName = "Waiting For Answer"),
 	URS_Speaking UMETA(DisplayName = "Speaking"),
 	URS_WaitingForEvent UMETA(DisplayName = "Waiting For Event"),
+	URS_WaitingForSelection UMETA(DisplayName = "Waiting For Selection"),
 	URS_Finished UMETA(DisplayName = "Finished"),
 	URS_FatalError UMETA(DisplayName = "Fatal Error"),
 	URS_MAX UMETA(Hidden)
@@ -84,9 +84,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void EventHandled();
 
+	//Select a Route for Selection Node (Pass a Negative Index to use the default selection for that node)
+	//Note that you still need to Manually Call Next() for the next node.
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
+	void SetSelection(int32 InIndex);
+
 	//Change a Script(When not Initialized)
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void ChangeScript(UUAVGScript* NewScript);
+
+	UFUNCTION(BlueprintPure, Category = "UAVG")
+	bool CanNext() const;
 protected:
 	UObject* UIInterface = nullptr;
 	AActor* ActorInterface = nullptr;
@@ -123,12 +131,14 @@ private:
 
 	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
 
+	TArray<FUAVGText> RecentDisplayingText;
 	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 
 	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEventNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResponse);
+	void OnReachSelectionNode(FUAVGComponentNextResponse& OutResponse);
 
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);

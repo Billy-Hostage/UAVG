@@ -8,6 +8,7 @@
 #include "SGraphPanel.h"
 
 #include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraphNodeSelection.h"
 
 TSharedRef<FDragUAVGScriptGraphNode> FDragUAVGScriptGraphNode::New(const TSharedRef<SGraphPanel>& InGraphPanel, const TSharedRef<SGraphNode>& InDraggedNode)
 {
@@ -52,10 +53,26 @@ void SUAVGScriptGraphNode::CreatePinWidgets()
 	UEdGraphPin* InputPin = MyGraphNode->GetInputPin();
 	UEdGraphPin* OutputPin = MyGraphNode->GetOutputPin();
 	if (InputPin) CreateStandardPinWidget(InputPin);
-	if (OutputPin) CreateStandardPinWidget(OutputPin);
+	if (OutputPin)
+	{
+		CreateStandardPinWidget(OutputPin);
+	}
+	else
+	{
+		UUAVGScriptGraphNodeSelection* SelectionGraphNode = Cast<UUAVGScriptGraphNodeSelection>(MyGraphNode);
+		if(SelectionGraphNode)
+		{
+			TArray<UEdGraphPin*> OPins = SelectionGraphNode->GetOutputPins();
+			for(UEdGraphPin* Pin : OPins)
+			{
+				CreateStandardPinWidget(Pin);
+			}
+		}
+	}
 }
 
 //Update The Node to match EdNode's Data
+//TODO Refactor Needed
 void SUAVGScriptGraphNode::UpdateGraphNode()
 {
 	InputPins.Empty();
@@ -152,6 +169,7 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 													SAssignNew(NodeTextBlock, SInlineEditableTextBlock)
 													.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
 													.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+													.Justification(ETextJustify::Center)
 													.IsReadOnly(true)
 												]
 												+SVerticalBox::Slot()
@@ -252,6 +270,7 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
 				.FillWidth(1.0f)
+				.Padding(0, 0, 20.0f, 0)
 				[
 					PinToAdd
 				];

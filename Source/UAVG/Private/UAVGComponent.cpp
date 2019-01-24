@@ -214,9 +214,10 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 	case EUAVGRuntimeState::URS_Finished:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Script Already Finished!"));
 		break;
-	case EUAVGRuntimeState::URS_WaitingForAnswer:
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Answer"));
-		break;
+	case EUAVGRuntimeState::URS_WaitingForSelection:
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("Selection Not Specified"));
+		SetSelection(-1);
+		return Next();
 	case EUAVGRuntimeState::URS_WaitingForEvent:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Event"));
 		break;
@@ -236,6 +237,20 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 
 	Response.CurrentState = GetUAVGState();
 	return Response;
+}
+
+bool UUAVGComponent::CanNext() const
+{
+	if(!bCanNext) return false;
+	if(GetUAVGState() == EUAVGRuntimeState::URS_ReadyForNext)
+	{
+		return true;
+	}
+	else if(GetUAVGState() == EUAVGRuntimeState::URS_Speaking)
+	{
+		return bCanPerformSkip;
+	}
+	return false;
 }
 
 void UUAVGComponent::EventHandled()
@@ -274,6 +289,26 @@ void UUAVGComponent::ChangeScript(UUAVGScript* NewScript)
 	}
 }
 
+void UUAVGComponent::SetSelection(int32 InIndex)
+{
+	if(GetUAVGState() != EUAVGRuntimeState::URS_WaitingForSelection)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("No Selection Pending."));
+		return;
+	}
+
+	UUAVGScriptRuntimeNodeSelection* RTSelectionNode = Cast<UUAVGScriptRuntimeNodeSelection>(CurrentNode);
+	if(!RTSelectionNode)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Selection Node is not valid."));
+		CurrentState = EUAVGRuntimeState::URS_FatalError;
+		return;
+	}
+
+	RTSelectionNode->SetSelectionIndex(InIndex, this);
+	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
+}
+
 FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 {
 	FString MyString = InText.TextLine.ToString();
@@ -287,8 +322,9 @@ FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 
 void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 {
-	LastNode = CurrentNode;
-	CurrentNode = CurrentNode->GetNextNode();
+	LastNode = CurrentNode;//Save the last node
+	CurrentNode = CurrentNode->GetNextNode(this);
+	LastNode->OnLeave(this);
 	if (CurrentNode == nullptr)
 	{
 		if(ScriptStack.Num() == 0)
@@ -328,6 +364,9 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 		break;
 	case EUAVGRuntimeNodeType::URNT_RunSubScript:
 		OnReachRunSubScriptNode(OutResponse);
+		break;
+	case EUAVGRuntimeNodeType::URNT_Selection:
+		OnReachSelectionNode(OutResponse);
 		break;
 	default:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
@@ -483,8 +522,19 @@ void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResp
 	OutResponse.bSucceed = true;
 }
 
+void UUAVGComponent::OnReachSelectionNode(FUAVGComponentNextResponse& OutResponse)
+{
+	CurrentState = EUAVGRuntimeState::URS_WaitingForSelection;
+	
+	IUAVGActorInterface::Execute_OnFaceSelection(ActorInterface, FUAVGActorSelectionInfo(LastNodeResponse.SelectionTexts));
+	IUAVGUIInterface::Execute_OnFaceSelection(UIInterface, FUAVGUISelectionInfo(LastNodeResponse.SelectionTexts));
+
+	OutResponse.bSucceed = true;
+}
+
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 {
+	RecentDisplayingText = NewText;
 	DesiredText = NewText;
 
 	DisplayingNums.Init(-1, DesiredText.Num());
@@ -518,6 +568,7 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 	InSave->MyScript = MyScript;
 	InSave->CurrentNode = CurrentNode;
 	InSave->LastNode = LastNode;
+	InSave->RecentDisplayingText = RecentDisplayingText;
 	InSave->EnvironmentDescriptor = EnvironmentDescriptor;
 	InSave->ScriptStack = ScriptStack;
 	InSave->CurrentNodeStack = CurrentNodeStack;

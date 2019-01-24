@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "UAVGComponent.h"
+#include "Nodes/UAVGScriptRTNode.h"
 #include "UAVGSaveGame.generated.h"
 
 UCLASS(BlueprintType)
@@ -32,4 +33,8 @@ public:
 	TArray<class UUAVGScriptRuntimeNode*> CurrentNodeStack;
 	UPROPERTY()
 	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
+
+	//You might wish to use this in save management, etc.
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FUAVGText> RecentDisplayingText;
 };
