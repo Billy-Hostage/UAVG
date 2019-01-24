@@ -215,8 +215,9 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Script Already Finished!"));
 		break;
 	case EUAVGRuntimeState::URS_WaitingForSelection:
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Selection"));
-		break;
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("Selection Not Specified"));
+		SetSelection(-1);
+		return Next();
 	case EUAVGRuntimeState::URS_WaitingForEvent:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Waiting for a Event"));
 		break;
@@ -236,6 +237,20 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 
 	Response.CurrentState = GetUAVGState();
 	return Response;
+}
+
+bool UUAVGComponent::CanNext() const
+{
+	if(!bCanNext) return false;
+	if(GetUAVGState() == EUAVGRuntimeState::URS_ReadyForNext)
+	{
+		return true;
+	}
+	else if(GetUAVGState() == EUAVGRuntimeState::URS_Speaking)
+	{
+		return bCanPerformSkip;
+	}
+	return false;
 }
 
 void UUAVGComponent::EventHandled()
@@ -274,6 +289,26 @@ void UUAVGComponent::ChangeScript(UUAVGScript* NewScript)
 	}
 }
 
+void UUAVGComponent::SetSelection(int32 InIndex)
+{
+	if(GetUAVGState() != EUAVGRuntimeState::URS_WaitingForSelection)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("No Selection Pending."));
+		return;
+	}
+
+	UUAVGScriptRuntimeNodeSelection* RTSelectionNode = Cast<UUAVGScriptRuntimeNodeSelection>(CurrentNode);
+	if(!RTSelectionNode)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Selection Node is not valid."));
+		CurrentState = EUAVGRuntimeState::URS_FatalError;
+		return;
+	}
+
+	RTSelectionNode->SetSelectionIndex(InIndex, this);
+	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
+}
+
 FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 {
 	FString MyString = InText.TextLine.ToString();
@@ -287,9 +322,9 @@ FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
 
 void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 {
-	CurrentNode->OnLeave(this);
 	LastNode = CurrentNode;//Save the last node
-	CurrentNode = CurrentNode->GetNextNode();
+	CurrentNode = CurrentNode->GetNextNode(this);
+	LastNode->OnLeave(this);
 	if (CurrentNode == nullptr)
 	{
 		if(ScriptStack.Num() == 0)
@@ -314,7 +349,6 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 {
 	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
-	OldNodeResponse = LastNodeResponse;
 	LastNodeResponse = ArriveResponse;//Cache it
 
 	switch (ArriveResponse.NodeType)
@@ -500,6 +534,7 @@ void UUAVGComponent::OnReachSelectionNode(FUAVGComponentNextResponse& OutRespons
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 {
+	RecentDisplayingText = NewText;
 	DesiredText = NewText;
 
 	DisplayingNums.Init(-1, DesiredText.Num());
@@ -533,6 +568,7 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 	InSave->MyScript = MyScript;
 	InSave->CurrentNode = CurrentNode;
 	InSave->LastNode = LastNode;
+	InSave->RecentDisplayingText = RecentDisplayingText;
 	InSave->EnvironmentDescriptor = EnvironmentDescriptor;
 	InSave->ScriptStack = ScriptStack;
 	InSave->CurrentNodeStack = CurrentNodeStack;

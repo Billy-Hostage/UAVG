@@ -33,4 +33,8 @@ public:
 	TArray<class UUAVGScriptRuntimeNode*> CurrentNodeStack;
 	UPROPERTY()
 	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
+
+	//You might wish to use this in save management, etc.
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FUAVGText> RecentDisplayingText;
 };

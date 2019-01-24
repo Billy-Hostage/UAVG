@@ -14,7 +14,7 @@ public:
 	UUAVGScriptRuntimeNodeSelection();
 
 	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
-
+	virtual void OnLeave(class UUAVGComponent* InComponent) override;
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr) override;
 
 	virtual void SetSelectionIndex(int32 SelectionIndex, class UUAVGComponent* InComponent);

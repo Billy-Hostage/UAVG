@@ -24,7 +24,7 @@ void UUAVGScriptRuntimeNodeSelection::EditorClearSelections()
 
 UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNodeSelection::GetNextNode(class UUAVGComponent* InComponent)
 {
-	if(!SelectedIndexs.Contains(InComponent))
+	if(SelectedIndexs.Contains(InComponent))
 	{
 		return SelectionNodes.IsValidIndex(SelectedIndexs[InComponent])? SelectionNodes[SelectedIndexs[InComponent]] : nullptr;
 	}
@@ -39,6 +39,10 @@ void UUAVGScriptRuntimeNodeSelection::SetSelectionIndex(int32 SelectionIndex, cl
 	if(!ensure(InComponent)) return;
 	if(!Selections.IsValidIndex(SelectionIndex))
 	{
+		if(SelectionIndex >= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid SelectionIndex at Node %s"), *GetName());
+		}
 		SelectedIndexs.Add(InComponent, DefaultIndex);
 	}
 	SelectedIndexs.Add(InComponent, SelectionIndex);
@@ -60,4 +64,13 @@ FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSelection::OnArrive()
 	Response.SelectionTexts = Selections;
 
 	return Response;
+}
+
+void UUAVGScriptRuntimeNodeSelection::OnLeave(class UUAVGComponent* InComponent)
+{
+	if(SelectedIndexs.Contains(InComponent))
+	{
+		SelectedIndexs.Remove(InComponent);
+	}
+	Super::OnLeave(InComponent);
 }

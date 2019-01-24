@@ -52,6 +52,7 @@ void UUAVGScriptGraphNodeSelection::SaveToRTNode(class UUAVGScript* RTScript)
 	UUAVGScriptRuntimeNodeSelection* RTSelectionNode = CastChecked<UUAVGScriptRuntimeNodeSelection>(MyRTNode);
 	RTSelectionNode->EditorClearSelections();
 	RTSelectionNode->Selections = Selections;
+	RTSelectionNode->DefaultIndex = (int32)DefaultSelectionIndex;
 
 	for(UEdGraphPin* SelectionPin : GetOutputPins())
 	{

@@ -69,4 +69,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FText> Selections;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	uint8 DefaultSelectionIndex;
 };

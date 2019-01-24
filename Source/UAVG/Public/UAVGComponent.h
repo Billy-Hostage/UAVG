@@ -84,9 +84,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void EventHandled();
 
+	//Select a Route for Selection Node (Pass a Negative Index to use the default selection for that node)
+	//Note that you still need to Manually Call Next() for the next node.
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
+	void SetSelection(int32 InIndex);
+
 	//Change a Script(When not Initialized)
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void ChangeScript(UUAVGScript* NewScript);
+
+	UFUNCTION(BlueprintPure, Category = "UAVG")
+	bool CanNext() const;
 protected:
 	UObject* UIInterface = nullptr;
 	AActor* ActorInterface = nullptr;
@@ -123,7 +131,7 @@ private:
 
 	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
 
-	FUAVGScriptRuntimeNodeArriveResponse OldNodeResponse;
+	TArray<FUAVGText> RecentDisplayingText;
 	FUAVGScriptRuntimeNodeArriveResponse LastNodeResponse;
 
 	void OnReachSayNode(FUAVGComponentNextResponse& OutResponse);
