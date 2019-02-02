@@ -15,6 +15,7 @@ class UUAVGSaveGame : public USaveGame
 public:
 	UUAVGSaveGame();
 
+	///General
 	UPROPERTY()
 	class UUAVGScript* MyScript;
 
@@ -24,7 +25,8 @@ public:
 	UPROPERTY()
 	class UUAVGScriptRuntimeNode* LastNode;
 
-	UPROPERTY()
+	//You might wish to revive scenes from savedata using this variable
+	UPROPERTY(BlueprintReadOnly)
 	TArray<FUAVGEnvironmentDescriptor> EnvironmentDescriptor;
 
 	UPROPERTY()
@@ -34,7 +36,10 @@ public:
 	UPROPERTY()
 	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
 
-	//You might wish to use this in save management, etc.
+	//You might wish to use this in save management
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FUAVGText> RecentDisplayingText;
+
+	///Node Specific
+
 };

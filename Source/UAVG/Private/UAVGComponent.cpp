@@ -585,7 +585,10 @@ void UUAVGComponent::UnWarpSaveObject(UUAVGSaveGame* InSave)
 	ScriptStack = InSave->ScriptStack;
 	CurrentNodeStack = InSave->CurrentNodeStack;
 	LastNodeStack = InSave->LastNodeStack;
-	UnWarpEnvironmentDescriptor(InSave->EnvironmentDescriptor);
+	EnvironmentDescriptor = InSave->EnvironmentDescriptor;
+	//UnWarpEnvironmentDescriptor(InSave->EnvironmentDescriptor);
+	IUAVGActorInterface::Execute_OnRevivedFromSave(ActorInterface, InSave);
+	IUAVGUIInterface::Execute_OnRevivedFromSave(UIInterface, InSave);
 }
 
 void UUAVGComponent::UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescriptor> SavedDescriptor)

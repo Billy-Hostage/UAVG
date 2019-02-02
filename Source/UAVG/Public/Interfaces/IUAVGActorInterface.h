@@ -52,6 +52,9 @@ class IUAVGActorInterface
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnRevivedFromSave(class UUAVGSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void OnTextUpdated(int32 Index, const FText& NewText);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
