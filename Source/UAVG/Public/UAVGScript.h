@@ -32,7 +32,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable)
-	const FText& TestScript();
+	FText HelloScript();
 
 #if WITH_EDITORONLY_DATA
 

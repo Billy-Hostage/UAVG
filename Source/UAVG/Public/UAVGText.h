@@ -31,7 +31,7 @@ public:
 		return TextLine.ToString().Len();
 	}
 protected:
-	//DEPRECATED
+	//REMOVED
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Delay (ms)", ShortTooltip = "ms", Tooltip = "Only Works when 'Display Delay' is Set to Negative"))
 	//int32 CharacterDisplayDelayInMs = 0;
 

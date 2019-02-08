@@ -158,6 +158,8 @@ protected:
 
 	void Speak(float DeltaTime);
 
+	void CompleteScript();
+
 	void OnScriptEnded();
 
 	void WarpSaveObject(class UUAVGSaveGame* InSave);

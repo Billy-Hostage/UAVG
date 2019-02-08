@@ -161,6 +161,7 @@ void UUAVGComponent::Reset()
 	ScriptStack.Empty();
 	CurrentNodeStack.Empty();
 	LastNodeStack.Empty();
+	EnvironmentDescriptor.Empty();
 	CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 }
 
@@ -330,7 +331,7 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 	{
 		if(ScriptStack.Num() == 0)
 		{
-			OnScriptEnded();
+			CompleteScript();
 			OutResponse.bSucceed = true;
 			return;
 		}
@@ -399,7 +400,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 		int32 CharacterDisplayDelayInMs = DesiredText[i].GetCharacterDisplayDelayInMs();
 		if(CharacterDisplayDelayInMs < 0)
 		{
-			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->DefaultCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->DefaultCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
+			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
 			UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Using fallback CharacterDisplayDelayInMs"));
 		}
 		int32 NewNums = SpeakDurationInMs / CharacterDisplayDelayInMs;
@@ -423,6 +424,32 @@ void UUAVGComponent::CheckIfLineCompleted()
 	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
 	IUAVGActorInterface::Execute_OnLineComplete(ActorInterface);
 	IUAVGUIInterface::Execute_OnLineComplete(UIInterface);
+}
+
+void UUAVGComponent::CompleteScript()
+{
+	switch (MyScript->GetConstRootNode()->OnScriptCompleted)
+	{
+	case EUAVGScriptCompleteBehaviour::USCB_Nothing:
+		OnScriptEnded();
+		break;
+	case EUAVGScriptCompleteBehaviour::USCB_JumpToScriptReset:
+		if (MyScript->GetConstRootNode()->ScriptToJump)
+		{
+			UUAVGScript* NextScript = MyScript->GetConstRootNode()->ScriptToJump;
+			UObject* UII = UIInterface;
+			AActor* AII = ActorInterface;
+			Reset();//Protect Whiteboard datas here in the future
+			ChangeScript(NextScript);
+			InitializeNew(UII, AII, true);
+		}
+		else
+		{
+			UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Next script target not specified!"));
+			OnScriptEnded();
+		}
+		break;
+	}
 }
 
 void UUAVGComponent::OnScriptEnded()
@@ -523,8 +550,8 @@ void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResp
 	MyScript = LastNodeResponse.SubScriptToRun;
 	CurrentNode = Cast<UUAVGScriptRuntimeNode>(MyScript->GetRuntimeRootNode());
 	
-	FUAVGComponentNextResponse R;
-	NextNode(R);
+	FUAVGComponentNextResponse Response;
+	NextNode(Response);
 	
 	OutResponse.bSucceed = true;
 }
