@@ -29,5 +29,5 @@ protected:
 	int32 CharacterDisplayDelayInMs = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Display Delay (ms)", ShortTooltip = "ms", Tooltip = "Leave here Negative Number to Use 'Character Display Delay' "))
-	int32 DisplayTimeInMs = 3000;
+	int32 DisplayTimeInMs = 250;
 };
