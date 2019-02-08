@@ -16,7 +16,9 @@ void UUAVGScriptGraphNodeRoot::SaveToRTNode(UUAVGScript* RTScript)
 	UUAVGScriptRuntimeNodeRoot* RTRootNode = CastChecked<UUAVGScriptRuntimeNodeRoot>(MyRTNode);
 	
 	RTRootNode->ScriptName = ScriptName;
-	RTRootNode->DefaultCharacterDisplayDelayInMs = CharacterDisplayDelayInMs;
+	RTRootNode->FallbackCharacterDisplayDelayInMs = CharacterDisplayDelayInMs;
+	RTRootNode->OnScriptCompleted = OnScriptCompleted;
+	RTRootNode->ScriptToJump = ScriptToJump;
 }
 
 void UUAVGScriptGraphNodeRoot::AllocateDefaultPins()

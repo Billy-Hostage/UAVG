@@ -93,6 +93,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void ChangeScript(UUAVGScript* NewScript);
 
+	//Check if we can do next without triggering warnings and errors
 	UFUNCTION(BlueprintPure, Category = "UAVG")
 	bool CanNext() const;
 protected:
@@ -152,9 +153,12 @@ protected:
 	void NextNode(FUAVGComponentNextResponse& OutResponse);
 	void ProcessNode(FUAVGComponentNextResponse& OutResponse);
 
+	//Try to skip.
 	void TrySkip();
 
 	void Speak(float DeltaTime);
+
+	void CompleteScript();
 
 	void OnScriptEnded();
 
@@ -164,10 +168,15 @@ protected:
 
 	///Configs Here
 
+	//Set it to false to manually disable Next() command
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config")
 	bool bCanNext = true;
+
+	//Set it to false to disable skip
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")
-	bool bCanPerformSkip = false;
+	bool bCanPerformSkip = true;
+
+	//Determines skipping speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")
 	int32 EachSkipTimeInMs = 200;
 };

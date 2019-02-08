@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGRuntimeComponent);
+#define CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK 200
 
 void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -160,6 +161,7 @@ void UUAVGComponent::Reset()
 	ScriptStack.Empty();
 	CurrentNodeStack.Empty();
 	LastNodeStack.Empty();
+	EnvironmentDescriptor.Empty();
 	CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 }
 
@@ -329,7 +331,7 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 	{
 		if(ScriptStack.Num() == 0)
 		{
-			OnScriptEnded();
+			CompleteScript();
 			OutResponse.bSucceed = true;
 			return;
 		}
@@ -395,7 +397,13 @@ void UUAVGComponent::Speak(float DeltaTime)
 	{
 		if (SpeakComplete[i]) continue;
 		if (DisplayingNums[i] < 0) continue;
-		int32 NewNums = SpeakDurationInMs / DesiredText[i].GetCharacterDisplayDelayInMs();
+		int32 CharacterDisplayDelayInMs = DesiredText[i].GetCharacterDisplayDelayInMs();
+		if(CharacterDisplayDelayInMs < 0)
+		{
+			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
+			UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Using fallback CharacterDisplayDelayInMs"));
+		}
+		int32 NewNums = SpeakDurationInMs / CharacterDisplayDelayInMs;
 		if (NewNums >= DesiredText[i].TextLine.ToString().Len())
 		{
 			SpeakComplete[i] = true;
@@ -416,6 +424,32 @@ void UUAVGComponent::CheckIfLineCompleted()
 	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
 	IUAVGActorInterface::Execute_OnLineComplete(ActorInterface);
 	IUAVGUIInterface::Execute_OnLineComplete(UIInterface);
+}
+
+void UUAVGComponent::CompleteScript()
+{
+	switch (MyScript->GetConstRootNode()->OnScriptCompleted)
+	{
+	case EUAVGScriptCompleteBehaviour::USCB_Nothing:
+		OnScriptEnded();
+		break;
+	case EUAVGScriptCompleteBehaviour::USCB_JumpToScriptReset:
+		if (MyScript->GetConstRootNode()->ScriptToJump)
+		{
+			UUAVGScript* NextScript = MyScript->GetConstRootNode()->ScriptToJump;
+			UObject* UII = UIInterface;
+			AActor* AII = ActorInterface;
+			Reset();//Protect Whiteboard datas here in the future
+			ChangeScript(NextScript);
+			InitializeNew(UII, AII, true);
+		}
+		else
+		{
+			UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Next script target not specified!"));
+			OnScriptEnded();
+		}
+		break;
+	}
 }
 
 void UUAVGComponent::OnScriptEnded()
@@ -516,8 +550,8 @@ void UUAVGComponent::OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResp
 	MyScript = LastNodeResponse.SubScriptToRun;
 	CurrentNode = Cast<UUAVGScriptRuntimeNode>(MyScript->GetRuntimeRootNode());
 	
-	FUAVGComponentNextResponse R;
-	NextNode(R);
+	FUAVGComponentNextResponse Response;
+	NextNode(Response);
 	
 	OutResponse.bSucceed = true;
 }
@@ -545,7 +579,7 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
 		{
 			DisplayingNums[i] = 0;
-			if (DesiredText[i].GetCharacterDisplayDelayInMs() <= 0)
+			if (DesiredText[i].GetCharacterDisplayDelayInMs() == 0)
 			{
 				//Just Update Texts and Mark as Complete
 				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
@@ -555,6 +589,7 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 		}
 		else//Empty Text is Always Completed
 		{
+			//No need to update
 			SpeakComplete[i] = true;
 		}
 	}
@@ -613,3 +648,5 @@ void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorChanged(UIInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
 	}
 }
+
+#undef CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK

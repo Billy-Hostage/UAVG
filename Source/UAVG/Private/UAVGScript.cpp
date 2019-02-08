@@ -24,7 +24,7 @@ bool UUAVGScript::AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode)
 	return true;
 }
 
-const FText& UUAVGScript::TestScript()
+FText UUAVGScript::HelloScript()
 {
 	if (RootNode)
 	{
@@ -36,9 +36,5 @@ const FText& UUAVGScript::TestScript()
 		return FText::GetEmpty();
 	}
 
-	//temporary testing code
-	UUAVGScriptRuntimeNodeSaySingle* SaySingleNode = Cast<UUAVGScriptRuntimeNodeSaySingle>(RootNode->MyChildNodes[0]);
-	if (!SaySingleNode) return FText::GetEmpty();
-	if (!SaySingleNode->SaySingleTextsArray.IsValidIndex(0)) return FText::GetEmpty();
-	return SaySingleNode->SaySingleTextsArray[0].TextLine;
+	return FText::FromName(RootNode->ScriptName);
 }
