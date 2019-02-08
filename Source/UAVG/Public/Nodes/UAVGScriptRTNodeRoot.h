@@ -6,6 +6,7 @@
 #include "UAVGScriptRTNode.h"
 #include "UAVGScriptRTNodeRoot.generated.h"
 
+//Every UAVGScript has this root node
 UCLASS(Blueprintable)
 class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 {
@@ -21,5 +22,5 @@ public:
 	FName ScriptName;
 
 	UPROPERTY(BlueprintReadOnly)
-	uint8 DefaultCharacterDisplayDelayInMs = 200;
+	int32 DefaultCharacterDisplayDelayInMs = 200;
 };

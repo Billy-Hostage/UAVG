@@ -26,6 +26,11 @@ public:
 
 	bool AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode);
 
+	const UUAVGScriptRuntimeNodeRoot* GetConstRootNode() const
+	{
+		return RootNode;
+	}
+
 	UFUNCTION(BlueprintCallable)
 	const FText& TestScript();
 

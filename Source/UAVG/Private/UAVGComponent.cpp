@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGRuntimeComponent);
+#define CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK 200
 
 void UUAVGComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -395,7 +396,13 @@ void UUAVGComponent::Speak(float DeltaTime)
 	{
 		if (SpeakComplete[i]) continue;
 		if (DisplayingNums[i] < 0) continue;
-		int32 NewNums = SpeakDurationInMs / DesiredText[i].GetCharacterDisplayDelayInMs();
+		int32 CharacterDisplayDelayInMs = DesiredText[i].GetCharacterDisplayDelayInMs();
+		if(CharacterDisplayDelayInMs < 0)
+		{
+			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->DefaultCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->DefaultCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
+			UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Using fallback CharacterDisplayDelayInMs"));
+		}
+		int32 NewNums = SpeakDurationInMs / CharacterDisplayDelayInMs;
 		if (NewNums >= DesiredText[i].TextLine.ToString().Len())
 		{
 			SpeakComplete[i] = true;
@@ -545,7 +552,7 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
 		{
 			DisplayingNums[i] = 0;
-			if (DesiredText[i].GetCharacterDisplayDelayInMs() <= 0)
+			if (DesiredText[i].GetCharacterDisplayDelayInMs() == 0)
 			{
 				//Just Update Texts and Mark as Complete
 				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
@@ -555,6 +562,7 @@ void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 		}
 		else//Empty Text is Always Completed
 		{
+			//No need to update
 			SpeakComplete[i] = true;
 		}
 	}
@@ -613,3 +621,5 @@ void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorChanged(UIInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
 	}
 }
+
+#undef CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK
