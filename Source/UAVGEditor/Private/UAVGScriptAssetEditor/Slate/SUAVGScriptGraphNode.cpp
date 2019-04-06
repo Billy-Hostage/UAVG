@@ -98,7 +98,6 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 			.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 			.Padding(0.0f)
 			.BorderBackgroundColor(this, &SUAVGScriptGraphNode::GetNodeBackgroundColor)
-			//.OnMouseButtonDown(this, &SUAVGScriptGraphNode::OnMouseDown)
 			[
 				SNew(SOverlay)
 
@@ -126,11 +125,6 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 						SNew(SVerticalBox)
 						+SVerticalBox::Slot()
 						.AutoHeight()
-						//[
-							//TODO Decorators
-						//]
-						+SVerticalBox::Slot()
-						.AutoHeight()
 						[
 							SAssignNew(NodeBody, SBorder)
 							.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
@@ -150,17 +144,13 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 									[
 										SNew(SHorizontalBox)
 										+SHorizontalBox::Slot()
-										.AutoWidth()
+										//.AutoWidth()
+										.HAlign(HAlign_Center)
 										[
 											SNew(SHorizontalBox)
 											+SHorizontalBox::Slot()
-											.AutoWidth()
-											.VAlign(VAlign_Center)
-											//[
-												//TODO Node Icon
-											//]
-											+SHorizontalBox::Slot()
-											.Padding(FMargin(4.f, 0.f, 4.f, 0.f))
+											.HAlign(HAlign_Center)
+											//.Padding(FMargin(4.f, 0.f, 4.f, 0.f))
 											[
 												SNew(SVerticalBox)
 												+SVerticalBox::Slot()
@@ -180,20 +170,9 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 											]
 										]
 									]
-									+SVerticalBox::Slot()
-									.AutoHeight()
-									//[
-										//TODO Description Message
-									//]
 								]
 							]
 						]
-						+SVerticalBox::Slot()
-						.AutoHeight()
-						.Padding(FMargin(10.f, 0.f, 0.f, 0.f))
-						//[
-							//TODO Services
-						//]
 					]
 					//OUTPUT PIN
 					+SVerticalBox::Slot()
@@ -212,19 +191,6 @@ void SUAVGScriptGraphNode::UpdateGraphNode()
 								SAssignNew(OutputPinBox, SHorizontalBox)
 							]
 						]
-					]
-				]
-				+SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-					.BorderBackgroundColor(FLinearColor::Black)
-					.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-					.Visibility(EVisibility::Visible)
-					[
-						SNew(SBox)
-						.HeightOverride(4)
 					]
 				]
 			]
@@ -252,14 +218,12 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 	}
 	else // Direction == EEdGraphPinDirection::EGPD_Output
 	{
-		const bool bIsSingleTaskPin = false;//TODO
-		if (bIsSingleTaskPin)
+		if (OutputPins.Num() == 0)
 		{
 			OutputPinBox->AddSlot()
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
-				.FillWidth(0.4f)
-				.Padding(0, 0, 20.0f, 0)
+				.FillWidth(1.0f)
 				[
 					PinToAdd
 				];
@@ -270,11 +234,34 @@ void SUAVGScriptGraphNode::AddPin(const TSharedRef<SGraphPin>& PinToAdd)
 				.HAlign(HAlign_Fill)
 				.VAlign(VAlign_Fill)
 				.FillWidth(1.0f)
-				.Padding(0, 0, 20.0f, 0)
+				.Padding(20.f, 0, 0, 0)
 				[
 					PinToAdd
 				];
 		}
+		//const bool bIsSingleTaskPin = false;
+		//if (bIsSingleTaskPin)
+		//{
+		//	OutputPinBox->AddSlot()
+		//		.HAlign(HAlign_Fill)
+		//		.VAlign(VAlign_Fill)
+		//		.FillWidth(0.4f)
+		//		.Padding(0, 0, 20.0f, 0)
+		//		[
+		//			PinToAdd
+		//		];
+		//}
+		//else
+		//{
+		//	OutputPinBox->AddSlot()
+		//		.HAlign(HAlign_Fill)
+		//		.VAlign(VAlign_Fill)
+		//		.FillWidth(1.0f)
+		//		.Padding(0, 0, 20.0f, 0)
+		//		[
+		//			PinToAdd
+		//		];
+		//}
 		OutputPins.Add(PinToAdd);
 	}
 }

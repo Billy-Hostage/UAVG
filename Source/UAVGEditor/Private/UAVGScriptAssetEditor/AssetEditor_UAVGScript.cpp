@@ -245,7 +245,7 @@ FText FAssetEditor_UAVGScrpit::GetToolkitName() const
 
 	FFormatNamedArguments Args;
 	Args.Add(TEXT("UAVGScriptName"), FText::FromString(EditingScript->GetName()));
-	Args.Add(TEXT("DirtyState"), bDirtyState ? FText::FromString(TEXT("*")) : FText::GetEmpty());
+	Args.Add(TEXT("DirtyState"), /*bDirtyState ? FText::FromString(TEXT("*")) : */FText::GetEmpty()); //It seems that ue is handling the dirty mark itself.
 	return FText::Format(LOCTEXT("UAVGScriptToolkitName", "{UAVGScriptName}{DirtyState}"), Args);
 }
 
