@@ -2,7 +2,7 @@
 
 An Unreal Engine 4 Plugin design to create AVG Games in a friendly way
 
-**Currently Tested UE Version: 4.22.0**
+**Currently Tested UE Version: 4.23.0**
 
 ---
 How to Build&Use:
