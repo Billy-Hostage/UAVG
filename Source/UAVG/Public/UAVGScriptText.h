@@ -13,7 +13,7 @@ public:
 	UUAVGScriptText();
 
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FString> ScriptLines;
 
 #ifdef WITH_EDITOR
