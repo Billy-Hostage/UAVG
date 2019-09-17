@@ -13,7 +13,7 @@ class UAVG_API UUAVGScriptRuntimeNodeRemoveEnvironment : public UUAVGScriptRunti
 public:
 	UUAVGScriptRuntimeNodeRemoveEnvironment();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FString> EnvironmentsToRemove;

@@ -48,7 +48,7 @@ void UUAVGScriptRuntimeNodeSelection::SetSelectionIndex(int32 SelectionIndex, cl
 	SelectedIndexs.Add(InComponent, SelectionIndex);
 }
 
-FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSelection::OnArrive()
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeSelection::OnArrive(class UUAVGComponent* InComponent)
 {
 	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_Selection);
 

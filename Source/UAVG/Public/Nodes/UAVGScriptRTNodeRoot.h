@@ -23,7 +23,7 @@ class UAVG_API UUAVGScriptRuntimeNodeRoot : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeRoot();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	///Properties Here
 

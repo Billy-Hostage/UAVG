@@ -54,7 +54,7 @@ class UAVG_API UUAVGScriptRuntimeNode : public UObject
 public:
 	UUAVGScriptRuntimeNode();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive()
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent)
 	{
 		return FUAVGScriptRuntimeNodeArriveResponse();
 	}

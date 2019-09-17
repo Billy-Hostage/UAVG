@@ -13,7 +13,7 @@ class UAVG_API UUAVGScriptRuntimeNodeAddEnvironment : public UUAVGScriptRuntimeN
 public:
 	UUAVGScriptRuntimeNodeAddEnvironment();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	FString EnvironmentToAdd;

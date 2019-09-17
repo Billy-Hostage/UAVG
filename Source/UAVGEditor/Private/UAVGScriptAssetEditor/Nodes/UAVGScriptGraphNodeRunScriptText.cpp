@@ -1,10 +1,34 @@
 //NTRHostage
 
 #include "UAVGScriptGraphNodeRunScriptText.h"
+#include "UAVGScript.h"
+#include "UAVGScriptRTNodeRunScriptText.h"
 
 UUAVGScriptGraphNodeRunScriptText::UUAVGScriptGraphNodeRunScriptText(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void UUAVGScriptGraphNodeRunScriptText::SetupRTNode(class UUAVGScript* RTScript)
+{
+	check(RTScript != nullptr);
+	if (MyRTNode == nullptr)
+	{
+		UUAVGScriptRuntimeNodeRunScriptText* RTNode = NewObject<UUAVGScriptRuntimeNodeRunScriptText>(RTScript);
+		MyRTNode = CastChecked<UUAVGScriptRuntimeNode>(RTNode);
+		if (MyRTNode != nullptr)
+		{
+			RTScript->AddRuntimeNode(MyRTNode);
+		}
+	}
+}
+
+void UUAVGScriptGraphNodeRunScriptText::SaveToRTNode(class UUAVGScript* RTScript)
+{
+	Super::SaveToRTNode(RTScript);
+	UUAVGScriptRuntimeNodeRunScriptText* RTNode = CastChecked<UUAVGScriptRuntimeNodeRunScriptText>(MyRTNode);
+
+	RTNode->ScriptTextAsset = ScriptText;
 }
 
 FText UUAVGScriptGraphNodeRunScriptText::GetNodeTitle(ENodeTitleType::Type TitleType) const

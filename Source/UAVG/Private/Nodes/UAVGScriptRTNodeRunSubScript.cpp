@@ -7,7 +7,7 @@ UUAVGScriptRuntimeNodeRunSubScript::UUAVGScriptRuntimeNodeRunSubScript()
 
 }
 
-FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRunSubScript::OnArrive()
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRunSubScript::OnArrive(class UUAVGComponent* InComponent)
 {
 	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_RunSubScript);
 

@@ -17,8 +17,6 @@ public class UAVG : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-                "UAVG/Private",
-				"UAVG/Private/Nodes"
 				// ... add other private include paths required here ...
 			}
 			);

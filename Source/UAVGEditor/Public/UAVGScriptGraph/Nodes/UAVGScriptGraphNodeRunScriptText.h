@@ -11,6 +11,9 @@ class UUAVGScriptGraphNodeRunScriptText : public UUAVGScriptGraphNode
 {
 	GENERATED_UCLASS_BODY()
 public:
+	virtual void SetupRTNode(class UUAVGScript* RTScript) override;
+	virtual void SaveToRTNode(class UUAVGScript* RTScript) override;
+
 	virtual bool IsUserCreatableNode()const override
 	{
 		return true;

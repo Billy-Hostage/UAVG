@@ -13,7 +13,7 @@ class UAVG_API UUAVGScriptRuntimeNodeRunSubScript : public UUAVGScriptRuntimeNod
 public:
 	UUAVGScriptRuntimeNodeRunSubScript();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	class UUAVGScript* SubRTScript;

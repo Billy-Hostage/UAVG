@@ -14,7 +14,7 @@ class UAVG_API UUAVGScriptRuntimeNodeSaySingle : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeSaySingle();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FUAVGText> SaySingleTextsArray;

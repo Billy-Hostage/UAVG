@@ -1,7 +1,6 @@
 //NTRHostage
 
 #include "UAVGScriptGraphNodeEvent.h"
-
 #include "UAVGScript.h"
 #include "UAVGScriptRTNodeEvent.h"
 

@@ -21,8 +21,6 @@ public class UAVGEditor : ModuleRules
                 "UAVGEditor/Private",
 				"UAVGEditor/Private/AssetTypeActions",
                 "UAVGEditor/Private/UAVGScriptAssetEditor",
-				"UAVGEditor/Private/UAVGScriptAssetEditor/Nodes",
-				"UAVGEditor/Private/UAVGScriptAssetEditor/Slate",
 				"UAVGEditor/Private/Factories",
 				// ... add other private include paths required here ...
 			}
