@@ -12,14 +12,13 @@ class UAVG_API UUAVGScriptText : public UObject
 public:
 	UUAVGScriptText();
 
-	const TArray<FString>& GetLocalizedScriptLines();
-
+	TArray<FString> GetLocalizedScriptLines();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FText> ScriptLines;
 
-	UPROPERTY(Transient)
-	TArray<FString> LocalizedScriptTextLine;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<class UStringTable*> StringTableToSearch;
 
 #ifdef WITH_EDITOR
 public:

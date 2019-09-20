@@ -370,13 +370,13 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 	case EUAVGRuntimeNodeType::URNT_Selection:
 		OnReachSelectionNode(OutResponse);
 		break;
-	case EUAVGRuntimeNodeType::URNT_NULL://Normal Error
-		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("Reached problematic node %s."), *(CurrentNode->GetName()));
+	case EUAVGRuntimeNodeType::URNT_NULL://Empty Node
+		UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Reach Empty node %s."), *(CurrentNode->GetName()));
 		CurrentState = EUAVGRuntimeState::URS_ReadyForNext;//Skip this node.
 		break;
 	case EUAVGRuntimeNodeType::URNT_MAX://Fatal Error
 	default:
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type for %s!"), *(CurrentNode->GetName()));
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		OutResponse.bSucceed = false;
 		break;

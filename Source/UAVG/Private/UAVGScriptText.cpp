@@ -1,22 +1,23 @@
 //NTRHostage
 
 #include "UAVGScriptText.h"
+#include "Internationalization/StringTable.h"
 
 UUAVGScriptText::UUAVGScriptText()
 {
 
 }
 
-const TArray<FString>& UUAVGScriptText::GetLocalizedScriptLines()
+TArray<FString> UUAVGScriptText::GetLocalizedScriptLines()
 {
-	if (LocalizedScriptTextLine.Num() != ScriptLines.Num())
+	TArray<FString> LocalizedScriptTextLine;
+
+	for (const FText& txt : ScriptLines)
 	{
-		LocalizedScriptTextLine.Empty();
-		for (const FText& txt : ScriptLines)
-		{
-			LocalizedScriptTextLine.Add(txt.ToString());
-		}
+		//Preprocess stringtables, etc.
+		LocalizedScriptTextLine.Add(txt.ToString());
 	}
+
 	return LocalizedScriptTextLine;
 }
 
