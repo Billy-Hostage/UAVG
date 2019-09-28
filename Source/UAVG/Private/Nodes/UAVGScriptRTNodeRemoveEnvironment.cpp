@@ -7,7 +7,7 @@ UUAVGScriptRuntimeNodeRemoveEnvironment::UUAVGScriptRuntimeNodeRemoveEnvironment
 
 }
 
-FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRemoveEnvironment::OnArrive()
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRemoveEnvironment::OnArrive(class UUAVGComponent* InComponent)
 {
 	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor);
 

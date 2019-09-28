@@ -13,7 +13,7 @@ class UAVG_API UUAVGScriptRuntimeNodeSelection : public UUAVGScriptRuntimeNode
 public:
 	UUAVGScriptRuntimeNodeSelection();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive() override;
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 	virtual void OnLeave(class UUAVGComponent* InComponent) override;
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr) override;
 

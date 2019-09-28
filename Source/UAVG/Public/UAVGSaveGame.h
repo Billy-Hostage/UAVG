@@ -42,4 +42,10 @@ public:
 
 	///Node Specific
 
+	UPROPERTY()
+	class UUAVGScriptText* UsingScriptTextAsset;
+	UPROPERTY()
+	uint32 LastTextLinePointer = 0;
+	UPROPERTY()
+	int32 TextDisplayTime = 250;
 };

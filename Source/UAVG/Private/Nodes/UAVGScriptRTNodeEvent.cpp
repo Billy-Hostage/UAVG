@@ -7,7 +7,7 @@ UUAVGScriptRuntimeNodeEvent::UUAVGScriptRuntimeNodeEvent()
 
 }
 
-FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeEvent::OnArrive()
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeEvent::OnArrive(class UUAVGComponent* InComponent)
 {
 	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_CustomEvent);
 	Response.EventName = EventName;

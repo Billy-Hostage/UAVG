@@ -15,6 +15,7 @@ UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNode::GetNextNode(class UUAVGComponent
 	return MyChildNodes[0];
 }
 
+#ifdef WITH_EDITOR
 bool UUAVGScriptRuntimeNode::CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* InNode) const
 {
 	if (InNode == this || InNode == nullptr) return false;//TODO Error Message
@@ -40,3 +41,5 @@ bool UUAVGScriptRuntimeNode::SetParent(TArray<UUAVGScriptRuntimeNode*> InParentN
 	MyParentNodes = InParentNodes;
 	return true;
 }
+
+#endif // WITH_EDITOR

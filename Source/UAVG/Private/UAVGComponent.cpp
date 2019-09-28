@@ -130,7 +130,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	UnWarpSaveObject(SaveData);
 	if (CurrentNode)
 	{
-		CurrentNode->UnWarpUAVGSaveGame(SaveData);
+		CurrentNode->UnWarpUAVGSaveGame(this, SaveData);
 		FUAVGComponentNextResponse Response;
 		ProcessNode(Response);
 		return true;
@@ -193,7 +193,7 @@ UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 
 	WarpSaveObject(SaveObj);
 	if (CurrentNode)
-		CurrentNode->WarpUAVGSaveGame(SaveObj);
+		CurrentNode->WarpUAVGSaveGame(this, SaveObj);
 
 	return SaveObj;
 }
@@ -229,8 +229,8 @@ FUAVGComponentNextResponse UUAVGComponent::Next()
 	case EUAVGRuntimeState::URS_FatalError:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Fatal Error in UAVGComponent %s"), *GetName());
 		break;
-	case EUAVGRuntimeState::URS_MAX:
 	case EUAVGRuntimeState::URS_NULL:
+	case EUAVGRuntimeState::URS_MAX:
 	default:
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("UAVGComponent %s Unexpected State"), *GetName());
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
@@ -340,18 +340,18 @@ void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 			MyScript = ScriptStack.Pop(true);
 			CurrentNode = CurrentNodeStack.Pop(true);
 			LastNode = LastNodeStack.Pop(true);
-			NextNode(OutResponse);
+			NextNode(OutResponse);//Try to restore progress
 			return;
 		}
 	}
 
-	ProcessNode(OutResponse);
+	ProcessNode(OutResponse);//Normal Process
 }
 
 void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 {
-	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive();
-	LastNodeResponse = ArriveResponse;//Cache it
+	FUAVGScriptRuntimeNodeArriveResponse ArriveResponse = CurrentNode->OnArrive(this);
+	LastNodeResponse = ArriveResponse;//Cache it. Might use in other funcs
 
 	switch (ArriveResponse.NodeType)
 	{
@@ -370,8 +370,13 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 	case EUAVGRuntimeNodeType::URNT_Selection:
 		OnReachSelectionNode(OutResponse);
 		break;
+	case EUAVGRuntimeNodeType::URNT_NULL://Empty Node
+		UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Reach Empty node %s."), *(CurrentNode->GetName()));
+		CurrentState = EUAVGRuntimeState::URS_ReadyForNext;//Skip this node.
+		break;
+	case EUAVGRuntimeNodeType::URNT_MAX://Fatal Error
 	default:
-		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type!"));
+		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Unexpected Node Type for %s!"), *(CurrentNode->GetName()));
 		CurrentState = EUAVGRuntimeState::URS_FatalError;
 		OutResponse.bSucceed = false;
 		break;
@@ -508,6 +513,11 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 		}
 	}
 
+	//TODO Refactor
+	//Add additional args to remenv node
+	//args.num() == 0 remove des completly
+	//num() > 0 just remove indicated arg(s)
+	//change interface required
 	if (LastNodeResponse.EnvironmentsToRemove.Num() > 0)
 	{
 		TArray<FUAVGEnvironmentDescriptor> Removed;
@@ -636,7 +646,8 @@ void UUAVGComponent::UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescript
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, NewDes, EnvironmentDescriptor);
 	}
 }
-
+//Refactor
+//Just append new args(change interface required)
 void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
 {
 	if (EnvironmentDescriptor.IsValidIndex(IndexToChange))

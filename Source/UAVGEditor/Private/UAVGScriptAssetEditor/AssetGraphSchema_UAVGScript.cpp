@@ -57,7 +57,7 @@ const FPinConnectionResponse UAssetGraphSchema_UAVGScript::CanCreateConnection(c
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("CanCreateConnectionMessage_WrongDirection", "Output Pin can only connects with Input Pin"));
 	}
 
-	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, LOCTEXT("CanCreateConnectionMessage_OK", "Create Link"));
+	return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, LOCTEXT("CanCreateConnectionMessage_OK", "Create Link"));
 }
 
 bool UAssetGraphSchema_UAVGScript::SafeDeleteNodeFromGraph(UEdGraph* Graph, UEdGraphNode* Node) const

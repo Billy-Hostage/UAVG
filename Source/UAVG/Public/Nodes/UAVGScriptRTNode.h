@@ -45,6 +45,8 @@ public:
 	class UUAVGScript* SubScriptToRun;
 
 	TArray<FText> SelectionTexts;
+
+	//TArray<FString> Indication;
 };
 
 UCLASS(Abstract, BlueprintType)
@@ -54,28 +56,28 @@ class UAVG_API UUAVGScriptRuntimeNode : public UObject
 public:
 	UUAVGScriptRuntimeNode();
 
-	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive()
+	virtual FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent)
 	{
 		return FUAVGScriptRuntimeNodeArriveResponse();
 	}
 
-	virtual void OnLeave(class UUAVGComponent* InComponent)
-	{
-	}
+	virtual void OnLeave(class UUAVGComponent* InComponent){}
 
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr);
 
-	virtual void WarpUAVGSaveGame(class UUAVGSaveGame* InSave){}
-	virtual void UnWarpUAVGSaveGame(class UUAVGSaveGame* InSave){}
+	virtual void WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave){}
+	virtual void UnWarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave){}
 
+#ifdef WITH_EDITOR
 	/*Called When Editor Saving Graph*/
 	virtual bool SetChild(TArray<UUAVGScriptRuntimeNode*> InChildNodes);
 	virtual bool SetParent(TArray<UUAVGScriptRuntimeNode*> InParentNodes);
 	bool CheckNodeCanBePaentOrChild(UUAVGScriptRuntimeNode* InNode) const;
 	/*End Called When Editor Saving Graph*/
+#endif // WITH_EDITOR
 public:
 	UPROPERTY()
-		TArray<UUAVGScriptRuntimeNode*> MyParentNodes;
+	TArray<UUAVGScriptRuntimeNode*> MyParentNodes;
 	UPROPERTY()
-		TArray<UUAVGScriptRuntimeNode*> MyChildNodes;
+	TArray<UUAVGScriptRuntimeNode*> MyChildNodes;
 };

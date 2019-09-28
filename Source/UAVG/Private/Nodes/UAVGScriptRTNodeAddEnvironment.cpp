@@ -7,7 +7,7 @@ UUAVGScriptRuntimeNodeAddEnvironment::UUAVGScriptRuntimeNodeAddEnvironment()
 
 }
 
-FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeAddEnvironment::OnArrive()
+FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeAddEnvironment::OnArrive(class UUAVGComponent* InComponent)
 {
 	FUAVGScriptRuntimeNodeArriveResponse Response(EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor);
 

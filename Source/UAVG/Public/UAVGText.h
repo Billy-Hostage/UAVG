@@ -15,6 +15,12 @@ public:
 	{
 	}
 
+	FUAVGText(const FString& str, int32 DisplayTime = -1)
+	{
+		TextLine = FText::FromString(str);
+		DisplayTimeInMs = DisplayTime;
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Text Line"))
 	FText TextLine;
 
