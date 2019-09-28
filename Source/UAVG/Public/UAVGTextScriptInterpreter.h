@@ -23,6 +23,10 @@ public:
 	void OnArrive(FUAVGScriptRuntimeNodeArriveResponse& Response);
 
 	bool IsScriptTextCompleted() const;
+
+	void WarpUAVGSaveGame(class UUAVGSaveGame* InSave);
+
+	void UnWarpUAVGSaveGame(class UUAVGSaveGame* InSave);
 protected:
 	UPROPERTY()
 	class UUAVGScriptText* ScriptTextAsset = nullptr;

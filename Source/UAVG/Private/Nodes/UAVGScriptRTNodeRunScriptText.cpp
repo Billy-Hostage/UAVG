@@ -2,6 +2,7 @@
 
 #include "UAVGScriptRTNodeRunScriptText.h"
 #include "UAVGTextScriptInterpreter.h"
+#include "UAVGSaveGame.h"
 
 UUAVGScriptRuntimeNodeRunScriptText::UUAVGScriptRuntimeNodeRunScriptText()
 {
@@ -36,4 +37,25 @@ UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNodeRunScriptText::GetNextNode(class U
 		return Super::GetNextNode(InComponent);
 
 	return this;
+}
+
+void UUAVGScriptRuntimeNodeRunScriptText::WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave)
+{
+	UUAVGTextScriptInterpreter* MyInterpreter = Interpreters.FindRef(InComponent);
+	if (!ensure(MyInterpreter))
+		return;
+
+	MyInterpreter->WarpUAVGSaveGame(InSave);
+}
+
+void UUAVGScriptRuntimeNodeRunScriptText::UnWarpUAVGSaveGame(UUAVGComponent* InComponent, UUAVGSaveGame* InSave)
+{
+	if (!ensure(InComponent && InSave))
+		return;
+	if (!ensure(InSave->UsingScriptTextAsset == ScriptTextAsset))
+		return;
+
+	UUAVGTextScriptInterpreter* MyInterpreter = NewObject<UUAVGTextScriptInterpreter>();
+	Interpreters.Add(InComponent, MyInterpreter);
+	MyInterpreter->UnWarpUAVGSaveGame(InSave);
 }

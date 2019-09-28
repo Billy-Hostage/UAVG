@@ -2,6 +2,7 @@
 
 #include "UAVGTextScriptInterpreter.h"
 #include "UAVGScriptText.h"
+#include "UAVGSaveGame.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGRuntimeScriptTextInterpreter);
 #define SPLIT_LINE_STRING "--------------"
@@ -19,6 +20,19 @@ void UUAVGTextScriptInterpreter::SetupInterpreter(class UUAVGScriptText* InScrip
 	ScriptTextAsset = InScriptTextAsset;
 	CachedScriptLines = InScriptTextAsset->GetLocalizedScriptLines();
 	TextLinePointer = 0;
+}
+
+void UUAVGTextScriptInterpreter::WarpUAVGSaveGame(UUAVGSaveGame* InSave)
+{
+	InSave->UsingScriptTextAsset = ScriptTextAsset;
+	InSave->LastTextLinePointer = LastCompleteLinePointer;
+	InSave->TextDisplayTime = TextDisplayTime;
+}
+void UUAVGTextScriptInterpreter::UnWarpUAVGSaveGame(UUAVGSaveGame* InSave)
+{
+	SetupInterpreter(InSave->UsingScriptTextAsset);
+	TextLinePointer = InSave->LastTextLinePointer;
+	TextDisplayTime = InSave->TextDisplayTime;
 }
 
 void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& Response)

@@ -130,7 +130,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	UnWarpSaveObject(SaveData);
 	if (CurrentNode)
 	{
-		CurrentNode->UnWarpUAVGSaveGame(SaveData);
+		CurrentNode->UnWarpUAVGSaveGame(this, SaveData);
 		FUAVGComponentNextResponse Response;
 		ProcessNode(Response);
 		return true;
@@ -193,7 +193,7 @@ UUAVGSaveGame* UUAVGComponent::Save(UUAVGSaveGame* SaveObj/* = nullptr*/)
 
 	WarpSaveObject(SaveObj);
 	if (CurrentNode)
-		CurrentNode->WarpUAVGSaveGame(SaveObj);
+		CurrentNode->WarpUAVGSaveGame(this, SaveObj);
 
 	return SaveObj;
 }

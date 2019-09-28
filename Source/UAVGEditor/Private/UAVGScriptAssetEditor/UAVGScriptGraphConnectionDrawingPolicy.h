@@ -34,7 +34,7 @@ public:
 	FVector2D ComputeSplineTangent(const FVector2D& Start, const FVector2D& End) const override;
 
 	/** Draws the wire */
-	void Draw(TMap<TSharedRef<SWidget>, FArrangedWidget>& PinGeometries, FArrangedChildren& ArrangedNodes) override;
+	void Draw(TMap<TSharedRef<SWidget>, FArrangedWidget>& InPinGeometries, FArrangedChildren& ArrangedNodes) override;
 
 	// End of FConnectionDrawingPolicy interface
 
