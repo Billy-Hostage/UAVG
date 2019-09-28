@@ -25,6 +25,7 @@ FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRunScriptText::OnArri
 		MyInterpreter->SetupInterpreter(ScriptTextAsset);
 	}
 	MyInterpreter->OnArrive(Response);//Pass-through Request
+
 	return Response;
 }
 

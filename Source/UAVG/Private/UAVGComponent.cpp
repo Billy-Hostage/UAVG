@@ -513,6 +513,11 @@ void UUAVGComponent::OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse
 		}
 	}
 
+	//TODO Refactor
+	//Add additional args to remenv node
+	//args.num() == 0 remove des completly
+	//num() > 0 just remove indicated arg(s)
+	//change interface required
 	if (LastNodeResponse.EnvironmentsToRemove.Num() > 0)
 	{
 		TArray<FUAVGEnvironmentDescriptor> Removed;
@@ -641,7 +646,8 @@ void UUAVGComponent::UnWarpEnvironmentDescriptor(TArray<FUAVGEnvironmentDescript
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorAdded(UIInterface, NewDes, EnvironmentDescriptor);
 	}
 }
-
+//Refactor
+//Just append new args(change interface required)
 void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
 {
 	if (EnvironmentDescriptor.IsValidIndex(IndexToChange))

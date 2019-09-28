@@ -2,6 +2,7 @@
 
 #include "UAVGScriptText.h"
 #include "Internationalization/StringTable.h"
+#include "Internationalization/StringTableCore.h"
 
 UUAVGScriptText::UUAVGScriptText()
 {
@@ -14,8 +15,31 @@ TArray<FString> UUAVGScriptText::GetLocalizedScriptLines()
 
 	for (const FText& txt : ScriptLines)
 	{
-		//Preprocess stringtables, etc.
-		LocalizedScriptTextLine.Add(txt.ToString());
+		FString str = txt.ToString();
+		if (str.StartsWith("$"))
+		{
+			str = str.Right(str.Len() - 1);
+			bool flagFoundRelatedString = false;
+			for (UStringTable* StringTable : StringTableToSearch)
+			{
+				FStringTableConstRef table = StringTable->GetStringTable();
+				FStringTableEntryConstPtr entry = table.Get().FindEntry(str);
+				if (entry.IsValid() && entry->GetDisplayString().IsValid())
+				{
+					str = *entry->GetDisplayString().Get();
+					flagFoundRelatedString = true;//set flag
+					break;//Exit loop
+				}
+			}
+
+			if (!flagFoundRelatedString)
+				UE_LOG(LogTemp, Warning, TEXT("%s not found in given string talble(s)"), *str);
+
+			str.Append("[l]");//For it's a speaker string(maybe change this behaviour?)
+		}
+		if (str.StartsWith("^"))//This is a comment
+			continue;
+		LocalizedScriptTextLine.Add(str);
 	}
 
 	return LocalizedScriptTextLine;

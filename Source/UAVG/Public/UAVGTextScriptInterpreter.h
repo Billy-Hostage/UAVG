@@ -8,6 +8,9 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeScriptTextInterpreter, Log, All);
 
+/*
+ *TODO This class needs refactor
+ */
 UCLASS()
 class UUAVGTextScriptInterpreter : public UObject
 {
@@ -39,7 +42,7 @@ private:
 
 	void SkipToNextLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
 
-	///These Funcs might not be safe.
+	///These Funcs are not safe.
 	//Does not change pointer count.
 	FString TryFetchString(uint16 offset = 0) const;
 	//Increase Pointer by one
@@ -48,4 +51,9 @@ protected:
 
 	///Below are interpreter funcs.
 	virtual void ReachSayLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
+
+	virtual void ReachEventLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
+	
+	virtual void ReachAddEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response);
+	virtual void ReachRemoveEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response);
 };

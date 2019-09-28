@@ -35,19 +35,15 @@ void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& 
 	TCHAR CurrentLineCommand = TryFetchString()[0];
 	switch (CurrentLineCommand)//Command Switch
 	{
-	case '^'://Comment
-		SkipToNextLine(Response);
-		break;
-
 	case '@'://Trigger events with args
-		SkipToNextLine(Response);//TODO
+		ReachEventLine(Response);
 		break;
 
 	case '!'://Add Env Descriptor
-		SkipToNextLine(Response);//TODO
+		ReachAddEnvDescriptor(Response);
 		break;
 	case '%'://Remove Env Descriptor
-		SkipToNextLine(Response);//TODO
+		ReachRemoveEnvDescriptor(Response);
 		break;
 
 	case '#'://Change Interpreter Behaviour
@@ -93,6 +89,31 @@ FString UUAVGTextScriptInterpreter::TryFetchString(uint16 offset) const
 FString UUAVGTextScriptInterpreter::FetchString()
 {
 	return CachedScriptLines[TextLinePointer++];
+}
+
+void UUAVGTextScriptInterpreter::ReachEventLine(FUAVGScriptRuntimeNodeArriveResponse& Response)
+{
+	FString str = FetchString();
+	TArray<FString> SplitedLine;
+	FString EventName;
+	TArray<FString> EventArgs;
+	str.ParseIntoArray(SplitedLine, TEXT(" "));//Spacing-split
+	for (int i = 0; i < SplitedLine.Num(); ++i)
+	{
+		FString token = SplitedLine[i];
+		if (i == 0)
+		{
+			token = token.Right(token.Len() - 1);
+			EventName = token;
+			continue;
+		}
+		//i != 0
+		EventArgs.Add(token);
+	}
+
+	Response.NodeType = EUAVGRuntimeNodeType::URNT_CustomEvent;
+	Response.EventName = EventName;
+	Response.EventArguments = EventArgs;
 }
 
 void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveResponse& Response)
@@ -151,6 +172,42 @@ void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveRespon
 		Response.NodeType = EUAVGRuntimeNodeType::URNT_Say;
 		Response.DesiredTexts = SayBuffer;
 	}
+}
+
+void UUAVGTextScriptInterpreter::ReachAddEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response)
+{
+	FString str = FetchString();
+	TArray<FString> SplitedLine;
+	FString EnvironmentToAdd;
+	TArray<FString> AdditonalArgs;
+	str.ParseIntoArray(SplitedLine, TEXT(" "));//Spacing-split
+
+	for (int i = 0; i < SplitedLine.Num(); ++i)
+	{
+		FString token = SplitedLine[i];
+		if (i == 0)
+		{
+			token = token.Right(token.Len() - 1);
+			EnvironmentToAdd = token;
+			continue;
+		}
+
+		AdditonalArgs.Add(token);
+	}
+	Response.NodeType = EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor;
+	Response.EnvironmentToAdd = EnvironmentToAdd;
+	Response.AdditonalEnvironmentArguments = AdditonalArgs;
+}
+
+void UUAVGTextScriptInterpreter::ReachRemoveEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response)
+{
+	FString str = FetchString();
+	TArray<FString> SplitedLine;
+	str.ParseIntoArray(SplitedLine, TEXT(" "));//Spacing-split
+	SplitedLine[0] = SplitedLine[0].Right(SplitedLine[0].Len() - 1);//Remove % mark
+
+	Response.NodeType = EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor;
+	Response.EnvironmentsToRemove = SplitedLine;
 }
 
 #undef SPLIT_LINE_STRING
