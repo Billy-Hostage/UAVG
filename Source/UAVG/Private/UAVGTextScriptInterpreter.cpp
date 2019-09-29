@@ -54,14 +54,14 @@ void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& 
 		break;
 
 	case '!'://Add Env Descriptor
-		ReachAddEnvDescriptor(Response);
+		ReachAddEnvDescriptorLine(Response);
 		break;
 	case '%'://Remove Env Descriptor
-		ReachRemoveEnvDescriptor(Response);
+		ReachRemoveEnvDescriptorLine(Response);
 		break;
 
 	case '#'://Change Interpreter Behaviour
-		SkipToNextLine(Response);//TODO
+		ReachInterpreterCommandLine(Response);
 		break;
 
 	///This might be done in ScriptText just once
@@ -154,6 +154,7 @@ void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveRespon
 		}
 		else if (str.EndsWith("[p]"))
 		{
+			UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Verbose, TEXT("Speaking %s for time %d(ms)"), *str.Left(str.Len() - 3), TextDisplayTime);
 			SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3), TextDisplayTime));
 			//break since 'p'
 			FoundEndFlag = true;
@@ -188,7 +189,7 @@ void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveRespon
 	}
 }
 
-void UUAVGTextScriptInterpreter::ReachAddEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response)
+void UUAVGTextScriptInterpreter::ReachAddEnvDescriptorLine(FUAVGScriptRuntimeNodeArriveResponse& Response)
 {
 	FString str = FetchString();
 	TArray<FString> SplitedLine;
@@ -213,7 +214,7 @@ void UUAVGTextScriptInterpreter::ReachAddEnvDescriptor(FUAVGScriptRuntimeNodeArr
 	Response.AdditonalEnvironmentArguments = AdditonalArgs;
 }
 
-void UUAVGTextScriptInterpreter::ReachRemoveEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response)
+void UUAVGTextScriptInterpreter::ReachRemoveEnvDescriptorLine(FUAVGScriptRuntimeNodeArriveResponse& Response)
 {
 	FString str = FetchString();
 	TArray<FString> SplitedLine;
@@ -222,6 +223,33 @@ void UUAVGTextScriptInterpreter::ReachRemoveEnvDescriptor(FUAVGScriptRuntimeNode
 
 	Response.NodeType = EUAVGRuntimeNodeType::URNT_EnvironmentDescriptor;
 	Response.EnvironmentsToRemove = SplitedLine;
+}
+
+void UUAVGTextScriptInterpreter::ReachInterpreterCommandLine(FUAVGScriptRuntimeNodeArriveResponse& Response)
+{
+	FString str = TryFetchString();
+	TArray<FString> SplitedLine;
+	str.ParseIntoArray(SplitedLine, TEXT(" "));//Spacing-split
+	FString Var = SplitedLine[0].Right(SplitedLine[0].Len() - 1);
+
+	bool flagFoundVar = false;
+
+	if (Var == "displaytime" && SplitedLine.IsValidIndex(1))
+	{
+		TextDisplayTime = FCString::Atoi(*SplitedLine[1]);//Unsafe!
+		flagFoundVar = true;
+	}
+
+	if (!flagFoundVar)
+	{
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Warning, TEXT(SPLIT_LINE_STRING));
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Warning, TEXT("Script Interpreter Error in Script %s"), *(ScriptTextAsset->GetName()));
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Warning, TEXT("Specified Variable %s not found."), *Var);
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Warning, TEXT("Last Processing Line %d"), LastCompleteLinePointer);
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Warning, TEXT(SPLIT_LINE_STRING));
+	}
+
+	SkipToNextLine(Response);
 }
 
 #undef SPLIT_LINE_STRING

@@ -58,6 +58,8 @@ protected:
 
 	virtual void ReachEventLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
 	
-	virtual void ReachAddEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response);
-	virtual void ReachRemoveEnvDescriptor(FUAVGScriptRuntimeNodeArriveResponse& Response);
+	virtual void ReachAddEnvDescriptorLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
+	virtual void ReachRemoveEnvDescriptorLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
+
+	virtual void ReachInterpreterCommandLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
 };
