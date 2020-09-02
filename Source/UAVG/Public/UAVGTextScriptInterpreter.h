@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UAVGScriptRTNode.h"//Use struct FUAVGScriptRuntimeNodeArriveResponse
+#include "Nodes/UAVGScriptRTNode.h"//Use struct FUAVGScriptRuntimeNodeArriveResponse
 #include "UAVGTextScriptInterpreter.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeScriptTextInterpreter, Log, All);

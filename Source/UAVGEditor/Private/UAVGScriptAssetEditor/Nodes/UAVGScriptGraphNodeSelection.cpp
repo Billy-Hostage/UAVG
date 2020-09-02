@@ -1,10 +1,10 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeSelection.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeSelection.h"
 
-#include "UAVGScriptRTNode.h"
-#include "UAVGScriptRTNodeSelection.h"
-#include "UAVGScriptGraphPin.h"
+#include "Nodes/UAVGScriptRTNode.h"
+#include "Nodes/UAVGScriptRTNodeSelection.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
 
 UUAVGScriptGraphNodeSelection::UUAVGScriptGraphNodeSelection(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

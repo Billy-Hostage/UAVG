@@ -1,7 +1,7 @@
 //NTRHostage
 
-#include "SUAVGScriptGraphPalette.h"
-#include "AssetGraphSchema_UAVGScript.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPalette.h"
+#include "UAVGScriptGraph/AssetGraphSchema_UAVGScript.h"
 
 void SUAVGScriptGraphPalette::Construct(const FArguments& InArgs)
 {

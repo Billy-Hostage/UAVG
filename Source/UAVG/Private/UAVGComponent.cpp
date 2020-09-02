@@ -3,11 +3,11 @@
 #include "UAVGComponent.h"
 
 #include "GameFramework/Actor.h"
-#include "IUAVGActorInterface.h"
-#include "IUAVGUIInterface.h"
+#include "Interfaces/IUAVGActorInterface.h"
+#include "Interfaces/IUAVGUIInterface.h"
 #include "UAVGScript.h"
-#include "UAVGScriptRTNodeRoot.h"
-#include "UAVGScriptRTNodeSaySingle.h"
+#include "Nodes/UAVGScriptRTNodeRoot.h"
+#include "Nodes/UAVGScriptRTNodeSaySingle.h"
 #include "UAVGSaveGame.h"
 
 #include "Kismet/GameplayStatics.h"

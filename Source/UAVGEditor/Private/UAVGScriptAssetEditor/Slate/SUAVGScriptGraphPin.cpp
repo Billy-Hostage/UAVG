@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "SUAVGScriptGraphPin.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
 
 void SUAVGScriptGraphPin::Construct(const FArguments& InArgs, class UEdGraphPin* InPin)
 {

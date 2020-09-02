@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UAVGScriptGraphNode.h"
-#include "UAVGScriptRTNodeRoot.h"
+#include "Nodes/UAVGScriptRTNodeRoot.h"
 #include "UAVGScriptGraphNodeRoot.generated.h"
 
 UCLASS(MinimalAPI)

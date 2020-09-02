@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "UAVGScriptRTNodeRemoveEnvironment.h"
+#include "Nodes/UAVGScriptRTNodeRemoveEnvironment.h"
 
 UUAVGScriptRuntimeNodeRemoveEnvironment::UUAVGScriptRuntimeNodeRemoveEnvironment()
 {

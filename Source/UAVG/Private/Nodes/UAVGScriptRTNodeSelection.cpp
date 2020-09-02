@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "UAVGScriptRTNodeSelection.h"
+#include "Nodes/UAVGScriptRTNodeSelection.h"
 
 UUAVGScriptRuntimeNodeSelection::UUAVGScriptRuntimeNodeSelection()
 {

@@ -1,9 +1,9 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeAddEnvironment.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeAddEnvironment.h"
 
-#include "UAVGScriptGraphPin.h"
-#include "UAVGScriptRTNodeAddEnvironment.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
+#include "Nodes/UAVGScriptRTNodeAddEnvironment.h"
 
 UUAVGScriptGraphNodeAddEnvironment::UUAVGScriptGraphNodeAddEnvironment(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

@@ -1,10 +1,10 @@
 //NTRHostage
 
-#include "EdGraph_UAVGScript.h"
-#include "UAVGScriptGraphNodeRoot.h"
+#include "UAVGScriptGraph/EdGraph_UAVGScript.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRoot.h"
 
 #include "UAVGScript.h"
-#include "UAVGScriptRTNodeRoot.h"
+#include "Nodes/UAVGScriptRTNodeRoot.h"
 
 UEdGraph_UAVGScript::UEdGraph_UAVGScript()
 {

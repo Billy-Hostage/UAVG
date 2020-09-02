@@ -1,12 +1,14 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNode.h"
 
-#include "UAVGScriptRTNode.h"
+#include "Nodes/UAVGScriptRTNode.h"
 #include "Framework/Commands/GenericCommands.h"
 
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphSchema.h"
+
+#include "ToolMenus/Public/ToolMenu.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGScriptGraphNode);
 
@@ -69,14 +71,15 @@ void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
 	}
 }
 
-void UUAVGScriptGraphNode::GetContextMenuActions(const FGraphNodeContextMenuBuilder& Context) const
+void UUAVGScriptGraphNode::GetNodeContextMenuActions(UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const
 {
-	if (Context.Node && !IsRootNode())
+	if (Context->Node && !IsRootNode())
 	{
-		Context.MenuBuilder->BeginSection("UAVGScriptGraphNode_BaseNodeEdit");
+		//Context.MenuBuilder->BeginSection("UAVGScriptGraphNode_BaseNodeEdit");
+		auto& section = Menu->AddSection("UAVGScriptGraphNode_BaseNodeEdit", FText::FromString("Edit"));
 
 		if (CanUserDeleteNode())
-			Context.MenuBuilder->AddMenuEntry(FGenericCommands::Get().Delete);
+			section.AddMenuEntry(FGenericCommands::Get().Delete);
 	}
 }
 

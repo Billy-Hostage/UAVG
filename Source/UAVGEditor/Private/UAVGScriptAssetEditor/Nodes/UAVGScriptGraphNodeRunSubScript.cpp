@@ -1,9 +1,9 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeRunSubScript.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRunSubScript.h"
 
-#include "UAVGScriptGraphPin.h"
-#include "UAVGScriptRTNodeRunSubScript.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
+#include "Nodes/UAVGScriptRTNodeRunSubScript.h"
 
 UUAVGScriptGraphNodeRunSubScript::UUAVGScriptGraphNodeRunSubScript(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

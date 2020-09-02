@@ -1,8 +1,8 @@
 //NTRHostage
 
-#include "AssetGraphSchema_UAVGScript.h"
-#include "UAVGScriptGraphNodeRoot.h"
-#include "EdGraph_UAVGScript.h"
+#include "UAVGScriptGraph/AssetGraphSchema_UAVGScript.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRoot.h"
+#include "UAVGScriptGraph/EdGraph_UAVGScript.h"
 #include "UAVGScript.h"
 #include "ScopedTransaction.h"
 

@@ -2,21 +2,21 @@
 
 #include "AssetEditor_UAVGScript.h"
 
-#include "EdGraph_UAVGScript.h"
-#include "AssetGraphSchema_UAVGScript.h"
+#include "UAVGScriptGraph/EdGraph_UAVGScript.h"
+#include "UAVGScriptGraph/AssetGraphSchema_UAVGScript.h"
 #include "UAVGScript.h"
-#include "UAVGScriptGraphNodeRoot.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRoot.h"
 
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
-#include "SUAVGScriptGraphPalette.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPalette.h"
 
 #include "Framework/Commands/GenericCommands.h"
 #include "GraphEditorActions.h"
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "ScopedTransaction.h"
-#include "GenericCommands.h"
+#include "Framework/Commands/GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "PropertyEditorModule.h"

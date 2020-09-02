@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "UAVGScriptRTNodeAddEnvironment.h"
+#include "Nodes/UAVGScriptRTNodeAddEnvironment.h"
 
 UUAVGScriptRuntimeNodeAddEnvironment::UUAVGScriptRuntimeNodeAddEnvironment()
 {

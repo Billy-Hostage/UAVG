@@ -49,7 +49,8 @@ public class UAVGEditor : ModuleRules
                 "GraphEditor",
                 "EditorStyle",
                 "Projects",
-                "InputCore"
+                "InputCore",
+				"ToolMenus"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

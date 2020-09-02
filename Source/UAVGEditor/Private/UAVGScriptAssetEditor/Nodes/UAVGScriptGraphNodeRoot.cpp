@@ -1,9 +1,9 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeRoot.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRoot.h"
 
 #include "UAVGScript.h"
-#include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNode.h"
 
 UUAVGScriptGraphNodeRoot::UUAVGScriptGraphNodeRoot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

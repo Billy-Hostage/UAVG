@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "UAVGScriptRTNodeSaySingle.h"
+#include "Nodes/UAVGScriptRTNodeSaySingle.h"
 
 UUAVGScriptRuntimeNodeSaySingle::UUAVGScriptRuntimeNodeSaySingle()
 {

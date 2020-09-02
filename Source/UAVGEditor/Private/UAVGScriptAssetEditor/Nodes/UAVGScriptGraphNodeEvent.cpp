@@ -1,8 +1,8 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeEvent.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeEvent.h"
 #include "UAVGScript.h"
-#include "UAVGScriptRTNodeEvent.h"
+#include "Nodes/UAVGScriptRTNodeEvent.h"
 
 UUAVGScriptGraphNodeEvent::UUAVGScriptGraphNodeEvent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

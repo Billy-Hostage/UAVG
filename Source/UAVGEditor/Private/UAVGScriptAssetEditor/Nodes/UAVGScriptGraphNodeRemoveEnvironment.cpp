@@ -1,9 +1,9 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeRemoveEnvironment.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeRemoveEnvironment.h"
 
-#include "UAVGScriptGraphPin.h"
-#include "UAVGScriptRTNodeRemoveEnvironment.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
+#include "Nodes/UAVGScriptRTNodeRemoveEnvironment.h"
 
 UUAVGScriptGraphNodeRemoveEnvironment::UUAVGScriptGraphNodeRemoveEnvironment(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

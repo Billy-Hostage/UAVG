@@ -1,10 +1,10 @@
 //NTRHostage
 
-#include "UAVGScriptGraphNodeSaySingle.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeSaySingle.h"
 
 #include "UAVGScript.h"
-#include "UAVGScriptGraphPin.h"
-#include "UAVGScriptRTNodeSaySingle.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
+#include "Nodes/UAVGScriptRTNodeSaySingle.h"
 
 UUAVGScriptGraphNodeSaySingle::UUAVGScriptGraphNodeSaySingle(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

@@ -1,14 +1,14 @@
 //NTRHostage
 
-#include "SUAVGScriptGraphNode.h"
-#include "SUAVGScriptGraphPin.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphPin.h"
 
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "Widgets/SBoxPanel.h"
 #include "SGraphPanel.h"
 
-#include "UAVGScriptGraphNode.h"
-#include "UAVGScriptGraphNodeSelection.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNodeSelection.h"
 
 TSharedRef<FDragUAVGScriptGraphNode> FDragUAVGScriptGraphNode::New(const TSharedRef<SGraphPanel>& InGraphPanel, const TSharedRef<SGraphNode>& InDraggedNode)
 {

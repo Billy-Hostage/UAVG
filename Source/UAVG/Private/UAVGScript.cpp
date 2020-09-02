@@ -1,8 +1,8 @@
 //NTRHostage Coded
 
 #include "UAVGScript.h"
-#include "UAVGScriptRTNodeRoot.h"
-#include "UAVGScriptRTNodeSaySingle.h"
+#include "Nodes/UAVGScriptRTNodeRoot.h"
+#include "Nodes/UAVGScriptRTNodeSaySingle.h"
 
 DEFINE_LOG_CATEGORY(LogUAVGRuntimeScript);
 

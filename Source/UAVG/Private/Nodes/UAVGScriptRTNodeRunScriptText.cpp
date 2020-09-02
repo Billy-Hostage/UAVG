@@ -1,6 +1,6 @@
 //NTRHostage
 
-#include "UAVGScriptRTNodeRunScriptText.h"
+#include "Nodes/UAVGScriptRTNodeRunScriptText.h"
 #include "UAVGTextScriptInterpreter.h"
 #include "UAVGSaveGame.h"
 

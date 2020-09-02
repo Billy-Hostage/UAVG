@@ -2,8 +2,8 @@
 
 #include "UAVGEditor.h"
 #include "AssetTypeActions_UAVGScript.h"
-#include "Slate/SUAVGScriptGraphNode.h"
-#include "UAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Slate/SUAVGScriptGraphNode.h"
+#include "UAVGScriptGraph/Nodes/UAVGScriptGraphNode.h"
 
 #include "EdGraphUtilities.h"
 

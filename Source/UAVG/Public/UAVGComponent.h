@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "UAVGText.h"
-#include "UAVGScriptRTNode.h"//We want to use the structs in this header file
+#include "Nodes/UAVGScriptRTNode.h"//We want to use the structs in this header file
 #include "UAVGComponent.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeComponent, Log, All);
