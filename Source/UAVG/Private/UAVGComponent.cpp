@@ -146,7 +146,7 @@ void UUAVGComponent::Reset()
 	case EUAVGRuntimeState::URS_NotInitialized:
 	case EUAVGRuntimeState::URS_NULL:
 	case EUAVGRuntimeState::URS_MAX:
-		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("UAVGComponent %s no need to reset"), *GetName());
+		UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("UAVGComponent %s no need to reset"), *GetName());
 		return;//Stop here
 	}
 
