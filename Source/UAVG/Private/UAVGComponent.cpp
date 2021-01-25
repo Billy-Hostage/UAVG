@@ -8,6 +8,7 @@
 #include "UAVGScript.h"
 #include "Nodes/UAVGScriptRTNodeRoot.h"
 #include "Nodes/UAVGScriptRTNodeSaySingle.h"
+#include "Nodes/UAVGScriptRTNodeSelection.h"
 #include "UAVGSaveGame.h"
 
 #include "Kismet/GameplayStatics.h"
