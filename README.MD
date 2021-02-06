@@ -2,7 +2,7 @@
 
 An Unreal Engine 4 Plugin designed to create AVG Games in a friendly way
 
-**Partially Tested in UE Version: 4.25.3**
+**Partially Tested in UE Version: 4.25.4**
 
 ---
 How to Build&Use:
