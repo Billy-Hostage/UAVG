@@ -30,6 +30,7 @@ void UUAVGScriptGraphNodeEvent::SaveToRTNode(class UUAVGScript* RTScript)
 
 	RTEventNode->EventName = EventName;
 	RTEventNode->Arguments = Arguments;
+	RTEventNode->bIsCosmetic = bIsCosmetic;
 }
 
 FText UUAVGScriptGraphNodeEvent::GetNodeTitle(ENodeTitleType::Type TitleType) const

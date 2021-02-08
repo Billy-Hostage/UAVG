@@ -84,6 +84,9 @@ public:
 		return nullptr;
 	}
 
+	virtual bool IsInputPin(UEdGraphPin* PinToCheck);
+	virtual bool IsOutputPin(UEdGraphPin* PinToCheck);
+	
 	virtual void SetupRTNode(class UUAVGScript* RTScript)
 	{
 		unimplemented();

@@ -32,6 +32,7 @@ bool UUAVGComponent::InitializeNew(UObject* UIObject, AActor* ParentActor, bool 
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_NotInitialized)
 	{
+		static_assert(CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK >= 0, "CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK must be positive");
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Component %s has been initialized already."), *GetName());
 		return false;
 	}
@@ -131,9 +132,11 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	UnWarpSaveObject(SaveData);
 	if (CurrentNode)
 	{
-		CurrentNode->UnWarpUAVGSaveGame(this, SaveData);
-		FUAVGComponentNextResponse Response;
-		ProcessNode(Response);
+		if (CurrentNode->UnWarpUAVGSaveGame(this, SaveData))
+		{
+			FUAVGComponentNextResponse Response;
+			ProcessNode(Response);
+		}
 		return true;
 	}
 
@@ -612,6 +615,7 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 		return;
 
 	InSave->MyScript = MyScript;
+	InSave->RTState = CurrentState;
 	InSave->CurrentNode = CurrentNode;
 	InSave->LastNode = LastNode;
 	InSave->RecentDisplayingText = RecentDisplayingText;
@@ -627,6 +631,7 @@ void UUAVGComponent::UnWarpSaveObject(UUAVGSaveGame* InSave)
 		return;
 
 	CurrentNode = InSave->CurrentNode;
+	CurrentState = InSave->RTState;
 	LastNode = InSave->LastNode;
 	ScriptStack = InSave->ScriptStack;
 	CurrentNodeStack = InSave->CurrentNodeStack;

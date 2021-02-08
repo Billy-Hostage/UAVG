@@ -58,6 +58,8 @@ public:
 		return Pins[0];
 	}
 
+	virtual bool IsOutputPin(UEdGraphPin* PinToCheck) override;
+	
 	virtual void AllocateDefaultPins() override;
 
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;

@@ -48,14 +48,15 @@ void UUAVGScriptRuntimeNodeRunScriptText::WarpUAVGSaveGame(class UUAVGComponent*
 	MyInterpreter->WarpUAVGSaveGame(InSave);
 }
 
-void UUAVGScriptRuntimeNodeRunScriptText::UnWarpUAVGSaveGame(UUAVGComponent* InComponent, UUAVGSaveGame* InSave)
+bool UUAVGScriptRuntimeNodeRunScriptText::UnWarpUAVGSaveGame(UUAVGComponent* InComponent, UUAVGSaveGame* InSave)
 {
 	if (!ensure(InComponent && InSave))
-		return;
+		return true;
 	if (!ensure(InSave->UsingScriptTextAsset == ScriptTextAsset))
-		return;
+		return true;
 
 	UUAVGTextScriptInterpreter* MyInterpreter = NewObject<UUAVGTextScriptInterpreter>();
 	Interpreters.Add(InComponent, MyInterpreter);
 	MyInterpreter->UnWarpUAVGSaveGame(InSave);
+	return true;
 }

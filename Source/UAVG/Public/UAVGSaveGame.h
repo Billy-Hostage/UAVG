@@ -20,6 +20,9 @@ public:
 	class UUAVGScript* MyScript;
 
 	UPROPERTY()
+	EUAVGRuntimeState RTState;
+
+	UPROPERTY()
 	class UUAVGScriptRuntimeNode* CurrentNode;
 
 	UPROPERTY()

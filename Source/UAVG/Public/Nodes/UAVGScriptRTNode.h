@@ -66,7 +66,7 @@ public:
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr);
 
 	virtual void WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave){}
-	virtual void UnWarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave){}
+	virtual bool UnWarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave) { return true; }
 
 #ifdef WITH_EDITOR
 	/*Called When Editor Saving Graph*/

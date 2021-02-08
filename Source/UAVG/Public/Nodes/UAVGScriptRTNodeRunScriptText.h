@@ -21,7 +21,7 @@ public:
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr) override;
 
 	void WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave) override;
-	void UnWarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave) override;
+	bool UnWarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave) override;
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TMap<class UUAVGComponent*, class UUAVGTextScriptInterpreter*> Interpreters;

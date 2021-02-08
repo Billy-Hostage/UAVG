@@ -70,4 +70,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Event Arguments", ToolTip = "The Arguments passed to the Event"))
 	TArray<FString> Arguments;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Is Cosmetic Event", ToolTip = "When checked, the event can be executed again if a save was made here. If you don't know what this is, keep it unchecked!"))
+	bool bIsCosmetic = false;
 };

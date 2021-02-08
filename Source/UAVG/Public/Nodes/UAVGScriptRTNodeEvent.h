@@ -14,6 +14,8 @@ public:
 	FUAVGScriptRuntimeNodeArriveResponse OnArrive(class UUAVGComponent* InComponent) override;
 
 	UUAVGScriptRuntimeNodeEvent();
+
+	virtual bool UnWarpUAVGSaveGame(UUAVGComponent* InComponent, UUAVGSaveGame* InSave) override { return bIsCosmetic; /* prevent multiple execution or not depends on the bIsCosmetic flag*/ }
 	
 	///Properties Here
 
@@ -22,4 +24,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FString> Arguments;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsCosmetic = false;
 };

@@ -52,15 +52,24 @@ void UUAVGScriptGraphNodeSelection::SaveToRTNode(class UUAVGScript* RTScript)
 	UUAVGScriptRuntimeNodeSelection* RTSelectionNode = CastChecked<UUAVGScriptRuntimeNodeSelection>(MyRTNode);
 	RTSelectionNode->EditorClearSelections();
 	RTSelectionNode->Selections = Selections;
-	RTSelectionNode->DefaultIndex = (int32)DefaultSelectionIndex;
+	RTSelectionNode->DefaultIndex = static_cast<int32>(DefaultSelectionIndex);
 
 	for(UEdGraphPin* SelectionPin : GetOutputPins())
 	{
-		UUAVGScriptRuntimeNode* NextNode = CastChecked<UUAVGScriptGraphNode>
-			((SelectionPin->LinkedTo)[0]->GetOwningNode())->GetRTNode();//Only save the first Input pin linked to the output selection pin
-		if(!RTSelectionNode->EditorAddSelectionNodes(NextNode))//Save falied
+		if (SelectionPin->LinkedTo.Num() == 0)
 		{
-			UE_LOG(LogTemp, Error, TEXT("AddSelectionNodes Falied at Node %s"), *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("SelectionNode %s has a empty pin?"), *GetName());
+			if (!RTSelectionNode->EditorAddSelectionNodes(nullptr))
+			{
+				UE_LOG(LogTemp, Error, TEXT("AddSelectionNodes Failed at Node %s"), *GetName());
+			}
+			continue;
+		}
+		
+		UUAVGScriptRuntimeNode* NextNode = CastChecked<UUAVGScriptGraphNode>((SelectionPin->LinkedTo)[0]->GetOwningNode())->GetRTNode();//Only save the first Input pin linked to the output selection pin
+		if(!RTSelectionNode->EditorAddSelectionNodes(NextNode))//Save failed
+		{
+			UE_LOG(LogTemp, Error, TEXT("AddSelectionNodes Failed at Node %s"), *GetName());
 		}
 	}
 }
@@ -77,6 +86,17 @@ FText UUAVGScriptGraphNodeSelection::GetNodeTitle(ENodeTitleType::Type TitleType
 	default:
 		return NSLOCTEXT("UAVGScriptGraphNode_Selection", "SelectionFullTitle", "Selection Node");
 	}
+}
+
+bool UUAVGScriptGraphNodeSelection::IsOutputPin(UEdGraphPin* PinToCheck)
+{
+	auto AllOutputPins = GetOutputPins();
+	for (auto* Pin : AllOutputPins)
+	{
+		if (Pin == PinToCheck)
+			return true;
+	}
+	return false;
 }
 
 void UUAVGScriptGraphNodeSelection::AllocateDefaultPins()

@@ -46,9 +46,9 @@ void UAssetGraphSchema_UAVGScript::CreateDefaultNodesForGraph(UEdGraph& Graph) c
 
 const FPinConnectionResponse UAssetGraphSchema_UAVGScript::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
 {
-	UUAVGScriptGraphNode* FromNode = CastChecked<UUAVGScriptGraphNode>(A->GetOwningNode());
-	UUAVGScriptGraphNode* ToNode = CastChecked<UUAVGScriptGraphNode>(B->GetOwningNode());
-	if (FromNode == ToNode)
+	UUAVGScriptGraphNode* ANode = CastChecked<UUAVGScriptGraphNode>(A->GetOwningNode());
+	UUAVGScriptGraphNode* BNode = CastChecked<UUAVGScriptGraphNode>(B->GetOwningNode());
+	if (ANode == BNode)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("CanCreateConnectionMessage_SameNode", "Can't connect to self!"));
 	}
@@ -56,8 +56,11 @@ const FPinConnectionResponse UAssetGraphSchema_UAVGScript::CanCreateConnection(c
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("CanCreateConnectionMessage_WrongDirection", "Output Pin can only connects with Input Pin"));
 	}
-
-	return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, LOCTEXT("CanCreateConnectionMessage_OK", "Create Link"));
+	// find out which pin is the output one, we want output pins having only one node connected to
+	if (A->Direction == EGPD_Output)
+		return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_A, LOCTEXT("CanCreateConnectionMessage_OK", "Created Link"));
+	else
+		return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_B, LOCTEXT("CanCreateConnectionMessage_OK", "Created Link"));
 }
 
 bool UAssetGraphSchema_UAVGScript::SafeDeleteNodeFromGraph(UEdGraph* Graph, UEdGraphNode* Node) const

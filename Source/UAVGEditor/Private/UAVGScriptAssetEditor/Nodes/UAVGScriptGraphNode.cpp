@@ -71,6 +71,15 @@ void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
 	}
 }
 
+bool UUAVGScriptGraphNode::IsInputPin(UEdGraphPin* PinToCheck)
+{
+	return PinToCheck == GetInputPin();
+}
+bool UUAVGScriptGraphNode::IsOutputPin(UEdGraphPin* PinToCheck)
+{
+	return PinToCheck == GetOutputPin();
+}
+
 void UUAVGScriptGraphNode::PostPasteNode()
 {
 	Super::PostPasteNode();
