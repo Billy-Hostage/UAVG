@@ -61,6 +61,8 @@ public:
 	virtual void AllocateDefaultPins() override;
 
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+
+	virtual void GetAllConnectedScriptNodes(TArray<UUAVGScriptGraphNode*>& OutNodes) override;
 protected:
 	virtual void CreateOutputPins(int32 Index);
 	virtual void CreateInputPin() override;

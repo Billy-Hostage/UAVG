@@ -69,7 +69,7 @@ protected:
 protected:
 	///Properties Here
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ToolTip = "This might not be unique"))
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ToolTip = "This might not be unique"))
 	FName ScriptName = "UAVGScirpt";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Fallback Character Display Delay (ms)"))

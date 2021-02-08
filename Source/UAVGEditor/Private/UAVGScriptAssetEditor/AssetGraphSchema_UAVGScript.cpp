@@ -98,21 +98,21 @@ void UAssetGraphSchema_UAVGScript::GetAllUAVGScriptGraphNodeActions(FGraphAction
 	if (ActionMenuBuilder.FromPin == nullptr)
 	{
 		// Just right clicked on the empty graph
-		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip", "Adds {Name} to the graph");
+		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip", "Adds {Name} to graph");
 		MenuDesc = LOCTEXT("NewUAVGScriptNodeMenuDescription", "{Name}");
 	}
 	else if (ActionMenuBuilder.FromPin->Direction == EGPD_Input)
 	{
 		// From an input pin
-		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip_FromInputPin", "Adds {Name} to the graph as a parent to the current node");
-		MenuDesc = LOCTEXT("NewUAVGScriptNodeMenuDescription_FromInputPin", "Add {Name} parent");
+		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip_FromInputPin", "Adds {Name} as parent");
+		MenuDesc = LOCTEXT("NewUAVGScriptNodeMenuDescription_FromInputPin", "{Name}");
 	}
 	else
 	{
 		// From an output pin
 		check(ActionMenuBuilder.FromPin->Direction == EGPD_Output);
-		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip_FromOutputPin", "Adds {Name} to the graph as a child to the current node");
-		MenuDesc = LOCTEXT("NewUAVGScriptNodeMenuDescription_FromOutputPin", "Add {Name} child");
+		ToolTip = LOCTEXT("NewUAVGScriptNodeTooltip_FromOutputPin", "Adds {Name} as child");
+		MenuDesc = LOCTEXT("NewUAVGScriptNodeMenuDescription_FromOutputPin", "{Name}");
 	}
 
 

@@ -12,6 +12,7 @@
 #include "UAVGScriptGraph/Slate/SUAVGScriptGraphPalette.h"
 
 #include "Framework/Commands/GenericCommands.h"
+#include "EdGraphUtilities.h"
 #include "GraphEditorActions.h"
 #include "Modules/ModuleManager.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -22,6 +23,7 @@
 #include "PropertyEditorModule.h"
 #include "Framework/Application/SlateApplication.h"
 #include "EditorStyleSet.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "AssetEditor_GenericGraph"
@@ -160,6 +162,11 @@ void FAssetEditor_UAVGScrpit::AddReferencedObjects(FReferenceCollector& Collecto
 	Collector.AddReferencedObject(EditingScript);
 }
 
+TSharedPtr<SGraphEditor> FAssetEditor_UAVGScrpit::GetCurrentGraphEditor() const
+{
+	return GraphEditor;
+}
+
 void FAssetEditor_UAVGScrpit::TryCreateEditorGraph()
 {
 	if (EditingScript->MyEdGraph == nullptr)
@@ -178,11 +185,23 @@ void FAssetEditor_UAVGScrpit::BindEditorCommands()
 	GraphEditorCommands = MakeShareable(new FUICommandList);
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().Delete,
-		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes),
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::DeleteSelectedNodes),
 		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanDeleteNodes));
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Duplicate,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::DuplicateNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanDuplicateNodes));
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Copy,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CopySelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanCopyNodes));
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Cut,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CutSelectedNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanCutNodes));
+	GraphEditorCommands->MapAction(FGenericCommands::Get().Paste,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::PasteNodes),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_UAVGScrpit::CanPasteNodes));
 }
 
-void FAssetEditor_UAVGScrpit::OnCommandDeleteSelectedNodes() const
+void FAssetEditor_UAVGScrpit::DeleteSelectedNodes() const
 {
 	if (!GraphEditor.IsValid() || EditingScript == nullptr)
 		return;
@@ -225,13 +244,174 @@ bool FAssetEditor_UAVGScrpit::CanDeleteNodes() const
 	{
 		NodeObj = Cast<UUAVGScriptGraphNode>(Obj);
 		
-		if (NodeObj != nullptr && NodeObj->CanUserDeleteNode())
+		if (NodeObj == nullptr || !NodeObj->CanUserDeleteNode())
 		{
-			return true;
+			return false;
 		}
 	}
 
-	return false;
+	return true;
+}
+
+void FAssetEditor_UAVGScrpit::DuplicateNodes()
+{
+	CopySelectedNodes();
+	PasteNodes();
+}
+
+bool FAssetEditor_UAVGScrpit::CanDuplicateNodes()
+{
+	if (!GraphEditor.IsValid() || EditingScript == nullptr)
+		return false;
+
+	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
+
+	UUAVGScriptGraphNode* NodeObj = nullptr;
+	for (UObject* Obj : SelectedNodes)
+	{
+		NodeObj = Cast<UUAVGScriptGraphNode>(Obj);
+
+		if (NodeObj == nullptr || !NodeObj->CanDuplicateNode())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void FAssetEditor_UAVGScrpit::CopySelectedNodes()
+{
+	// Export the selected nodes and place the text on the clipboard
+	FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+
+	FString ExportedText;
+
+	for (FGraphPanelSelectionSet::TIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
+	{
+		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
+		if (Node == nullptr)
+		{
+			SelectedIter.RemoveCurrent();
+			continue;
+		}
+		
+		Node->PrepareForCopying();
+	}
+
+	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
+	FPlatformApplicationMisc::ClipboardCopy(*ExportedText);
+}
+
+bool FAssetEditor_UAVGScrpit::CanCopyNodes()
+{
+	return CanDuplicateNodes();
+}
+
+void FAssetEditor_UAVGScrpit::PasteNodes()
+{
+	if (GraphEditor.IsValid() && EditingScript)
+	{
+		PasteNodesAt(GraphEditor->GetPasteLocation());
+	}
+}
+
+void FAssetEditor_UAVGScrpit::PasteNodesAt(const FVector2D& Location)
+{
+	if (!GraphEditor.IsValid()) return;
+
+	UEdGraph* EdGraph = GraphEditor->GetCurrentGraph();
+	{
+		const FScopedTransaction Transaction(FGenericCommands::Get().Paste->GetDescription());
+		EdGraph->Modify();
+
+		// Clear the selection set (newly pasted stuff will be selected)
+		GraphEditor->ClearSelectionSet();
+
+		// Grab the text to paste from the clipboard.
+		FString TextToImport;
+		FPlatformApplicationMisc::ClipboardPaste(TextToImport);
+
+		// Import the nodes
+		TSet<UEdGraphNode*> PastedNodes;
+		FEdGraphUtilities::ImportNodesFromText(EdGraph, TextToImport, PastedNodes);
+
+		//Average position of nodes so we can move them while still maintaining relative distances to each other
+		FVector2D AvgNodePosition(0.0f, 0.0f);
+
+		for (TSet<UEdGraphNode*>::TIterator It(PastedNodes); It; ++It)
+		{
+			UEdGraphNode* Node = *It;
+			AvgNodePosition.X += Node->NodePosX;
+			AvgNodePosition.Y += Node->NodePosY;
+		}
+
+		float InvNumNodes = 1.0f / float(PastedNodes.Num());
+		AvgNodePosition.X *= InvNumNodes;
+		AvgNodePosition.Y *= InvNumNodes;
+
+		for (TSet<UEdGraphNode*>::TIterator It(PastedNodes); It; ++It)
+		{
+			UEdGraphNode* Node = *It;
+			GraphEditor->SetNodeSelection(Node, true);
+
+			Node->NodePosX = (Node->NodePosX - AvgNodePosition.X) + Location.X;
+			Node->NodePosY = (Node->NodePosY - AvgNodePosition.Y) + Location.Y;
+
+			Node->SnapToGrid(16);
+
+			// Give new node a different Guid from the old one
+			Node->CreateNewGuid();
+
+			CastChecked<UUAVGScriptGraphNode>(Node)->SetupRTNode(EditingScript);
+		}
+	}
+
+	// Update UI
+	GraphEditor->NotifyGraphChanged();
+
+	UObject* GraphOwner = EdGraph->GetOuter();
+	if (GraphOwner)
+	{
+		GraphOwner->PostEditChange();
+		GraphOwner->MarkPackageDirty();
+	}
+}
+
+bool FAssetEditor_UAVGScrpit::CanPasteNodes()
+{
+	if (!GraphEditor.IsValid() || EditingScript == nullptr)
+		return false;
+
+	FString ClipboardContent;
+	FPlatformApplicationMisc::ClipboardPaste(ClipboardContent);
+
+	return FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ClipboardContent);
+}
+
+void FAssetEditor_UAVGScrpit::CutSelectedNodes()
+{
+	CopySelectedNodes();
+	DeleteSelectedNodes();
+}
+
+bool FAssetEditor_UAVGScrpit::CanCutNodes()
+{
+	return CanCopyNodes() && CanDeleteNodes();
+}
+
+FGraphPanelSelectionSet FAssetEditor_UAVGScrpit::GetSelectedNodes() const
+{
+	{
+		FGraphPanelSelectionSet CurrentSelection;
+		TSharedPtr<SGraphEditor> FocusedGraphEd = GetCurrentGraphEditor();
+		if (FocusedGraphEd.IsValid())
+		{
+			CurrentSelection = FocusedGraphEd->GetSelectedNodes();
+		}
+
+		return CurrentSelection;
+	}
 }
 
 FName FAssetEditor_UAVGScrpit::GetToolkitFName() const

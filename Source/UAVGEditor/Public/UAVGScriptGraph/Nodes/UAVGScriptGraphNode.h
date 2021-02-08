@@ -93,7 +93,11 @@ public:
 		return MyRTNode;
 	}
 
+	virtual void PostPasteNode() override;
+	
 	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
+
+	virtual void GetAllConnectedScriptNodes(TArray<UUAVGScriptGraphNode*>& OutNodes);
 protected:
 	virtual void CreateInputPin()
 	{
@@ -108,4 +112,5 @@ protected:
 	UUAVGScriptRuntimeNode* MyRTNode = nullptr;
 
 	static void GetPinConnectedNodes(class UEdGraphPin* Pin, TArray<UUAVGScriptRuntimeNode*>& OutNodes);
+	static void GetPinConnectedScriptNodes(class UEdGraphPin* Pin, TArray<UUAVGScriptGraphNode*>& OutNodes);
 };

@@ -34,16 +34,29 @@ public:
 	void SetDetailsViewTarget(class UObject* Target) const;
 
 	void OnSelectionChanged(const FGraphPanelSelectionSet& SelectionSet) const;
+
+	TSharedPtr<SGraphEditor> GetCurrentGraphEditor() const;
 private:
 	class UUAVGScript* EditingScript;
-
+	
 	void TryCreateEditorGraph();
 
 	void BindEditorCommands();
 
-	void OnCommandDeleteSelectedNodes() const;
+	void DeleteSelectedNodes() const;
 	bool CanDeleteNodes() const;
+	void DuplicateNodes();
+	bool CanDuplicateNodes();
+	void CopySelectedNodes();
+	bool CanCopyNodes();
+	void PasteNodes();
+	void PasteNodesAt(const FVector2D& Location);
+	bool CanPasteNodes();
+	void CutSelectedNodes();
+	bool CanCutNodes();
 
+	FGraphPanelSelectionSet GetSelectedNodes() const;
+	
 	/** IToolkit interface */
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetToolkitName() const override;

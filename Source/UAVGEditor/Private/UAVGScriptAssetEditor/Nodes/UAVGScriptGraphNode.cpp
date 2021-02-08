@@ -71,6 +71,12 @@ void UUAVGScriptGraphNode::AutowireNewNode(UEdGraphPin* FromPin)
 	}
 }
 
+void UUAVGScriptGraphNode::PostPasteNode()
+{
+	Super::PostPasteNode();
+	MyRTNode = nullptr;
+}
+
 void UUAVGScriptGraphNode::GetNodeContextMenuActions(UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const
 {
 	if (Context->Node && !IsRootNode())
@@ -80,6 +86,23 @@ void UUAVGScriptGraphNode::GetNodeContextMenuActions(UToolMenu* Menu, class UGra
 
 		if (CanUserDeleteNode())
 			section.AddMenuEntry(FGenericCommands::Get().Delete);
+		if (CanDuplicateNode())
+		{
+			section.AddMenuEntry(FGenericCommands::Get().Duplicate);
+			section.AddMenuEntry(FGenericCommands::Get().Copy);
+		}
+	}
+}
+
+void UUAVGScriptGraphNode::GetAllConnectedScriptNodes(TArray<UUAVGScriptGraphNode*>& OutNodes)
+{
+	if (GetInputPin())
+	{
+		GetPinConnectedScriptNodes(GetInputPin(), OutNodes);
+	}
+	if (GetOutputPin())
+	{
+		GetPinConnectedScriptNodes(GetOutputPin(), OutNodes);
 	}
 }
 
@@ -88,4 +111,13 @@ void UUAVGScriptGraphNode::GetPinConnectedNodes(class UEdGraphPin* Pin, TArray<U
 	UUAVGScriptRuntimeNode* LinkedNode = CastChecked<UUAVGScriptRuntimeNode>
 		(CastChecked<UUAVGScriptGraphNode>(Pin->GetOwningNode())->GetRTNode());
 	OutNodes.Add(LinkedNode);
+}
+
+void UUAVGScriptGraphNode::GetPinConnectedScriptNodes(UEdGraphPin* Pin, TArray<UUAVGScriptGraphNode*>& OutNodes)
+{
+	auto LinkedTo = Pin->LinkedTo;
+	for (auto P : LinkedTo)
+	{
+		OutNodes.Add(CastChecked<UUAVGScriptGraphNode>(P->GetOwningNode()));
+	}
 }

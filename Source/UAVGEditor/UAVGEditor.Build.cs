@@ -44,6 +44,7 @@ public class UAVGEditor : ModuleRules
 			{
 				"Slate",
 				"SlateCore",
+				"ApplicationCore",
                 "UAVG",
                 "AssetTools",
                 "GraphEditor",

@@ -147,3 +147,14 @@ void UUAVGScriptGraphNodeSelection::PostEditChangeChainProperty(FPropertyChanged
 	
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);
 }
+
+void UUAVGScriptGraphNodeSelection::GetAllConnectedScriptNodes(TArray<UUAVGScriptGraphNode*>& OutNodes)
+{
+	Super::GetAllConnectedScriptNodes(OutNodes);
+
+	for (auto* Pin : GetOutputPins())
+	{
+		if (Pin)
+			GetPinConnectedScriptNodes(Pin, OutNodes);
+	}
+}

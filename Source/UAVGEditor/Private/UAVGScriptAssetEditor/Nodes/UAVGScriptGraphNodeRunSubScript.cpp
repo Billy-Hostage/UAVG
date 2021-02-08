@@ -42,7 +42,7 @@ FText UUAVGScriptGraphNodeRunSubScript::GetNodeTitle(ENodeTitleType::Type TitleT
 		return NSLOCTEXT("UAVGScriptGraphNode_RunSubScript", "RunSubScriptList", "Run SubScript");
 	case ENodeTitleType::ListView:
 	default:
-		return NSLOCTEXT("UAVGScriptGraphNode_RunSubScript", "RunSubScriptFullTitle", "Add Run SubScript Node");
+		return NSLOCTEXT("UAVGScriptGraphNode_RunSubScript", "RunSubScriptFullTitle", "Run SubScript Node");
 	}
 }
 
