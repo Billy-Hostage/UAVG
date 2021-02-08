@@ -26,13 +26,13 @@ void UUAVGTextScriptInterpreter::WarpUAVGSaveGame(UUAVGSaveGame* InSave)
 {
 	InSave->UsingScriptTextAsset = ScriptTextAsset;
 	InSave->LastTextLinePointer = LastCompleteLinePointer;
-	InSave->TextDisplayTime = TextDisplayTime;
+	InSave->TextDisplayTime = TextDisplayTimeLine;
 }
 void UUAVGTextScriptInterpreter::UnWarpUAVGSaveGame(UUAVGSaveGame* InSave)
 {
 	SetupInterpreter(InSave->UsingScriptTextAsset);
 	TextLinePointer = InSave->LastTextLinePointer;
-	TextDisplayTime = InSave->TextDisplayTime;
+	TextDisplayTimeLine = InSave->TextDisplayTime;
 }
 
 void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& Response)
@@ -154,8 +154,14 @@ void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveRespon
 		}
 		else if (str.EndsWith("[p]"))
 		{
-			UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Verbose, TEXT("Speaking %s for time %d(ms)"), *str.Left(str.Len() - 3), TextDisplayTime);
-			SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3), TextDisplayTime));
+			if (!bUseLineMode)
+			{
+				SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3), TextDisplayTimeCharacter));
+			}
+			else
+			{
+				SayBuffer[SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3)))].SetCharacterTimeFromLineTime(TextDisplayTimeLine);
+			}
 			//break since 'p'
 			FoundEndFlag = true;
 			break;
@@ -167,7 +173,14 @@ void UUAVGTextScriptInterpreter::ReachSayLine(FUAVGScriptRuntimeNodeArriveRespon
 		}
 		else
 		{
-			SayBuffer.Add(FUAVGText(str, TextDisplayTime));
+			if (!bUseLineMode)
+			{
+				SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3), TextDisplayTimeCharacter));
+			}
+			else
+			{
+				SayBuffer[SayBuffer.Add(FUAVGText(str.Left(str.Len() - 3)))].SetCharacterTimeFromLineTime(TextDisplayTimeLine);
+			}
 		}
 	}
 
@@ -234,10 +247,30 @@ void UUAVGTextScriptInterpreter::ReachInterpreterCommandLine(FUAVGScriptRuntimeN
 
 	bool flagFoundVar = false;
 
-	if (Var == "displaytime" && SplitedLine.IsValidIndex(1))
+	//@TODO Implement a command system
+	
+	if (Var == "display_time_line" && SplitedLine.IsValidIndex(1))
 	{
-		TextDisplayTime = FCString::Atoi(*SplitedLine[1]);//Unsafe!
+		TextDisplayTimeLine = FCString::Atoi(*SplitedLine[1]);//Unsafe!
 		flagFoundVar = true;
+	}
+	else if (Var == "display_time_character" && SplitedLine.IsValidIndex(1))
+	{
+		TextDisplayTimeCharacter = FCString::Atoi(*SplitedLine[1]);//Unsafe!
+		flagFoundVar = true;
+	}
+	else if (Var == "display_mode" && SplitedLine.IsValidIndex(1))
+	{
+		if (SplitedLine[1] == "character")
+		{
+			bUseLineMode = false;
+			flagFoundVar = true;
+		}
+		else if (SplitedLine[1] == "line")
+		{
+			bUseLineMode = true;
+			flagFoundVar = true;
+		}
 	}
 
 	if (!flagFoundVar)

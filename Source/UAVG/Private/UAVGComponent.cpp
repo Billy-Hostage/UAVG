@@ -400,7 +400,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 	check(DeltaTime > 0.f);
 	if (DesiredText.Num() <= 0) return;
 
-	SpeakDurationInMs += FMath::RoundHalfToEven(DeltaTime * 1000.f);
+	SpeakDurationInMs += FMath::RoundHalfToZero(DeltaTime * 1000.f);
 
 	for (int32 i = 0; i < DesiredText.Num(); ++i)
 	{

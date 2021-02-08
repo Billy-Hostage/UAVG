@@ -41,7 +41,13 @@ protected:
 
 	///Below are interpreter properties
 	UPROPERTY()
-	int32 TextDisplayTime = 250;
+	int32 TextDisplayTimeLine = 250;
+
+	UPROPERTY()
+	int32 TextDisplayTimeCharacter = 100;
+
+	UPROPERTY()
+	bool bUseLineMode = false;
 private:
 
 	void SkipToNextLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
