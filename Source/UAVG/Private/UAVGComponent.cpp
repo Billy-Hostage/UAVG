@@ -259,6 +259,11 @@ bool UUAVGComponent::CanNext() const
 	return false;
 }
 
+UUAVGScript* UUAVGComponent::GetCurrentScript() const
+{
+	return MyScript;
+}
+
 void UUAVGComponent::EventHandled()
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForEvent)

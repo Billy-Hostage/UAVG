@@ -96,6 +96,9 @@ public:
 	//Check if we can do next without triggering warnings and errors
 	UFUNCTION(BlueprintPure, Category = "UAVG")
 	bool CanNext() const;
+
+	UFUNCTION(BlueprintPure, Category = "UAVG")
+	class UUAVGScript* GetCurrentScript() const;
 protected:
 	UObject* UIInterface = nullptr;
 	AActor* ActorInterface = nullptr;
