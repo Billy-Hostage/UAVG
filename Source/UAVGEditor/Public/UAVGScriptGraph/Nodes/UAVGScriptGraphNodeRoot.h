@@ -73,7 +73,7 @@ protected:
 	FName ScriptName = "UAVGScirpt";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Fallback Character Display Delay (ms)"))
-	uint8 CharacterDisplayDelayInMs = 200;
+	uint8 CharacterDisplayDelayInMs = 50;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Script Completed Behaviour", ToolTip = "What to do when this script has completed"))
 	EUAVGScriptCompleteBehaviour OnScriptCompleted = EUAVGScriptCompleteBehaviour::USCB_Nothing;

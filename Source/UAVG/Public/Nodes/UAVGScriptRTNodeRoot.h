@@ -31,7 +31,7 @@ public:
 	FName ScriptName;
 
 	UPROPERTY(BlueprintReadOnly)
-	int32 FallbackCharacterDisplayDelayInMs = 200;
+	int32 FallbackCharacterDisplayDelayInMs = 50;
 
 	UPROPERTY(BlueprintReadOnly)
 	EUAVGScriptCompleteBehaviour OnScriptCompleted = EUAVGScriptCompleteBehaviour::USCB_Nothing;
