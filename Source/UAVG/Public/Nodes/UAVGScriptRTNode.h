@@ -32,18 +32,30 @@ public:
 	}
 	EUAVGRuntimeNodeType NodeType = EUAVGRuntimeNodeType::URNT_NULL;
 
+	/// For Say Node
+	
 	TArray<FUAVGText> DesiredTexts;
 
+	/// For Event Node
+	
 	FString EventName;
 	TArray<FString> EventArguments;
 
+	/// For EnvAdd Node
+	
 	FString EnvironmentToAdd;
 	TArray<FString> AdditonalEnvironmentArguments;
+
+	/// For EnvRm Node
 	
 	TArray<FString> EnvironmentsToRemove;
+
+	/// For SubScript Node
 	
 	class UUAVGScript* SubScriptToRun;
 
+	/// For Selection Node
+	
 	TArray<FText> SelectionTexts;
 
 	//TArray<FString> Indication;

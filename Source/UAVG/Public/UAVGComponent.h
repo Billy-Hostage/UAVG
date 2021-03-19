@@ -147,7 +147,7 @@ private:
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);
 
-	FText BuildTextByIndex(const FUAVGText& InText, uint8 InNum);
+	FText BuildTextByNum(FUAVGText& InText, uint8 InNum);
 
 	void CheckIfLineCompleted();
 

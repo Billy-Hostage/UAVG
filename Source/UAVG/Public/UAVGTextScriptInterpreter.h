@@ -9,7 +9,8 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogUAVGRuntimeScriptTextInterpreter, Log, All);
 
 /*
- *TODO This class needs refactor
+ * This Object is spawned when a scripted text is encountered for each UAVGComponent
+ * contains runtime contexts for a script text
  */
 UCLASS()
 class UUAVGTextScriptInterpreter : public UObject
@@ -48,6 +49,9 @@ protected:
 
 	UPROPERTY()
 	bool bUseLineMode = false;
+
+	UPROPERTY()
+	int32 BreakTime = 500;
 private:
 
 	void SkipToNextLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
@@ -58,8 +62,8 @@ private:
 	//Increase Pointer by one
 	FString FetchString();
 protected:
-
 	///Below are interpreter funcs.
+	
 	virtual void ReachSayLine(FUAVGScriptRuntimeNodeArriveResponse& Response);
 
 	virtual void ReachEventLine(FUAVGScriptRuntimeNodeArriveResponse& Response);

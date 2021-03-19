@@ -5,21 +5,42 @@
 #include "CoreMinimal.h"
 #include "UAVGText.generated.h"
 
+enum class EUAVGTextTokenType
+{
+	TT_Nul,
+	TT_Normal,
+	TT_Delay,    // Timed Break
+};
+
+/*
+* This is intended for internal usage only
+* shall not exposed to blueprint
+*/
+USTRUCT()
+struct FUAVGTextToken
+{
+	GENERATED_BODY()
+	
+	FUAVGTextToken();
+	FUAVGTextToken(FString Character, int32 TypewriterDelay);
+	FUAVGTextToken(int32 Break);
+	
+	FString Character;
+	
+	int32 TypewriterDelay;
+
+	EUAVGTextTokenType Type = EUAVGTextTokenType::TT_Nul;
+};
+
 //The Text Struct used in UAVG Framework
 USTRUCT(BlueprintType, meta = (ToolTip = "UAVG Text"))
 struct FUAVGText
 {
 	GENERATED_BODY()
 public:
-	FUAVGText()
-	{
-	}
+	FUAVGText();
 
-	FUAVGText(const FString& str, int32 CharacterDisplayTime = -1)
-	{
-		TextLine = FText::FromString(str);
-		CharacterDisplayTimeInMs = CharacterDisplayTime;
-	}
+	FUAVGText(const FString& str, int32 CharacterDisplayTime = -1, int32 BreakDelayTime = 500);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Text Line"))
 	FText TextLine;
@@ -28,20 +49,31 @@ public:
 	{
 		return CharacterDisplayTimeInMs;
 	}
-
-	void SetCharacterTimeFromLineTime(int32 LineTime)
+	void SetCharacterDisplayDelayInMs(int time)
 	{
-		if (GetTextLen() <= 0) return;
-
-		CharacterDisplayTimeInMs = static_cast<int32>(FMath::RoundHalfToZero(static_cast<float>(LineTime) / static_cast<float>(GetTextLen())));
+		CharacterDisplayTimeInMs = time;
+		CachedTokenList.Empty();
 	}
+
+	void SetCharacterTimeFromLineTime(int32 LineTime);
+
+	bool IsEmpty();
 	
-	//TODO We want to remove all html markers here
-	int32 GetTextLen() const
-	{
-		return TextLine.ToString().Len();
-	}
+	int32 GetTextLen();
+
+	const TArray<FUAVGTextToken>& GetTokenizedList();
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Time (ms)", ShortTooltip = "ms", Tooltip = "The time it takes to display all characters in text. \n Note that a empty text will be treated as DisplayTimeInMs == 0.f \n A negative number here will make runtime to use default value"))
+	const TArray<FUAVGTextToken>& Tokenize();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Time (ms)", ShortTooltip = "ms", Tooltip = "The time it takes to display a character in text. \n A negative number here will make runtime to use default value"))
 	int32 CharacterDisplayTimeInMs = -1;
+	
+	int32 BreakDelayTimeInMs = 500;
+private:
+	void AddNormalCharacterToken(TCHAR Char);
+
+	void AddBreakDelayToken(int32 TimeMs);
+	
+	UPROPERTY(Transient)
+	TArray<FUAVGTextToken> CachedTokenList;
 };

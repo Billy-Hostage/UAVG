@@ -320,17 +320,6 @@ void UUAVGComponent::SetSelection(int32 InIndex)
 	CurrentState = EUAVGRuntimeState::URS_ReadyForNext;
 }
 
-FText UUAVGComponent::BuildTextByIndex(const FUAVGText& InText, uint8 InNum)
-{
-	FString MyString = InText.TextLine.ToString();
-
-	if (InNum > MyString.Len())
-		return InText.TextLine;
-
-	MyString = MyString.Left(InNum);
-	return FText::FromString(MyString);
-}
-
 void UUAVGComponent::NextNode(FUAVGComponentNextResponse& OutResponse)
 {
 	LastNode = CurrentNode;//Save the last node
@@ -400,18 +389,71 @@ void UUAVGComponent::TrySkip()
 	SpeakDurationInMs += EachSkipTimeInMs;
 }
 
+void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
+{
+	RecentDisplayingText = NewText;
+	DesiredText = NewText;
+
+	DisplayingNums.Init(0, DesiredText.Num());
+	SpeakComplete.Init(false, DesiredText.Num());
+
+	for (int32 i = 0; i < DesiredText.Num(); ++i) // process every incoming UAVGText
+	{
+		if (DesiredText[i].IsEmpty()) // Is empty
+		{
+			//No need to update
+			SpeakComplete[i] = true;
+		}
+		else
+		{
+			if (DesiredText[i].GetCharacterDisplayDelayInMs() < 0) // pending a fallback
+			{
+				const int32 CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
+				UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Using fallback CharacterDisplayDelayInMs"));
+				// apply fallback value
+				DesiredText[i].SetCharacterDisplayDelayInMs(CharacterDisplayDelayInMs);
+			}
+		}
+	}
+}
+
+// "read" through tokens list based on time
 void UUAVGComponent::Speak(float DeltaTime)
 {
 	check(DeltaTime > 0.f);
 	if (DesiredText.Num() <= 0) return;
 
-	SpeakDurationInMs += FMath::RoundHalfToZero(DeltaTime * 1000.f);
+	SpeakDurationInMs += FMath::RoundHalfToZero(DeltaTime * 1000.f); // this is the time that already passed since arrived at say node/line
 
 	for (int32 i = 0; i < DesiredText.Num(); ++i)
 	{
 		if (SpeakComplete[i]) continue;
 		if (DisplayingNums[i] < 0) continue;
-		int32 CharacterDisplayDelayInMs = DesiredText[i].GetCharacterDisplayDelayInMs();
+		const auto& Tokens = DesiredText[i].GetTokenizedList();
+
+		int32 TimeNeeded = 0;
+		int32 TokenProgress = 0;
+		
+		for (const auto& Token : Tokens)
+		{
+			TimeNeeded += Token.TypewriterDelay;
+			if (TimeNeeded > SpeakDurationInMs)
+			{
+				break;
+			}
+			TokenProgress++;
+		}
+
+		if (TokenProgress >= Tokens.Num())
+		{
+			SpeakComplete[i] = true;
+		}
+		DisplayingNums[i] = TokenProgress;
+		FText FinalText = BuildTextByNum(DesiredText[i], DisplayingNums[i]);
+		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, FinalText);
+		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, FinalText);
+		
+		/*int32 CharacterDisplayDelayInMs = DesiredText[i].GetTokenizedList()[DisplayingNums[i]].TypewriterDelay;
 		if(CharacterDisplayDelayInMs < 0)
 		{
 			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
@@ -423,10 +465,27 @@ void UUAVGComponent::Speak(float DeltaTime)
 			SpeakComplete[i] = true;
 		}
 		DisplayingNums[i] = NewNums;
-		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
-		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, BuildTextByIndex(DesiredText[i], NewNums));
+		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, BuildTextByNum(DesiredText[i], NewNums));
+		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, BuildTextByNum(DesiredText[i], NewNums));*/
+
+		
 	}
 	CheckIfLineCompleted();
+}
+
+FText UUAVGComponent::BuildTextByNum(FUAVGText& InText, uint8 InNum)
+{
+	FString MyString = "";
+	const auto& Tokens = InText.GetTokenizedList();
+	InNum = InNum > Tokens.Num() ? Tokens.Num() : InNum;
+
+	for (int32 i = 0; i < InNum; ++i)
+	{
+		if (Tokens[i].Type == EUAVGTextTokenType::TT_Normal)
+			MyString.Append(Tokens[i].Character);
+	}
+	
+	return FText::FromString(MyString);
 }
 
 void UUAVGComponent::CheckIfLineCompleted()
@@ -583,35 +642,6 @@ void UUAVGComponent::OnReachSelectionNode(FUAVGComponentNextResponse& OutRespons
 	IUAVGUIInterface::Execute_OnFaceSelection(UIInterface, FUAVGUISelectionInfo(LastNodeResponse.SelectionTexts));
 
 	OutResponse.bSucceed = true;
-}
-
-void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
-{
-	RecentDisplayingText = NewText;
-	DesiredText = NewText;
-
-	DisplayingNums.Init(-1, DesiredText.Num());
-	SpeakComplete.Init(false, DesiredText.Num());
-
-	for (int32 i = 0; i < DesiredText.Num(); ++i)
-	{
-		if (!DesiredText[i].TextLine.IsEmpty())//Not Empty
-		{
-			DisplayingNums[i] = 0;
-			if (DesiredText[i].GetCharacterDisplayDelayInMs() == 0)
-			{
-				//Just Update Texts and Mark as Complete
-				IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, DesiredText[i].TextLine);
-				IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, DesiredText[i].TextLine);
-				SpeakComplete[i] = true;
-			}
-		}
-		else//Empty Text is Always Completed
-		{
-			//No need to update
-			SpeakComplete[i] = true;
-		}
-	}
 }
 
 void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
