@@ -62,6 +62,8 @@ public:
 	int32 GetTextLen();
 
 	const TArray<FUAVGTextToken>& GetTokenizedList();
+
+	void ClearTokenCache();
 protected:
 	const TArray<FUAVGTextToken>& Tokenize();
 	

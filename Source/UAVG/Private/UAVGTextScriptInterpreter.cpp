@@ -64,11 +64,12 @@ void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& 
 		ReachInterpreterCommandLine(Response);
 		break;
 
-	///This might be done in ScriptText just once
-	//case '$'://Find Key in StringTable and insert this line as speakline[0]
-	//	//Force DisplayTime=0
-	//	break;
-
+	/*case '$':
+		UE_LOG(LogUAVGRuntimeScriptTextInterpreter, Error, TEXT("Stubbed: Variable load"));
+		// still, works the same as other say lines, just localized.
+		// a "[l]" mark was appended to the end of string when fetching
+		*/
+		
 	case '\''://Starts with a "'" ; Works the same as default
 	default://say command as normal
 		ReachSayLine(Response);

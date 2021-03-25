@@ -57,6 +57,11 @@ const TArray<FUAVGTextToken>& FUAVGText::GetTokenizedList()
 	return Tokenize();
 }
 
+void FUAVGText::ClearTokenCache()
+{
+	CachedTokenList.Empty();
+}
+
 const TArray<FUAVGTextToken>& FUAVGText::Tokenize()
 {
 	const FString& LocalizedStringToTokenize = TextLine.ToString();

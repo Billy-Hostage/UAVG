@@ -99,14 +99,22 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "UAVG")
 	class UUAVGScript* GetCurrentScript() const;
+
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Whiteboard")
+	void SetWhiteboardObject(class UUAVGWhiteboard* Object);
+
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Whiteboard")
+	class UUAVGWhiteboard* GetWhiteboardObject(bool bCreateIfNull = false);
 protected:
+	UPROPERTY()
 	UObject* UIInterface = nullptr;
+	UPROPERTY()
 	AActor* ActorInterface = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UAVG|Config")
 	class UUAVGScript* MyScript = nullptr;
 	
-	///These Arrays are alliegned
+	///These Arrays are aligned
 	UPROPERTY()
 	TArray<class UUAVGScript*> ScriptStack;
 	UPROPERTY()
@@ -121,12 +129,19 @@ public:
 		return CurrentState;
 	}
 private:
+	void GenerateEmptyWhiteboard();
+	
 	EUAVGRuntimeState CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 
 	int32 SpeakDurationInMs = 0;
 
+	UPROPERTY()
 	class UUAVGScriptRuntimeNode* LastNode = nullptr;
+	UPROPERTY()
 	class UUAVGScriptRuntimeNode* CurrentNode = nullptr;
+
+	UPROPERTY()
+	class UUAVGWhiteboard* WhiteboardObject = nullptr;
 
 	///These arrays are aligned.
 	TArray<bool> SpeakComplete;
@@ -143,6 +158,7 @@ private:
 	void OnReachEnvironmentDescriptorNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachRunSubScriptNode(FUAVGComponentNextResponse& OutResponse);
 	void OnReachSelectionNode(FUAVGComponentNextResponse& OutResponse);
+	void OnReachSetWhiteboardVariableNode(FUAVGComponentNextResponse& OutResponse);
 
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
 	void UpdateDisplayNum(int32 Index);
@@ -174,6 +190,10 @@ protected:
 	//Set it to false to manually disable Next() command
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config")
 	bool bCanNext = true;
+
+	//Save Whiteboard Data in built-in save objects or not
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config")
+	bool bHandlesWhiteboardSave = false;
 
 	//Set it to false to disable skip
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UAVG|Config|Skipping")

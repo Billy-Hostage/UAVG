@@ -26,19 +26,24 @@ TArray<FString> UUAVGScriptText::GetLocalizedScriptLines()
 				FStringTableEntryConstPtr entry = table.Get().FindEntry(str);
 				if (entry.IsValid() && entry->GetDisplayString().IsValid())
 				{
-					str = *entry->GetDisplayString().Get();
+					str = *entry->GetDisplayString().Get(); // we get the localized string in table
 					flagFoundRelatedString = true;//set flag
 					break;//Exit loop
 				}
 			}
 
 			if (!flagFoundRelatedString)
-				UE_LOG(LogTemp, Warning, TEXT("%s not found in given string talble(s)"), *str);
+			{
+				UE_LOG(LogTemp, Verbose, TEXT("%s not found in given string talble(s), this may be a variable"), *str);
+				// we will parse variables in components later
+			}
 
-			str.Append("[l]");//For it's a speaker string(maybe change this behaviour?)
+			str.Append("[l]"); //For it's a speaker string, no matter it's a variable or a localized string
 		}
-		if (str.StartsWith("^"))//This is a comment
+		
+		if (str.StartsWith("^")) //This is a comment, skip all comments
 			continue;
+		
 		LocalizedScriptTextLine.Add(str);
 	}
 

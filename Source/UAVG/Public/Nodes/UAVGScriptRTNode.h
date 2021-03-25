@@ -16,6 +16,7 @@ enum class EUAVGRuntimeNodeType : uint8
 	URNT_EnvironmentDescriptor,
 	URNT_RunSubScript,
 	URNT_Selection,
+	URNT_SetWhiteboardVar,
 	URNT_MAX,
 };
 
@@ -58,7 +59,10 @@ public:
 	
 	TArray<FText> SelectionTexts;
 
-	//TArray<FString> Indication;
+	/// For Set Whiteboard Variable Node
+
+	FString Key;
+	FString Value;
 };
 
 UCLASS(Abstract, BlueprintType)

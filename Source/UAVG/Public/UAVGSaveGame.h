@@ -43,6 +43,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FUAVGText> RecentDisplayingText;
 
+	//Whiteboard Data
+	UPROPERTY()
+	TMap<FString, FString> SavedWhiteboardVariables;
+	
 	///Node Specific
 
 	UPROPERTY()

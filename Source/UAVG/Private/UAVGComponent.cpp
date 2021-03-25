@@ -10,6 +10,7 @@
 #include "Nodes/UAVGScriptRTNodeSaySingle.h"
 #include "Nodes/UAVGScriptRTNodeSelection.h"
 #include "UAVGSaveGame.h"
+#include "UAVGWhiteboard.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -264,6 +265,36 @@ UUAVGScript* UUAVGComponent::GetCurrentScript() const
 	return MyScript;
 }
 
+void UUAVGComponent::SetWhiteboardObject(UUAVGWhiteboard* Object)
+{
+	if (ensure(Object))
+	{
+		WhiteboardObject = Object;
+	}
+}
+
+UUAVGWhiteboard* UUAVGComponent::GetWhiteboardObject(bool bCreateIfNull)
+{
+	if (!WhiteboardObject && bCreateIfNull)
+		GenerateEmptyWhiteboard();
+
+	return WhiteboardObject;
+}
+
+void UUAVGComponent::GenerateEmptyWhiteboard()
+{
+	if (WhiteboardObject != nullptr)
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("Clearing all preset variables"));
+	}
+	else
+	{
+		UE_LOG(LogUAVGRuntimeComponent, Warning, TEXT("Generating empty Whiteboard"));
+	}
+
+	WhiteboardObject = NewObject<UUAVGWhiteboard>();
+}
+
 void UUAVGComponent::EventHandled()
 {
 	if (GetUAVGState() != EUAVGRuntimeState::URS_WaitingForEvent)
@@ -368,6 +399,9 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 	case EUAVGRuntimeNodeType::URNT_Selection:
 		OnReachSelectionNode(OutResponse);
 		break;
+	case EUAVGRuntimeNodeType::URNT_SetWhiteboardVar:
+		OnReachSetWhiteboardVariableNode(OutResponse);
+		break;
 	case EUAVGRuntimeNodeType::URNT_NULL://Empty Node
 		UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Reach Empty node %s."), *(CurrentNode->GetName()));
 		CurrentState = EUAVGRuntimeState::URS_ReadyForNext;//Skip this node.
@@ -391,6 +425,22 @@ void UUAVGComponent::TrySkip()
 
 void UUAVGComponent::UpdateDesiredText(TArray<FUAVGText> NewText)
 {
+	for (auto& Text : NewText)
+	{
+		const FString Original = Text.TextLine.ToString();
+		if (!Original.IsEmpty() && Original[0] == '$')
+		{
+			// hitting a var here
+			if (!WhiteboardObject)
+				GenerateEmptyWhiteboard();
+
+			// fetch from whiteboard
+			const FString Result = WhiteboardObject->GetRawVariableConstRef(Original.Right(Original.Len() - 1));
+			Text.TextLine = FText::FromString(Result);
+			Text.ClearTokenCache();
+		}
+	}
+
 	RecentDisplayingText = NewText;
 	DesiredText = NewText;
 
@@ -451,24 +501,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 		DisplayingNums[i] = TokenProgress;
 		FText FinalText = BuildTextByNum(DesiredText[i], DisplayingNums[i]);
 		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, FinalText);
-		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, FinalText);
-		
-		/*int32 CharacterDisplayDelayInMs = DesiredText[i].GetTokenizedList()[DisplayingNums[i]].TypewriterDelay;
-		if(CharacterDisplayDelayInMs < 0)
-		{
-			CharacterDisplayDelayInMs = MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs > 0 ? MyScript->GetConstRootNode()->FallbackCharacterDisplayDelayInMs : CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK;
-			UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Using fallback CharacterDisplayDelayInMs"));
-		}
-		int32 NewNums = SpeakDurationInMs / CharacterDisplayDelayInMs;
-		if (NewNums >= DesiredText[i].TextLine.ToString().Len())
-		{
-			SpeakComplete[i] = true;
-		}
-		DisplayingNums[i] = NewNums;
-		IUAVGActorInterface::Execute_OnTextUpdated(ActorInterface, i, BuildTextByNum(DesiredText[i], NewNums));
-		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, BuildTextByNum(DesiredText[i], NewNums));*/
-
-		
+		IUAVGUIInterface::Execute_OnTextUpdated(UIInterface, i, FinalText);		
 	}
 	CheckIfLineCompleted();
 }
@@ -644,6 +677,17 @@ void UUAVGComponent::OnReachSelectionNode(FUAVGComponentNextResponse& OutRespons
 	OutResponse.bSucceed = true;
 }
 
+void UUAVGComponent::OnReachSetWhiteboardVariableNode(FUAVGComponentNextResponse& OutResponse)
+{
+	// Set vars
+	GetWhiteboardObject(true)->SetStringVariable(LastNodeResponse.Key, LastNodeResponse.Value);
+	
+	FUAVGComponentNextResponse Response;
+	NextNode(Response);
+
+	OutResponse.bSucceed = OutResponse.bSucceed && Response.bSucceed;
+}
+
 void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 {
 	if (!InSave)
@@ -658,6 +702,11 @@ void UUAVGComponent::WarpSaveObject(UUAVGSaveGame* InSave)
 	InSave->ScriptStack = ScriptStack;
 	InSave->CurrentNodeStack = CurrentNodeStack;
 	InSave->LastNodeStack = LastNodeStack;
+
+	if (bHandlesWhiteboardSave && WhiteboardObject)
+	{
+		InSave->SavedWhiteboardVariables = GetWhiteboardObject()->FetchVariablesMap();
+	}
 }
 
 void UUAVGComponent::UnWarpSaveObject(UUAVGSaveGame* InSave)
@@ -673,6 +722,13 @@ void UUAVGComponent::UnWarpSaveObject(UUAVGSaveGame* InSave)
 	LastNodeStack = InSave->LastNodeStack;
 	EnvironmentDescriptor = InSave->EnvironmentDescriptor;
 	//UnWarpEnvironmentDescriptor(InSave->EnvironmentDescriptor);
+
+	if (bHandlesWhiteboardSave)
+	{
+		WhiteboardObject = NewObject<UUAVGWhiteboard>();
+		GetWhiteboardObject()->InitWithVariables(InSave->SavedWhiteboardVariables);
+	}
+	
 	IUAVGActorInterface::Execute_OnRevivedFromSave(ActorInterface, InSave);
 	IUAVGUIInterface::Execute_OnRevivedFromSave(UIInterface, InSave);
 }
