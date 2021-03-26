@@ -13,14 +13,14 @@ UUAVGScript::UUAVGScript()
 UUAVGScriptRuntimeNodeRoot* UUAVGScript::SetupNewRuntimeScript()
 {
 	RootNode = NewObject<UUAVGScriptRuntimeNodeRoot>(this, UUAVGScriptRuntimeNodeRoot::StaticClass(), NAME_None, RF_Transactional);
-	AllNodes.Empty();
+	//AllNodes.Empty();
 	AddRuntimeNode(RootNode);
 	return RootNode;
 }
 
 bool UUAVGScript::AddRuntimeNode(UUAVGScriptRuntimeNode* NewNode)
 {
-	AllNodes.AddUnique(NewNode);
+	//AllNodes.AddUnique(NewNode);
 	return true;
 }
 

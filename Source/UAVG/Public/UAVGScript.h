@@ -17,7 +17,7 @@ class UAVG_API UUAVGScript : public UObject
 	GENERATED_BODY()
 public:
 	UUAVGScript();
-
+	
 	UUAVGScriptRuntimeNodeRoot* GetRuntimeRootNode() const
 	{
 		return RootNode;
@@ -38,12 +38,11 @@ public:
 
 	UPROPERTY()
 	class UEdGraph* MyEdGraph;
-
+	
 #endif
-protected:
 	UPROPERTY(BlueprintReadOnly)
 	UUAVGScriptRuntimeNodeRoot* RootNode;
 
-	UPROPERTY(BlueprintReadOnly)
-	TArray<class UUAVGScriptRuntimeNode*> AllNodes;
+	//UPROPERTY(BlueprintReadOnly)
+	//TArray<class UUAVGScriptRuntimeNode*> AllNodes;
 };
