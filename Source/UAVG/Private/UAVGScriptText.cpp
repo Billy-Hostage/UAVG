@@ -51,7 +51,7 @@ TArray<FString> UUAVGScriptText::GetLocalizedScriptLines()
 }
 
 #ifdef WITH_EDITOR
-void UUAVGScriptText::EditorSetupScriptText(const FString& ScriptString)
+void UUAVGScriptText::EditorSetupScriptText(const FString& ScriptString, const FString& FilePath)
 {
 	TArray<FString> StrScriptLines;
 	ScriptString.ParseIntoArrayLines(StrScriptLines, true);//Culled out all empty lines here
@@ -60,5 +60,7 @@ void UUAVGScriptText::EditorSetupScriptText(const FString& ScriptString)
 	{
 		ScriptLines.Add(FText::FromString(str));
 	}
+
+	SourceFilename = FilePath;
 }
 #endif

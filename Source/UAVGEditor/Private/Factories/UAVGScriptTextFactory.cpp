@@ -32,10 +32,58 @@ UObject* UUAVGScriptTextFactory::FactoryCreateText(UClass* InClass, UObject* InP
 	//Complete string building
 
 	ToReturn = NewObject<UUAVGScriptText>(InParent, InClass, InName, Flags | RF_Transactional);
-	ToReturn->EditorSetupScriptText(ImportedScriptString);
+	ToReturn->EditorSetupScriptText(ImportedScriptString, GetCurrentFilename());
 
 	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, ToReturn);
 	return ToReturn;
+}
+
+bool UUAVGScriptTextFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
+{
+	UUAVGScriptText* ScriptToReimport = Cast<UUAVGScriptText>(Obj);
+	if (ScriptToReimport)
+	{
+		OutFilenames.Add(ScriptToReimport->SourceFilename);
+		return true;
+	}
+	return false;
+}
+
+void UUAVGScriptTextFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& NewReimportPaths)
+{
+	UUAVGScriptText* ScriptToReimport = Cast<UUAVGScriptText>(Obj);
+	if (ScriptToReimport && ensure(NewReimportPaths.Num() == 1))
+	{
+		ScriptToReimport->SourceFilename = NewReimportPaths[0];
+	}
+}
+
+EReimportResult::Type UUAVGScriptTextFactory::Reimport(UObject* Obj)
+{
+	UUAVGScriptText* ScriptToReimport = Cast<UUAVGScriptText>(Obj);
+
+	if (!ScriptToReimport)
+	{
+		return EReimportResult::Failed;
+	}
+
+	if (ScriptToReimport->SourceFilename.IsEmpty() || !FPaths::FileExists(ScriptToReimport->SourceFilename))
+	{
+		return EReimportResult::Failed;
+	}
+
+	bool OutCanceled = false;
+	if (ImportObject(ScriptToReimport->GetClass(), ScriptToReimport->GetOuter(), *ScriptToReimport->GetName(), RF_Public | RF_Standalone, ScriptToReimport->SourceFilename, nullptr, OutCanceled))
+	{
+		return EReimportResult::Succeeded;
+	}
+
+	return OutCanceled ? EReimportResult::Cancelled : EReimportResult::Failed;
+}
+
+int32 UUAVGScriptTextFactory::GetPriority() const
+{
+	return ImportPriority;
 }
 
 #undef LOCTEXT_NAMESPACE
