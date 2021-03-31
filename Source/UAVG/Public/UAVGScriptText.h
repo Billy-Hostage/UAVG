@@ -28,5 +28,8 @@ public:
 #ifdef WITH_EDITOR
 public:
 	void EditorSetupScriptText(const FString& ScriptString, const FString& FilePath);
+
+	TArray<class UStringTable*> GetStringTableToSearch() const;
+	void OnReimported(const TArray<class UStringTable*>& OldStringTableToSearch);
 #endif
 };

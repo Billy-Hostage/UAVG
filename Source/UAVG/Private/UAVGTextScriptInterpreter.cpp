@@ -27,12 +27,27 @@ void UUAVGTextScriptInterpreter::WarpUAVGSaveGame(UUAVGSaveGame* InSave)
 	InSave->UsingScriptTextAsset = ScriptTextAsset;
 	InSave->LastTextLinePointer = LastCompleteLinePointer;
 	InSave->TextDisplayTime = TextDisplayTimeLine;
+	InSave->TextDisplayTimeCharacter = TextDisplayTimeCharacter;
+	InSave->bUseLineMode = bUseLineMode;
+	InSave->BreakTime = BreakTime;
 }
-void UUAVGTextScriptInterpreter::UnWarpUAVGSaveGame(UUAVGSaveGame* InSave)
+bool UUAVGTextScriptInterpreter::UnWarpUAVGSaveGame(UUAVGSaveGame* InSave)
 {
 	SetupInterpreter(InSave->UsingScriptTextAsset);
 	TextLinePointer = InSave->LastTextLinePointer;
 	TextDisplayTimeLine = InSave->TextDisplayTime;
+
+	TextDisplayTimeCharacter = InSave->TextDisplayTimeCharacter;
+	bUseLineMode = InSave->bUseLineMode;
+	BreakTime = InSave->BreakTime;
+
+	if (IsEventLine())
+	{
+		LastCompleteLinePointer = TextLinePointer;
+		TextLinePointer++;
+		return false;
+	}
+	return true;
 }
 
 void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& Response)
@@ -81,6 +96,15 @@ bool UUAVGTextScriptInterpreter::IsScriptTextCompleted() const
 {
 	//Invalid means we have completed the script.
 	return !CachedScriptLines.IsValidIndex(TextLinePointer);
+}
+
+bool UUAVGTextScriptInterpreter::IsEventLine() const
+{
+	if (!IsScriptTextCompleted())
+	{
+		return CachedScriptLines[TextLinePointer][0] == '@';
+	}
+	return false;
 }
 
 void UUAVGTextScriptInterpreter::SkipToNextLine(FUAVGScriptRuntimeNodeArriveResponse& Response)

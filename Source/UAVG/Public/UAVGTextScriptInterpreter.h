@@ -25,9 +25,11 @@ public:
 
 	bool IsScriptTextCompleted() const;
 
+	bool IsEventLine() const;
+
 	void WarpUAVGSaveGame(class UUAVGSaveGame* InSave);
 
-	void UnWarpUAVGSaveGame(class UUAVGSaveGame* InSave);
+	bool UnWarpUAVGSaveGame(class UUAVGSaveGame* InSave);
 protected:
 	UPROPERTY()
 	class UUAVGScriptText* ScriptTextAsset = nullptr;
@@ -37,6 +39,7 @@ protected:
 
 	UPROPERTY()
 	uint32 TextLinePointer = 0;
+	
 	UPROPERTY()
 	uint32 LastCompleteLinePointer = 0;
 

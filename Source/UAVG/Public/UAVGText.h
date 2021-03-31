@@ -75,7 +75,11 @@ private:
 	void AddNormalCharacterToken(TCHAR Char);
 
 	void AddBreakDelayToken(int32 TimeMs);
+
+	void AddLineBreakToken();
 	
 	UPROPERTY(Transient)
 	TArray<FUAVGTextToken> CachedTokenList;
+
+	static const TCHAR NewLineCharacter;
 };

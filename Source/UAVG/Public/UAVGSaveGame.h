@@ -55,4 +55,10 @@ public:
 	uint32 LastTextLinePointer = 0;
 	UPROPERTY()
 	int32 TextDisplayTime = 250;
+	UPROPERTY()
+	int32 TextDisplayTimeCharacter = 100;
+	UPROPERTY()
+	bool bUseLineMode = false;
+	UPROPERTY()
+	int32 BreakTime = 500;
 };

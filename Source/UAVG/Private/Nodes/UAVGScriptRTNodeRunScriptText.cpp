@@ -57,6 +57,5 @@ bool UUAVGScriptRuntimeNodeRunScriptText::UnWarpUAVGSaveGame(UUAVGComponent* InC
 
 	UUAVGTextScriptInterpreter* MyInterpreter = NewObject<UUAVGTextScriptInterpreter>();
 	Interpreters.Add(InComponent, MyInterpreter);
-	MyInterpreter->UnWarpUAVGSaveGame(InSave);
-	return true;
+	return MyInterpreter->UnWarpUAVGSaveGame(InSave);
 }

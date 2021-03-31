@@ -23,6 +23,8 @@ FUAVGTextToken::FUAVGTextToken(int32 Break)
 	Type = EUAVGTextTokenType::TT_Delay;
 }
 
+const TCHAR FUAVGText::NewLineCharacter = '\n';
+
 FUAVGText::FUAVGText()
 {
 }
@@ -75,7 +77,7 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize()
 		switch (CharToInspect)
 		{
 			case '\\':
-				if (LocalizedStringToTokenize[ProcessedIndex + 1] == '\\')
+				if (ProcessedIndex + 1 >= StringLength || LocalizedStringToTokenize[ProcessedIndex + 1] == '\\')
 				{
 					AddNormalCharacterToken('\\');
 					ProcessedIndex += 2;
@@ -83,6 +85,11 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize()
 				else if (LocalizedStringToTokenize[ProcessedIndex + 1] == 'b')
 				{
 					AddBreakDelayToken(BreakDelayTimeInMs);
+					ProcessedIndex += 2;
+				}
+				else if (LocalizedStringToTokenize[ProcessedIndex + 1] == 'n')
+				{
+					AddLineBreakToken();
 					ProcessedIndex += 2;
 				}
 				else
@@ -109,4 +116,9 @@ void FUAVGText::AddNormalCharacterToken(TCHAR Char)
 void FUAVGText::AddBreakDelayToken(int32 TimeMs)
 {
 	CachedTokenList.Add(FUAVGTextToken(TimeMs));
+}
+
+void FUAVGText::AddLineBreakToken()
+{
+	CachedTokenList.Add(FUAVGTextToken(FString::Chr(NewLineCharacter), 0));
 }

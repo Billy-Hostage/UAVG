@@ -63,4 +63,14 @@ void UUAVGScriptText::EditorSetupScriptText(const FString& ScriptString, const F
 
 	SourceFilename = FilePath;
 }
+
+TArray<UStringTable*> UUAVGScriptText::GetStringTableToSearch() const
+{
+	return StringTableToSearch;
+}
+
+void UUAVGScriptText::OnReimported(const TArray<UStringTable*>& OldStringTableToSearch)
+{
+	StringTableToSearch = OldStringTableToSearch;
+}
 #endif

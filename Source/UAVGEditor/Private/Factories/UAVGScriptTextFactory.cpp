@@ -61,7 +61,7 @@ void UUAVGScriptTextFactory::SetReimportPaths(UObject* Obj, const TArray<FString
 EReimportResult::Type UUAVGScriptTextFactory::Reimport(UObject* Obj)
 {
 	UUAVGScriptText* ScriptToReimport = Cast<UUAVGScriptText>(Obj);
-
+	const auto OldStringTable = ScriptToReimport->GetStringTableToSearch();
 	if (!ScriptToReimport)
 	{
 		return EReimportResult::Failed;
@@ -73,8 +73,10 @@ EReimportResult::Type UUAVGScriptTextFactory::Reimport(UObject* Obj)
 	}
 
 	bool OutCanceled = false;
-	if (ImportObject(ScriptToReimport->GetClass(), ScriptToReimport->GetOuter(), *ScriptToReimport->GetName(), RF_Public | RF_Standalone, ScriptToReimport->SourceFilename, nullptr, OutCanceled))
+	UObject* NewObject = ImportObject(ScriptToReimport->GetClass(), ScriptToReimport->GetOuter(), *ScriptToReimport->GetName(), RF_Public | RF_Standalone, ScriptToReimport->SourceFilename, nullptr, OutCanceled);
+	if (NewObject)
 	{
+		Cast<UUAVGScriptText>(NewObject)->OnReimported(OldStringTable);
 		return EReimportResult::Succeeded;
 	}
 
