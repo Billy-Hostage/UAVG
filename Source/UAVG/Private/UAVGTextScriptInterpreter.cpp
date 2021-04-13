@@ -54,8 +54,8 @@ void UUAVGTextScriptInterpreter::OnArrive(FUAVGScriptRuntimeNodeArriveResponse& 
 {
 	if (IsScriptTextCompleted())
 	{
-		//This should never happen!
-		Response.NodeType = EUAVGRuntimeNodeType::URNT_MAX;
+		// file is empty?
+		Response.NodeType = EUAVGRuntimeNodeType::URNT_NULL;
 		return;
 	}
 	

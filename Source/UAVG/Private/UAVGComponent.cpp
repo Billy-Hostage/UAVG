@@ -404,7 +404,7 @@ void UUAVGComponent::ProcessNode(FUAVGComponentNextResponse& OutResponse)
 		break;
 	case EUAVGRuntimeNodeType::URNT_NULL://Empty Node
 		UE_LOG(LogUAVGRuntimeComponent, Verbose, TEXT("Reach Empty node %s."), *(CurrentNode->GetName()));
-		CurrentState = EUAVGRuntimeState::URS_ReadyForNext;//Skip this node.
+		NextNode(OutResponse);
 		break;
 	case EUAVGRuntimeNodeType::URNT_MAX://Fatal Error
 	default:
