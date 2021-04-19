@@ -70,7 +70,7 @@ protected:
 	///Properties Here
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta = (DisplayName = "Script Name", ToolTip = "This might not be unique"))
-	FName ScriptName = "UAVGScirpt";
+	FName ScriptName = "UAVGScript";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Fallback Character Display Delay (ms)"))
 	uint8 CharacterDisplayDelayInMs = 50;
@@ -78,6 +78,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Script Completed Behaviour", ToolTip = "What to do when this script has completed"))
 	EUAVGScriptCompleteBehaviour OnScriptCompleted = EUAVGScriptCompleteBehaviour::USCB_Nothing;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (DisplayName = "Script To Jump",  ToolTip = "The script to jump to if you set OnScriptCompleted to Jump to Another Script"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (EditCondition = "OnScriptCompleted == EUAVGScriptCompleteBehaviour::USCB_JumpToScriptReset", DisplayName = "Script To Jump",  ToolTip = "The script to jump to if you set OnScriptCompleted to Jump to Another Script"))
 	class UUAVGScript* ScriptToJump = nullptr;
 };
