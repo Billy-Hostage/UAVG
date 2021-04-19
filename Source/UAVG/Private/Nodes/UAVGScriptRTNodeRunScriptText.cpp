@@ -34,7 +34,11 @@ UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNodeRunScriptText::GetNextNode(class U
 {
 	UUAVGTextScriptInterpreter* MyInterpreter = Interpreters.FindRef(InComponent);
 	if (MyInterpreter == nullptr || MyInterpreter->IsScriptTextCompleted())
+	{
+		// remove completed interpreter
+		Interpreters.Remove(InComponent);
 		return Super::GetNextNode(InComponent);
+	}
 
 	return this;
 }

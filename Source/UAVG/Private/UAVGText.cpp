@@ -110,6 +110,7 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize()
 
 void FUAVGText::AddNormalCharacterToken(TCHAR Char)
 {
+	//@TODO maybe filter out punctuations
 	CachedTokenList.Add(FUAVGTextToken(FString::Chr(Char), GetCharacterDisplayDelayInMs()));
 }
 
