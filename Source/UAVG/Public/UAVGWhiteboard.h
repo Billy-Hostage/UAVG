@@ -20,6 +20,12 @@ public:
 	void SetStringVariable(const FString& Key, const FString& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Whiteboard")
+	FString GetRawVariableByKey(const FString& Key, bool bInitIfNotFound = false, const FString& InitValue = "");
+
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Whiteboard")
+	bool ContainsVariable(const FString& Key) const;
+	
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Whiteboard")
 	FString GetRawVariableConstRef(const FString& Key) const;
 
 	// This is used for a custom save/load system
