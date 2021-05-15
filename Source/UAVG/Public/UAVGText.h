@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "UAVGText.generated.h"
 
+class UUAVGWhiteboard;
+
 enum class EUAVGTextTokenType
 {
 	TT_Nul,
@@ -61,11 +63,11 @@ public:
 	
 	int32 GetTextLen();
 
-	const TArray<FUAVGTextToken>& GetTokenizedList();
+	const TArray<FUAVGTextToken>& GetTokenizedList(UUAVGWhiteboard* Whiteboard = nullptr);
 
 	void ClearTokenCache();
 protected:
-	const TArray<FUAVGTextToken>& Tokenize();
+	const TArray<FUAVGTextToken>& Tokenize(UUAVGWhiteboard* Whiteboard = nullptr);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (DisplayName = "Character Display Time (ms)", ShortTooltip = "ms", Tooltip = "The time it takes to display a character in text. \n A negative number here will make runtime to use default value"))
 	int32 CharacterDisplayTimeInMs = -1;
@@ -82,4 +84,6 @@ private:
 	TArray<FUAVGTextToken> CachedTokenList;
 
 	static const TCHAR NewLineCharacter;
+
+	UUAVGWhiteboard* LastUsedWhiteboard = nullptr;
 };

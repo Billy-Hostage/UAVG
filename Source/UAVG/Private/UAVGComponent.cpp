@@ -479,7 +479,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 	{
 		if (SpeakComplete[i]) continue;
 		if (DisplayingNums[i] < 0) continue;
-		const auto& Tokens = DesiredText[i].GetTokenizedList();
+		const auto& Tokens = DesiredText[i].GetTokenizedList(GetWhiteboardObject());
 
 		int32 TimeNeeded = 0;
 		int32 TokenProgress = 0;
@@ -509,7 +509,7 @@ void UUAVGComponent::Speak(float DeltaTime)
 FText UUAVGComponent::BuildTextByNum(FUAVGText& InText, uint8 InNum)
 {
 	FString MyString = "";
-	const auto& Tokens = InText.GetTokenizedList();
+	const auto& Tokens = InText.GetTokenizedList(GetWhiteboardObject());
 	InNum = InNum > Tokens.Num() ? Tokens.Num() : InNum;
 
 	for (int32 i = 0; i < InNum; ++i)
