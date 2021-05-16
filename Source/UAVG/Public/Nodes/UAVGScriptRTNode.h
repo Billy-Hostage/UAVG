@@ -79,6 +79,8 @@ public:
 
 	virtual void OnLeave(class UUAVGComponent* InComponent){}
 
+	virtual void OnCurrentNodeReset(class UUAVGComponent* InComponent){}
+	
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr);
 
 	virtual void WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave){}

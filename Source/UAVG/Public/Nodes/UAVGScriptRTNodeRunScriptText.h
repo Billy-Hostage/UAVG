@@ -18,6 +18,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	class UUAVGScriptText* ScriptTextAsset;
 
+	virtual void OnCurrentNodeReset(UUAVGComponent* InComponent) override;
+	
 	virtual UUAVGScriptRuntimeNode* GetNextNode(class UUAVGComponent* InComponent = nullptr) override;
 
 	void WarpUAVGSaveGame(class UUAVGComponent* InComponent, class UUAVGSaveGame* InSave) override;

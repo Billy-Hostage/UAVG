@@ -155,6 +155,9 @@ void UUAVGComponent::Reset()
 		return;//Stop here
 	}
 
+	if (CurrentNode)
+		CurrentNode->OnCurrentNodeReset(this);
+	
 	CurrentNode = nullptr;
 	LastNode = nullptr;
 	UIInterface = nullptr;
@@ -545,7 +548,7 @@ void UUAVGComponent::CompleteScript()
 			UUAVGScript* NextScript = MyScript->GetConstRootNode()->ScriptToJump;
 			UObject* UII = UIInterface;
 			AActor* AII = ActorInterface;
-			Reset();//Protect Whiteboard datas here in the future
+			Reset();//Protect Whiteboard data here in the future
 			ChangeScript(NextScript);
 			InitializeNew(UII, AII, true);
 		}

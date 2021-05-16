@@ -30,6 +30,12 @@ FUAVGScriptRuntimeNodeArriveResponse UUAVGScriptRuntimeNodeRunScriptText::OnArri
 	return Response;
 }
 
+void UUAVGScriptRuntimeNodeRunScriptText::OnCurrentNodeReset(UUAVGComponent* InComponent)
+{
+	if (Interpreters.Contains(InComponent))
+		Interpreters.Remove(InComponent);
+}
+
 UUAVGScriptRuntimeNode* UUAVGScriptRuntimeNodeRunScriptText::GetNextNode(class UUAVGComponent* InComponent)
 {
 	UUAVGTextScriptInterpreter* MyInterpreter = Interpreters.FindRef(InComponent);

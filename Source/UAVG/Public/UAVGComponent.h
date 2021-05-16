@@ -161,7 +161,6 @@ private:
 	void OnReachSetWhiteboardVariableNode(FUAVGComponentNextResponse& OutResponse);
 
 	void UpdateDesiredText(TArray<FUAVGText> NewText);
-	void UpdateDisplayNum(int32 Index);
 
 	FText BuildTextByNum(FUAVGText& InText, uint8 InNum);
 
