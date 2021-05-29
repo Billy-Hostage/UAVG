@@ -144,7 +144,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 	return false;
 }
 
-void UUAVGComponent::Reset()
+void UUAVGComponent::Reset(bool ResetEnvironmentDescriptor)
 {
 	switch (GetUAVGState())
 	{
@@ -169,7 +169,10 @@ void UUAVGComponent::Reset()
 	ScriptStack.Empty();
 	CurrentNodeStack.Empty();
 	LastNodeStack.Empty();
-	EnvironmentDescriptor.Empty();
+	
+	if (ResetEnvironmentDescriptor)
+		EnvironmentDescriptor.Empty();
+	
 	CurrentState = EUAVGRuntimeState::URS_NotInitialized;
 }
 

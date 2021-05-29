@@ -71,7 +71,7 @@ public:
 	bool InitializeFromSave(UObject* UIObject, AActor* ParentActor, class UUAVGSaveGame* SaveData);
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG")
-	void Reset();
+	void Reset(bool ResetEnvironmentDescriptor = true);
 
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Save")
 	class UUAVGSaveGame* Save(class UUAVGSaveGame* SaveObj);
