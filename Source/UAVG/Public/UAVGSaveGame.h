@@ -9,7 +9,7 @@
 #include "UAVGSaveGame.generated.h"
 
 UCLASS(BlueprintType)
-class UUAVGSaveGame : public USaveGame
+class UAVG_API UUAVGSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 public:

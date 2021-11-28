@@ -12,7 +12,8 @@ FUAVGTextToken::FUAVGTextToken()
 
 FUAVGTextToken::FUAVGTextToken(FString Character, int32 TypewriterDelay)
 {
-	check(Character.Len() == 1);
+	// This is actually possible with html markers implemented
+	//check(Character.Len() == 1);
 	this->Character = Character;
 	this->TypewriterDelay = TypewriterDelay;
 	Type = EUAVGTextTokenType::TT_Normal;
@@ -72,6 +73,7 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize(UUAVGWhiteboard* Whiteboard)
 	const FString& LocalizedStringToTokenize = TextLine.ToString();
 	const int32 StringLength = LocalizedStringToTokenize.Len();
 	CachedTokenList.Empty();
+	ApplyingRichMarkerStack.Empty();
 	
 	int32 ProcessedIndex = 0;
 	while (ProcessedIndex < StringLength)
@@ -83,6 +85,11 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize(UUAVGWhiteboard* Whiteboard)
 				if (ProcessedIndex + 1 >= StringLength || LocalizedStringToTokenize[ProcessedIndex + 1] == '\\')
 				{
 					AddNormalCharacterToken('\\');
+					ProcessedIndex += 2;
+				}
+				else if (ProcessedIndex + 1 >= StringLength || LocalizedStringToTokenize[ProcessedIndex + 1] == '<')
+				{
+					AddNormalCharacterToken('<');
 					ProcessedIndex += 2;
 				}
 				else if (LocalizedStringToTokenize[ProcessedIndex + 1] == 'b')
@@ -147,6 +154,47 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize(UUAVGWhiteboard* Whiteboard)
 					break;
 				}
 				break;
+			case '<':
+				{
+					FString RichMarkerName = "";
+					int32 MarkerScannedCount = 1; // count-in '<'
+					bool bFoundEndBracket = false;
+
+					for (; ProcessedIndex + MarkerScannedCount < StringLength;)
+					{
+						if (LocalizedStringToTokenize[ProcessedIndex + MarkerScannedCount] == '>')
+						{
+							// found end bracket, stop scanning
+							bFoundEndBracket = true;
+							MarkerScannedCount++;
+							break;
+						}
+						RichMarkerName.AppendChar(LocalizedStringToTokenize[ProcessedIndex + MarkerScannedCount]);
+						MarkerScannedCount++;
+					}
+
+					if (!bFoundEndBracket)
+					{
+						// illegal marker. early break
+						UE_LOG(LogTemp, Error, TEXT("Incomplete HTML Marker in %s at %d"), *LocalizedStringToTokenize, ProcessedIndex);
+						AddNormalCharacterToken('<');
+						ProcessedIndex++; // jump over '<', ignore MarkerScannedCount
+						break;
+					}
+
+					if (RichMarkerName == "/")
+					{
+						// this is a end marker, pop a current stack
+						ApplyingRichMarkerStack.Pop();
+					}
+					else
+					{
+						ApplyingRichMarkerStack.Push(RichMarkerName);
+						
+					}
+					ProcessedIndex += MarkerScannedCount;
+				}
+				break;
 			default:
 				AddNormalCharacterToken(CharToInspect);
 				ProcessedIndex++;
@@ -159,8 +207,12 @@ const TArray<FUAVGTextToken>& FUAVGText::Tokenize(UUAVGWhiteboard* Whiteboard)
 
 void FUAVGText::AddNormalCharacterToken(TCHAR Char)
 {
-	//@TODO maybe filter out punctuations
-	CachedTokenList.Add(FUAVGTextToken(FString::Chr(Char), GetCharacterDisplayDelayInMs()));
+	FString FormationString = FString::Chr(Char);
+	for (const auto& Marker : ApplyingRichMarkerStack)
+	{
+		FormationString = FString::Printf(TEXT("<%s>%s</>"), *Marker, *FormationString);
+	}
+	CachedTokenList.Add(FUAVGTextToken(FormationString, GetCharacterDisplayDelayInMs()));
 }
 
 void FUAVGText::AddBreakDelayToken(int32 TimeMs)

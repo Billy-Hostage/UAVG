@@ -83,6 +83,9 @@ private:
 	UPROPERTY(Transient)
 	TArray<FUAVGTextToken> CachedTokenList;
 
+	UPROPERTY(Transient)
+	TArray<FString> ApplyingRichMarkerStack;
+
 	static const TCHAR NewLineCharacter;
 
 	UUAVGWhiteboard* LastUsedWhiteboard = nullptr;

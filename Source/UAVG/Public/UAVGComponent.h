@@ -80,6 +80,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	FUAVGComponentNextResponse Next();
 
+	//Useful when loading from savefile
+	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
+	void TrySkipToSpeakEnds();
+
 	//This should be called when a custom event is handled by user
 	UFUNCTION(BlueprintCallable, Category = "UAVG|Command")
 	void EventHandled();
@@ -123,6 +127,12 @@ protected:
 	TArray<class UUAVGScriptRuntimeNode*> LastNodeStack;
 public:
 	///Getters
+
+	UFUNCTION(BlueprintPure, Category = "UAVG|State")
+	bool IsFacingSelection() const;
+	UFUNCTION(BlueprintPure, Category = "UAVG|State")
+	bool IsWaitingEvent() const;
+
 	UFUNCTION(BlueprintPure, Category = "UAVG|State")
 	EUAVGRuntimeState GetUAVGState() const
 	{

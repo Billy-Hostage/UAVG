@@ -94,7 +94,7 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 		UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Invalid SaveData"));
 		return false;
 	}
-	if (SaveData->MyScript != MyScript)
+	/*if (SaveData->MyScript != MyScript)
 	{
 		bool bIsIncompatible = true;
 
@@ -112,7 +112,8 @@ bool UUAVGComponent::InitializeFromSave(UObject* UIObject, AActor* ParentActor, 
 			UE_LOG(LogUAVGRuntimeComponent, Error, TEXT("Possible Incompatible SaveData"));
 			return false;
 		}
-	}
+	}*/
+	MyScript = SaveData->MyScript; // checks above are actually useless and creates tons of confusion
 
 	if (MyScript == nullptr)
 	{
@@ -264,6 +265,12 @@ bool UUAVGComponent::CanNext() const
 		return bCanPerformSkip;
 	}
 	return false;
+}
+
+void UUAVGComponent::TrySkipToSpeakEnds()
+{
+	if (GetUAVGState() == EUAVGRuntimeState::URS_Speaking)
+		SpeakDurationInMs += 99999;
 }
 
 UUAVGScript* UUAVGComponent::GetCurrentScript() const
@@ -761,6 +768,15 @@ void UUAVGComponent::ChangeEnvironmentDescriptor(int32 IndexToChange)
 		IUAVGActorInterface::Execute_OnEnvironmentDescriptorChanged(ActorInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
 		IUAVGUIInterface::Execute_OnEnvironmentDescriptorChanged(UIInterface, OldDescriptor, EnvironmentDescriptor[IndexToChange], EnvironmentDescriptor);
 	}
+}
+
+bool UUAVGComponent::IsFacingSelection() const
+{
+	return GetUAVGState() == EUAVGRuntimeState::URS_WaitingForSelection;
+}
+bool UUAVGComponent::IsWaitingEvent() const
+{
+	return GetUAVGState() == EUAVGRuntimeState::URS_WaitingForEvent;
 }
 
 #undef CHARACTER_DISPLAY_DELAY_MS_FINAL_FALLBACK
