@@ -2,7 +2,7 @@
 
 An Unreal Engine 4 Plugin designed to create AVG Games in a friendly way
 
-**Partially Tested in UE Version: 4.25.4**
+**Tested under UE Version: 4.25**
 
 ---
 How to Build&Use:
@@ -17,3 +17,4 @@ Requirements: UE4&Visual Studio C++ Compile Toolchain
  
 Pre-Compiled binaries are not provided yet.
 **This project is not finished! Please use it at your own risk.**
+Currently used in a experimental project.
